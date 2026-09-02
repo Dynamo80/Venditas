@@ -48,3 +48,27 @@ Razorpay link collects £79 by hand perfectly well for the first customers.
 - **Brand colours in the prospect list are unreliable** — only 41 of 244 came
   from a verified source. Outreach is ordered to favour agencies whose logo we
   can fetch, since logos verified 10/10.
+
+## Founder assets that were not known when the plan was made
+
+Discovered from his LinkedIn on 2026-09-02, after the outreach plan was built.
+The plan assumed no audience and no domain expertise, and both were wrong.
+
+| Asset | Why it matters |
+|---|---|
+| **Hustlr** — live product, 50 users in 14 days, **agencies and SDRs** | A warm B2B audience adjacent to recruitment agencies. The single most valuable asset here, and cold email was chosen because it was believed not to exist |
+| **Labs60** — his agency, AI receptionists and video for SaaS teams | An existing commercial relationship base, and a second route to market |
+| Six years building, IIT Bombay special mention, national hackathon top three | Changes what he can credibly claim in outreach |
+
+**Action not yet taken:** work out whether Hustlr's 50 users can be told about
+Venditas. Warm beats cold by an order of magnitude, and this was never in the
+plan because the plan did not know it existed.
+
+## Conflict to resolve before LinkedIn outreach
+
+His public LinkedIn About says he **shut Venditas down** because "the problem
+wasn't real" — while we cold-email UK agencies under that name. Anyone who looks
+up the sender finds the founder disowning the company.
+
+Rewrite ready in `outreach/profile.md`, reclaiming the name rather than deleting
+the line. Needs his decision and his hands: LinkedIn cannot be edited from here.
