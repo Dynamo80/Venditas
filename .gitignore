@@ -5,6 +5,15 @@ out/
 .env.local
 .vercel
 *.log
-outreach/
 outreach/batches/
 outreach/sample-cache.json
+
+# Outreach tooling is tracked; the data it operates on is not.
+# A public repo must never carry the prospect list (a competitor's shortcut),
+# the addresses of people who opted out, or the record of who we mailed.
+outreach/prospects.csv
+outreach/prospects-notes.md
+outreach/batches/
+outreach/sample-cache.json
+outreach/sent.log
+outreach/suppressed.txt
