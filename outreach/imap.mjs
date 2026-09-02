@@ -121,6 +121,23 @@ export class Imap {
     return out;
   }
 
+  /**
+   * The text of a message. Only used on suspected bounces, where the failed
+   * recipient is in the body rather than the headers — fetching bodies for
+   * everything would pull other people's correspondence into memory for no
+   * reason.
+   */
+  async body(seq, maxChars = 4000) {
+    const res = await this.send(`FETCH ${seq} (BODY.PEEK[TEXT]<0.${maxChars}>)`);
+    // Payload follows a {byte-count} marker. Found by string indexing rather
+    // than a regex: this response is full of characters a pattern would have to
+    // escape, and the escaping has already broken this line three times.
+    const brace = res.indexOf('}');
+    if (brace === -1) return res;
+    const nl = res.indexOf('\n', brace);
+    return nl === -1 ? res : res.slice(nl + 1);
+  }
+
   async logout() {
     try { await this.send('LOGOUT'); } catch { /* closing anyway */ }
     this.sock?.destroy();

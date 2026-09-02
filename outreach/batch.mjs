@@ -23,6 +23,7 @@ import { preview } from '../lib/preview.mjs';
 import { extract } from '../lib/extract.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
 import { recentlyContacted, record, COOLING_DAYS } from './contacted.mjs';
+import { scanInbox } from './inbox.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const SAMPLES = path.join(ROOT, 'reference', 'samples');
@@ -188,6 +189,32 @@ async function main() {
   if (!existsSync(csv)) {
     console.error('outreach/prospects.csv not found');
     process.exit(1);
+  }
+
+  // Read the mailbox before doing anything else. Two failures this prevents,
+  // both of which get worse the longer nobody looks:
+  //
+  //   Someone who replied gets chased by the next batch or the follow-up, which
+  //   tells the one interested person that nobody read them.
+  //
+  //   A dead address gets mailed again. Repeat bounces are among the clearest
+  //   signals a provider uses to decide a domain sends rubbish.
+  try {
+    const seen = await scanInbox({ apply: true });
+    if (seen.replies.length || seen.bounces.length) {
+      console.log(`\ninbox: ${seen.replies.length} repl${seen.replies.length === 1 ? 'y' : 'ies'}, ${seen.bounces.length} bounce(s) — applied`);
+      for (const r of seen.replies) console.log(`  REPLIED  ${r.from}  "${r.subject.slice(0, 50)}"`);
+      for (const b of seen.bounces) console.log(`  BOUNCED  ${b.failed || 'unknown'} — suppressed`);
+    } else {
+      console.log('\ninbox: no replies, no bounces');
+    }
+  } catch (e) {
+    // A mailbox we cannot read is a reason to stop, not to guess. Sending into
+    // silence risks chasing someone who already answered.
+    console.error(`
+Cannot read the mailbox: ${e.message}`);
+    console.error('Refusing to send — fix this first, or pass --skip-inbox if you are certain.');
+    if (!flag('skip-inbox')) { closeTransport(); process.exit(1); }
   }
 
   const all = parseCsv(readFileSync(csv, 'utf8'));
