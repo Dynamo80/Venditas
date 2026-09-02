@@ -14,6 +14,30 @@ export async function GET() {
   const checks = {};
 
   checks.hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
+  checks.hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
+
+  // Whether the metering tables and the counter function actually exist. The
+  // env vars being present says nothing about whether the SQL has been run.
+  if (checks.hasSupabase) {
+    try {
+      const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/rpc/bump_usage`, {
+        method: 'POST',
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ p_key: 'healthcheck', p_kind: 'ip' }),
+      });
+      checks.meteringReady = res.ok;
+      if (!res.ok) checks.meteringError = (await res.text()).slice(0, 160);
+    } catch (e) {
+      checks.meteringReady = false;
+      checks.meteringError = String(e?.message || e).slice(0, 160);
+    }
+  } else {
+    checks.meteringReady = false;
+  }
   checks.node = process.version;
   checks.region = process.env.VERCEL_REGION || 'local';
 

@@ -1,5 +1,6 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
+import { check, recordLead, FREE_WITH_EMAIL } from '../../../lib/meter.mjs';
 import mammoth from 'mammoth';
 
 // Extraction takes ten seconds or so, most of it waiting on the model.
@@ -32,6 +33,28 @@ export async function POST(request) {
     // Redaction is opt-out, and only an explicit "no" turns it off.
     redact: form.get('redact') !== 'off',
   };
+
+  const email = (form.get('email') || '').toString().trim().toLowerCase();
+  if (!email) return bad('Enter your work email to run a CV.', 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
+    return bad("That email doesn't look right — mind checking it?", 400);
+  }
+
+  // Metered before anything expensive happens. Extraction spends a finite
+  // quota, so the decision to spend it has to come first.
+  const verdict = await check(request, email);
+  if (!verdict.allow) {
+    const messages = {
+      disposable: 'Please use your work email — throwaway addresses are blocked.',
+      'daily-cap': `That's ${FREE_WITH_EMAIL} CVs today, which is the free limit. It resets tomorrow, or reply to the email we sent you and we'll sort you out properly.`,
+      'ip-cap': "You've hit today's limit from this connection. It resets tomorrow.",
+      'need-email': 'Enter your work email to run a CV.',
+    };
+    return Response.json(
+      { error: messages[verdict.reason] || 'Limit reached.', reason: verdict.reason },
+      { status: verdict.reason === 'disposable' ? 400 : 429 }
+    );
+  }
 
   const logo = form.get('logo');
   if (logo && typeof logo !== 'string' && logo.size > 0 && logo.size < 2 * 1024 * 1024) {
@@ -90,6 +113,10 @@ export async function POST(request) {
       return bad('Could not verify redaction, so nothing was returned.', 500);
     }
   }
+
+  // Recorded only once the document exists. Capturing an address off a request
+  // that then failed would put someone on the list who never got anything.
+  await recordLead(email, brand.name);
 
   const safeName = (brand.redact ? reference : data.name || reference)
     .replace(/[^A-Za-z0-9._-]+/g, '-')

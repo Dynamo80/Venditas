@@ -6,6 +6,7 @@ const ACCEPT = '.pdf,.docx,.txt';
 
 export default function Page() {
   const [file, setFile] = useState(null);
+  const [email, setEmail] = useState('');
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -78,10 +79,24 @@ export default function Page() {
       <form className="panel" onSubmit={submit}>
         <h2>Try it on a real CV</h2>
         <p className="hint">
-          Free, no account. Nothing is stored — the file is processed and discarded.
+          Five free CVs a day. No card, no account to set up — just your work email so we
+          know who you are. The CV itself is processed and discarded, never stored.
         </p>
 
         <div className="grid">
+          <label>
+            <span className="lbl">Work email</span>
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="you@youragency.com"
+              maxLength={254}
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
           <label>
             <span className="lbl">Agency name</span>
             <input type="text" name="agency" placeholder="Meridian Talent Partners" maxLength={80} />
@@ -122,7 +137,7 @@ export default function Page() {
         </div>
 
         <div className="row">
-          <button className="go" type="submit" disabled={!file || busy}>
+          <button className="go" type="submit" disabled={!file || !email.trim() || busy}>
             {busy ? 'Working…' : 'Format this CV'}
           </button>
           <label className="check">
@@ -130,6 +145,11 @@ export default function Page() {
             <span>Keep the candidate's contact details (off by default)</span>
           </label>
         </div>
+
+        <p className="consent">
+          We'll email you about Venditas. One click unsubscribes you, and we won't pass your
+          address to anyone.
+        </p>
 
         {msg && <div className={`msg ${msg.tone}`}>{msg.text}</div>}
       </form>
@@ -161,7 +181,7 @@ export default function Page() {
 
       <footer>
         <p>
-          Venditas · Sector 28, Nerul, Navi Mumbai, India · Uploaded files are processed in memory
+          Venditas · Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India · Uploaded files are processed in memory
           and discarded immediately. Nothing is stored, and no candidate data is retained.
         </p>
       </footer>
