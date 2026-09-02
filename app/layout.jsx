@@ -1,16 +1,10 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Bellwether — AI API reliability index',
+  title: 'Venditas — branded CVs in four seconds',
   description:
-    'Independent, continuously measured latency and availability for OpenAI, Anthropic, Google, Groq, Mistral and Cohere. Free to read, always.',
+    'Drop in a candidate CV, get it back in your agency template with contact details stripped. Built for recruitment agencies.',
   metadataBase: new URL('https://venditas.in'),
-  openGraph: {
-    title: 'Bellwether — AI API reliability index',
-    description:
-      'Independent latency and availability measurements for the major AI provider APIs.',
-    type: 'website',
-  },
 };
 
 export default function RootLayout({ children }) {
@@ -21,7 +15,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap"
         />
       </head>
       <body>{children}</body>

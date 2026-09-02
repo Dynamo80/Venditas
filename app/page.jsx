@@ -1,150 +1,168 @@
-import { getIndex } from '../lib/db.mjs';
-import Flash from './Flash.jsx';
+'use client';
 
-export const revalidate = 60;
+import { useRef, useState } from 'react';
 
-/**
- * Status is derived from availability over the window, not from the single most
- * recent sample. One failed probe is a blip; a pattern is an incident, and
- * calling a blip an outage is the fastest way to lose an audience's trust.
- */
-function classify(s) {
-  if (!s || !s.samples) return { key: 'none', label: 'No data' };
-  if (s.availability < 0.9) return { key: 'down', label: 'Down' };
-  if (s.availability < 0.995 || !s.latestOk) return { key: 'slow', label: 'Degraded' };
-  return { key: 'up', label: 'Operational' };
-}
+const ACCEPT = '.pdf,.docx,.txt';
 
-function Spark({ buckets }) {
-  if (!buckets?.length) return <div className="spark" aria-hidden="true" />;
-  const vals = buckets.filter(Boolean).map((b) => b.ms).filter((n) => Number.isFinite(n));
-  const max = vals.length ? Math.max(...vals) : 1;
+export default function Page() {
+  const [file, setFile] = useState(null);
+  const [over, setOver] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const inputRef = useRef(null);
 
-  return (
-    <div className="spark" role="img" aria-label={`Median response time, last ${buckets.length} hours`}>
-      {buckets.map((b, i) => {
-        if (!b || !Number.isFinite(b.ms)) return <i key={i} className="gap" style={{ height: 2 }} />;
-        const h = Math.max(3, Math.round((b.ms / max) * 30));
-        const bad = b.availability < 0.9;
-        return <i key={i} className={bad ? 'bad' : ''} style={{ height: h }} />;
-      })}
-    </div>
-  );
-}
+  function choose(f) {
+    if (!f) return;
+    setFile(f);
+    setMsg(null);
+  }
 
-function Metric({ value, unit = 'ms' }) {
-  if (!Number.isFinite(value)) return <div className="metric empty num">—</div>;
-  return (
-    <div className="metric num">
-      {value}
-      <span className="unit">{unit}</span>
-    </div>
-  );
-}
+  function onDrop(e) {
+    e.preventDefault();
+    setOver(false);
+    choose(e.dataTransfer.files?.[0]);
+  }
 
-export default async function Page() {
-  const { configured, providers, regions, windowHours } = await getIndex();
-  const hasData = providers.some((p) => p.edge?.samples || p.inference?.samples);
+  async function submit(e) {
+    e.preventDefault();
+    if (!file || busy) return;
+
+    setBusy(true);
+    setMsg({ tone: 'work', text: 'Reading the CV… this takes about ten seconds.' });
+
+    const body = new FormData(e.currentTarget);
+    body.set('cv', file);
+
+    try {
+      const res = await fetch('/api/format', { method: 'POST', body });
+
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({}));
+        setMsg({ tone: 'err', text: error || 'Something went wrong. Nothing was saved.' });
+        return;
+      }
+
+      const blob = await res.blob();
+      const ref = res.headers.get('X-Candidate-Ref') || 'candidate';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${ref}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      setMsg({ tone: 'ok', text: `Done — downloaded as ${ref}.docx. Open it and check the formatting.` });
+    } catch {
+      setMsg({ tone: 'err', text: 'The upload failed. Check your connection and try again.' });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="wrap">
       <header className="masthead">
         <div className="brand">
-          <span className="brand-name">Bellwether</span>
-          <span className="brand-tag">AI API reliability index</span>
+          Venditas <span>for recruitment agencies</span>
         </div>
-        <h1>Independent measurements of the APIs you ship on.</h1>
+        <h1>Candidate CVs in your template, with the contact details stripped.</h1>
         <p className="standfirst">
-          Continuous probes against OpenAI, Anthropic, Google, Groq, Mistral and Cohere.
-          Not their status pages — ours. Free to read, always.
+          Drop in whatever mess the candidate sent. Get back a clean Word document in your
+          branding, ready to send to a client — with the candidate's name, email, phone and
+          LinkedIn removed so nobody goes around you.
         </p>
-        <div className="meta">
-          <span>
-            Window <b>{windowHours}h</b>
-          </span>
-          <span>
-            Measured from <b>{regions.length ? regions.join(', ') : '—'}</b>
-          </span>
-          <span>
-            Updated <b>{new Date().toISOString().replace('T', ' ').slice(0, 16)} UTC</b>
-          </span>
-        </div>
       </header>
 
-      <Flash />
+      <form className="panel" onSubmit={submit}>
+        <h2>Try it on a real CV</h2>
+        <p className="hint">
+          Free, no account. Nothing is stored — the file is processed and discarded.
+        </p>
 
-      {!hasData ? (
-        <div className="empty-state">
-          <h2>Collecting.</h2>
+        <div className="grid">
+          <label>
+            <span className="lbl">Agency name</span>
+            <input type="text" name="agency" placeholder="Meridian Talent Partners" maxLength={80} />
+          </label>
+          <label>
+            <span className="lbl">Contact line for the footer</span>
+            <input type="text" name="contact" placeholder="hello@youragency.com" maxLength={80} />
+          </label>
+          <label>
+            <span className="lbl">Brand colour</span>
+            <input type="color" name="colour" defaultValue="#33418f" />
+          </label>
+          <label>
+            <span className="lbl">Logo (PNG or JPG, optional)</span>
+            <input type="file" name="logo" accept="image/png,image/jpeg" />
+          </label>
+        </div>
+
+        <div
+          className={`drop${over ? ' over' : ''}${file ? ' has-file' : ''}`}
+          onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+          onDragLeave={() => setOver(false)}
+          onDrop={onDrop}
+          onClick={() => inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }}
+        >
+          <strong>{file ? file.name : 'Drop a CV here, or click to choose'}</strong>
+          <span>{file ? `${(file.size / 1024).toFixed(0)} KB — click to swap` : 'PDF or Word, up to 10MB'}</span>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={ACCEPT}
+            hidden
+            onChange={(e) => choose(e.target.files?.[0])}
+          />
+        </div>
+
+        <div className="row">
+          <button className="go" type="submit" disabled={!file || busy}>
+            {busy ? 'Working…' : 'Format this CV'}
+          </button>
+          <label className="check">
+            <input type="checkbox" name="redact" value="off" defaultChecked={false} />
+            <span>Keep the candidate's contact details (off by default)</span>
+          </label>
+        </div>
+
+        {msg && <div className={`msg ${msg.tone}`}>{msg.text}</div>}
+      </form>
+
+      <section className="why">
+        <div>
+          <h3>Contact details gone by default</h3>
           <p>
-            {configured
-              ? 'The probes are running. This page fills in as measurements land — no backfill, no synthetic data, so it stays empty until there is something true to show.'
-              : 'Not yet connected to the measurement store. Once it is, this page fills in from live probes.'}
+            Name, email, phone and LinkedIn are removed and replaced with a reference code. Every
+            document is checked after it's built — if anything would have leaked, you get an error
+            instead of a file.
           </p>
         </div>
-      ) : (
-        <div className="board">
-          <div className="board-head">
-            <div>Provider</div>
-            <div>Status</div>
-            <div>Median response, {windowHours}h</div>
-            <div className="num">p50</div>
-            <div className="num">p95</div>
-          </div>
-
-          {providers.map((p) => {
-            // Real generation latency where we have a key for it; otherwise the
-            // edge measurement, which is honest about being a different thing.
-            const s = p.inference?.samples ? p.inference : p.edge;
-            const st = classify(s);
-            const kind = p.inference?.samples ? 'inference' : 'edge only';
-
-            return (
-              <div className="row" key={p.id}>
-                <div>
-                  <div className="pname">{p.name}</div>
-                  <div className="psub">
-                    {kind}
-                    {s?.samples ? ` · ${s.samples} samples` : ''}
-                  </div>
-                </div>
-                <div>
-                  <span className={`pill ${st.key}`}>{st.label}</span>
-                </div>
-                <Spark buckets={s?.buckets} />
-                <Metric value={s?.p50} />
-                <Metric value={s?.p95} />
-              </div>
-            );
-          })}
+        <div>
+          <h3>Nothing gets rewritten</h3>
+          <p>
+            Your candidate's own wording is preserved exactly. This reformats a CV; it does not
+            invent achievements or embellish bullets you'll have to defend to a client.
+          </p>
         </div>
-      )}
-
-      <section className="cta">
-        <h2>Get told before your users tell you.</h2>
-        <p>
-          The index above is the present tense, and it stays free. What a team needs at 3am is
-          history, an alert, and evidence it can paste into an incident channel — that is the
-          paid part.
-        </p>
-        <form className="form" action="/api/subscribe" method="post">
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="you@company.com"
-            aria-label="Email address"
-          />
-          <button type="submit">Get alerts</button>
-        </form>
-        <p className="note">One email when a provider you watch degrades. Unsubscribe in one click.</p>
+        <div>
+          <h3>Handles the awful ones</h3>
+          <p>
+            Two-column layouts, sidebars, tables, inconsistent dates, scans. The formats that break
+            everything else are the ones this was built against.
+          </p>
+        </div>
       </section>
 
       <footer>
         <p>
-          Bellwether measures publicly documented API endpoints from its own infrastructure. It is
-          not affiliated with any provider listed. Method and known limits are published in full —
-          a measurement you cannot audit is just an assertion.
+          Venditas · Sector 28, Nerul, Navi Mumbai, India · Uploaded files are processed in memory
+          and discarded immediately. Nothing is stored, and no candidate data is retained.
         </p>
       </footer>
     </div>

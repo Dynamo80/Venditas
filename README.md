@@ -1,86 +1,47 @@
-# Bellwether
+# Venditas
 
-Independent reliability probes for AI provider APIs.
+Turns a candidate CV into an agency-branded Word document with the candidate's
+contact details removed.
 
-Every few minutes this measures whether each provider's API is reachable, how
-long the network legs take, and — where a key is available — how long a real
-generation request takes end to end. Samples are appended to Postgres and never
-edited.
+Recruitment agencies do this by hand, dozens of times a week, for one commercial
+reason: if the client can read the candidate's email, the client can hire them
+directly and the agency loses the fee. Everything else about the reformat is
+presentation. That part is the business — so redaction is on by default and the
+result is verified rather than assumed.
 
-The measurements are public. That is deliberate: an independent record is only
-worth something if anyone can check it.
+## How it works
+
+    CV (PDF/DOCX)  ->  text  ->  structured fields  ->  branded .docx
+
+**Text off the page** is deterministic and free: `unpdf` for PDF, `mammoth` for
+Word. A PDF with almost no text layer is a scan, and its pages are sent as
+images instead.
+
+**Fields** come from one model call constrained by a response schema, so the
+result is a typed object rather than prose to parse and hope about. The prompt
+forbids invention: anything the CV does not state comes back null. A blank field
+is correct; a plausible guess is a serious error, because a recruiter will
+forward it to a client as fact. Bullets are copied verbatim — this reformats a
+CV, it does not embellish one.
+
+**Rendering** produces the .docx, then reads it back and asserts that the
+candidate's name, email, phone and links are absent. A leak fails the request:
+returning nothing beats returning a document that costs the agency a placement.
 
 ## Run it
 
-```bash
-node probe/run.mjs --dry
-```
-
-No database, no API keys, no signup. It probes the live providers and prints
-what it found. This is the fastest way to see whether the numbers are real.
-
-For a live sweep that writes to Postgres:
-
-```bash
-cp .env.example .env   # fill in SUPABASE_URL and SUPABASE_SERVICE_KEY
-node probe/run.mjs
-```
-
-## What is measured
-
-**Edge probe** — an unauthenticated request to the provider's API. The question
-is whether the edge is reachable and how fast it answers; a `401` answers that
-perfectly, so auth-rejection codes count as reachable. A `5xx`, a TLS failure or
-a timeout does not. Runs for every provider, needs no key, and costs nothing.
-
-**Inference probe** — a real generation request: fixed prompt, temperature 0,
-fixed output cap, so the series stays comparable across providers and across
-months. Activates per provider only when that provider's key is in the
-environment.
-
-**Official status** — what the provider admits to on its own public status page,
-stored separately from our own measurements. The gap between the two is the most
-interesting thing here.
-
-## How the timings are taken
-
-`fetch` cannot say where the time went, so `probe/timing.mjs` drops to
-`node:https` and hooks the socket lifecycle to separate DNS from TCP from TLS
-from the server actually thinking. Each phase is reported as its own duration,
-not a cumulative offset.
-
-Every probe opens a fresh socket. A connection reused from a keep-alive pool
-would report ~0ms for DNS, TCP and TLS and quietly corrupt the series.
-
-## Known limits
-
-Stated here rather than buried, because a measurement you can't audit is just an
-assertion.
-
-- **Region coverage is thin.** Scheduled sweeps run from one location. A number
-  taken from one place is not a global number.
-- **Sampling is not perfectly even.** GitHub's scheduler runs late under load.
-  Every sample carries its own timestamp, and nothing downstream assumes a fixed
-  interval.
-- **Inference coverage depends on keys.** Providers without a key in the
-  environment get edge probes only — real latency for them is not being
-  measured, and the index says so rather than leaving a blank that looks like
-  a zero.
-- **Model pins matter.** Each inference probe names an exact model version, never
-  a `-latest` alias, because an alias that shifts underneath a benchmark
-  invalidates every prior comparison. When a pinned model is retired, the
-  changeover is recorded rather than backfilled.
+    npm install
+    GEMINI_API_KEY=... npm run dev
 
 ## Layout
 
-```
-probe/timing.mjs      timed HTTPS with per-phase socket instrumentation
-probe/inference.mjs   per-provider generation probes, key-gated
-probe/providers.mjs   offline fallback list, mirrors the SQL seed
-probe/store.mjs       Supabase over plain REST, no SDK
-probe/run.mjs         one sweep
-sql/001_schema.sql    tables, RLS policy, seed rows
-```
+    lib/extract.mjs        document -> typed fields
+    lib/render.mjs         fields -> branded .docx, plus the leak assertion
+    app/api/format/route.js  upload endpoint
+    app/page.jsx           the tool, which is also the landing page
+    reference/             validated Python original, kept for regression checks
 
-No dependencies. It has to run identically in a GitHub Action, an edge function
-and on a laptop.
+`reference/` is not shipped. It is the implementation the extraction prompt was
+developed and proven against, including `samples/make_sample.py`, which builds a
+deliberately awful two-column CV: split email addresses, three date formats, a
+sidebar, and page furniture. Change the prompt, re-run that.
