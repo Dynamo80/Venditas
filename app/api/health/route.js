@@ -16,6 +16,30 @@ export async function GET() {
   checks.hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
   checks.hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
 
+  /**
+   * Shape of a secret, never the secret. Length and "is it plain ASCII" are
+   * enough to catch the failure that actually happens in practice: a value
+   * copied out of a masked field, so it carries the bullet characters the UI
+   * was drawing instead of the value underneath.
+   */
+  const shape = (name) => {
+    const v = process.env[name];
+    if (!v) return { set: false };
+    const badAt = [...v].findIndex((c) => c.charCodeAt(0) > 126 || c.charCodeAt(0) < 32);
+    return {
+      set: true,
+      length: v.length,
+      ascii: badAt === -1,
+      ...(badAt === -1 ? {} : { firstBadIndex: badAt, firstBadCode: v.charCodeAt(badAt) }),
+      trimmedDiffers: v !== v.trim(),
+    };
+  };
+  checks.env = {
+    SUPABASE_URL: shape('SUPABASE_URL'),
+    SUPABASE_SERVICE_KEY: shape('SUPABASE_SERVICE_KEY'),
+    GEMINI_API_KEY: shape('GEMINI_API_KEY'),
+  };
+
   // Whether the metering tables and the counter function actually exist. The
   // env vars being present says nothing about whether the SQL has been run.
   if (checks.hasSupabase) {
