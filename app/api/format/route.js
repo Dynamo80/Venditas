@@ -1,6 +1,7 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
 import { check, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
+import { coverage, COVERAGE_FLOOR } from '../../../lib/coverage.mjs';
 import mammoth from 'mammoth';
 
 // Extraction takes ten seconds or so, most of it waiting on the model.
@@ -98,9 +99,10 @@ export async function POST(request) {
   // the finished document rather than assumed from the code path. A leak fails
   // the request outright — shipping a CV with the candidate's email in it is
   // worse for the agency than shipping nothing.
+  let docText = null;
   if (brand.redact) {
     try {
-      const { value: docText } = await mammoth.extractRawText({ buffer: docx });
+      ({ value: docText } = await mammoth.extractRawText({ buffer: docx }));
       const leaks = redactionLeaks(docText, data);
       if (leaks.length) {
         console.error('redaction leak', leaks);
@@ -112,6 +114,26 @@ export async function POST(request) {
     } catch (e) {
       console.error('redaction check failed:', e?.message || 'unknown');
       return bad('Could not verify redaction, so nothing was returned.', 500);
+    }
+  }
+
+  // Did the whole CV make it through? Healthy documents score 92-97%; a sharp
+  // drop means a section went missing, which is this product's worst failure
+  // and the one that is invisible without measuring it. Logged as a ratio and
+  // a handful of absent words - never the CV's content.
+  let cov = null;
+  if (data._sourceText) {
+    try {
+      if (!docText) ({ value: docText } = await mammoth.extractRawText({ buffer: docx }));
+      cov = coverage(data._sourceText, docText, data);
+      if (cov.ratio < COVERAGE_FLOOR) {
+        console.warn(
+          `low coverage ${(cov.ratio * 100).toFixed(0)}% (${cov.kept}/${cov.total})`,
+          'sample of absent terms:', cov.missing.join(' ')
+        );
+      }
+    } catch (e) {
+      console.error('coverage check failed:', e?.message || 'unknown');
     }
   }
 
@@ -130,6 +152,7 @@ export async function POST(request) {
       'Content-Disposition': `attachment; filename="${safeName}.docx"`,
       'Content-Length': String(docx.length),
       'X-Candidate-Ref': reference,
+      ...(cov ? { 'X-Coverage': cov.ratio.toFixed(2) } : {}),
       'Cache-Control': 'no-store',
     },
   });
