@@ -179,12 +179,6 @@ export default function Page() {
         </div>
       </section>
 
-      <footer>
-        <p>
-          Venditas · Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India · Uploaded files are processed in memory
-          and discarded immediately. Nothing is stored, and no candidate data is retained.
-        </p>
-      </footer>
     </div>
   );
 }

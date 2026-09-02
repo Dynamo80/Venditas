@@ -72,7 +72,7 @@ export async function POST(request) {
     // fault on our side: log it in full, tell them something true and useful,
     // and never hand a stranger the name of an environment variable.
     if (e?.userFacing) return bad(e.message, 422);
-    console.error('extraction failed', e);
+    console.error('extraction failed:', e?.message || 'unknown');
     return bad("We couldn't process that CV. This one is on us — try again shortly.", 500);
   }
 
@@ -89,7 +89,7 @@ export async function POST(request) {
   try {
     docx = await render(data, brand, { reference });
   } catch (e) {
-    console.error('render failed', e);
+    console.error('render failed:', e?.message || 'unknown');
     return bad('Formatting failed after the CV was read. Nothing was saved.', 500);
   }
 
@@ -109,7 +109,7 @@ export async function POST(request) {
         );
       }
     } catch (e) {
-      console.error('redaction check failed', e);
+      console.error('redaction check failed:', e?.message || 'unknown');
       return bad('Could not verify redaction, so nothing was returned.', 500);
     }
   }

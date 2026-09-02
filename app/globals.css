@@ -48,14 +48,14 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-  font-family: Newsreader, Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-weight: 500;
   text-wrap: balance;
   letter-spacing: -0.015em;
@@ -68,7 +68,7 @@ a { color: var(--accent-ink); }
 
 /* --------------------------------------------------------------- masthead */
 .brand {
-  font-family: Newsreader, Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 19px; font-weight: 600; letter-spacing: -0.02em;
 }
 .brand span { color: var(--ink-3); font-weight: 400; }
@@ -158,3 +158,103 @@ footer {
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 .consent { font-size: 12.5px; color: var(--ink-3); margin: 14px 0 0; max-width: 60ch; }
+
+/* ==================================================================== chrome */
+.nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  max-width: 940px; margin: 0 auto; padding: 20px 24px 0; flex-wrap: wrap;
+}
+.nav-brand {
+  font-family: var(--font-display), Georgia, serif; font-size: 19px; font-weight: 600;
+  letter-spacing: -0.02em; color: var(--ink); text-decoration: none;
+}
+.nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.nav-links a { font-size: 14.5px; color: var(--ink-2); text-decoration: none; }
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.nav-cta {
+  color: #fff; background: var(--accent); padding: 7px 15px; border-radius: 7px;
+  font-weight: 600; font-size: 14px;
+}
+.nav-links a.nav-cta:hover { background: var(--accent-ink); color: #fff; }
+
+.site-footer {
+  border-top: 1px solid var(--line); margin-top: 64px; background: var(--surface-2);
+}
+.foot-cols {
+  max-width: 940px; margin: 0 auto; padding: 40px 24px 26px;
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 30px;
+}
+.foot-head {
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 600; margin-bottom: 11px;
+}
+.foot-cols p { margin: 0; font-size: 13.5px; color: var(--ink-2); max-width: 34ch; }
+.foot-cols a {
+  display: block; font-size: 13.5px; color: var(--ink-2);
+  text-decoration: none; margin-bottom: 7px;
+}
+.foot-cols a:hover { color: var(--ink); text-decoration: underline; }
+.foot-legal {
+  max-width: 940px; margin: 0 auto; padding: 16px 24px 34px;
+  border-top: 1px solid var(--line);
+}
+.foot-legal p { margin: 0 0 4px; font-size: 12.5px; color: var(--ink-3); }
+
+/* ================================================================== pricing */
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 20px; margin-top: 30px; }
+.plan {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 26px 26px 28px; box-shadow: var(--shadow); display: flex; flex-direction: column;
+}
+.plan.featured { border-color: var(--accent); border-width: 2px; }
+.plan h2 { font-size: 20px; margin: 0 0 4px; }
+.plan .amount {
+  font-family: var(--font-display), Georgia, serif; font-size: 42px; font-weight: 600;
+  letter-spacing: -0.03em; line-height: 1; margin: 14px 0 2px;
+}
+.plan .per { font-size: 13.5px; color: var(--ink-3); }
+.plan .blurb { font-size: 14.5px; color: var(--ink-2); margin: 12px 0 18px; }
+.plan ul { list-style: none; margin: 0 0 22px; padding: 0; flex: 1; }
+.plan li {
+  font-size: 14.5px; color: var(--ink-2); padding: 6px 0 6px 22px; position: relative;
+}
+.plan li::before {
+  content: "→"; position: absolute; left: 0; color: var(--accent); font-size: 13px;
+}
+.plan .act {
+  display: inline-block; text-align: center; padding: 11px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 15px; text-decoration: none;
+}
+.plan .act.primary { background: var(--accent); color: #fff; }
+.plan .act.primary:hover { background: var(--accent-ink); }
+.plan .act.quiet { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line-2); }
+
+.currency { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+.currency a {
+  font-size: 13px; padding: 5px 12px; border-radius: 99px; text-decoration: none;
+  border: 1px solid var(--line-2); color: var(--ink-2);
+}
+.currency a.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* ================================================================ prose page */
+.prose { max-width: 66ch; }
+.prose h2 { font-size: 22px; margin: 34px 0 8px; }
+.prose h3 { font-size: 17px; margin: 24px 0 6px; }
+.prose p, .prose li { color: var(--ink-2); font-size: 15.5px; }
+.prose ul { padding-left: 20px; }
+.prose li { margin-bottom: 6px; }
+.prose strong { color: var(--ink); }
+.prose .callout {
+  background: var(--accent-soft); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 16px 18px; margin: 22px 0;
+}
+.prose .callout p { margin: 0; color: var(--ink); }
+
+.qa { border-top: 1px solid var(--line); padding: 20px 0; }
+.qa h3 { margin: 0 0 7px; font-size: 17px; }
+.qa p { margin: 0; }
+
+@media (max-width: 780px) {
+  .foot-cols { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .nav { padding: 16px 16px 0; }
+}

@@ -23,10 +23,6 @@ export default async function Unsubscribe({ searchParams }) {
 
   return (
     <div className="wrap" style={{ maxWidth: 620 }}>
-      <div className="brand" style={{ marginBottom: 28 }}>
-        Venditas <span>for recruitment agencies</span>
-      </div>
-
       {state === 'done' && (
         <>
           <h1 style={{ fontSize: 30 }}>Done. You won't hear from us again.</h1>
@@ -63,9 +59,6 @@ export default async function Unsubscribe({ searchParams }) {
         </>
       )}
 
-      <footer style={{ marginTop: 44 }}>
-        <p>Venditas · Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India</p>
-      </footer>
     </div>
   );
 }
