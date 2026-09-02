@@ -6,3 +6,5 @@ out/
 .vercel
 *.log
 outreach/
+outreach/batches/
+outreach/sample-cache.json
