@@ -17,6 +17,7 @@ import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { unsubUrl as signedUnsubUrl, tokenFor } from '../lib/unsub.mjs';
+import { Imap, pickFolder } from './imap.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 
@@ -130,6 +131,50 @@ export function transport(env = loadEnv()) {
   return _transport;
 }
 
+/**
+ * Compose the message without sending, so we hold the exact bytes.
+ *
+ * Needed because the copy filed in Sent must be byte-identical to the copy that
+ * went out. Rebuilding it separately would let the two drift, and a Sent folder
+ * showing something subtly different from what the recipient received is worse
+ * than no Sent folder at all.
+ */
+let _composer = null;
+function composer() {
+  if (!_composer) _composer = nodemailer.createTransport({ streamTransport: true, buffer: true });
+  return _composer;
+}
+
+/**
+ * File a copy in the Sent folder over IMAP.
+ *
+ * Sending is SMTP; Sent is IMAP. A mail client writes this copy itself after
+ * sending, and a script talking SMTP never does — which is why twenty-five
+ * emails went out and the founder's Sent folder stayed empty, leaving him no
+ * way to tell whether anything had happened.
+ *
+ * Best effort on purpose. Failing to file a copy must never fail a send that
+ * has already reached the recipient.
+ */
+async function fileInSent(raw, env) {
+  const host = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^smtpout\./, 'imap.');
+  if (!host || !env.SMTP_USER || !env.SMTP_PASS) return false;
+  const im = new Imap({ host, port: Number(env.IMAP_PORT || 993), user: env.SMTP_USER, pass: env.SMTP_PASS });
+  try {
+    await im.connect();
+    await im.login();
+    const folder = pickFolder(await im.listFolders(), ['Sent', 'Sent Items', 'INBOX.Sent']);
+    if (!folder) return false;
+    await im.append(folder, raw);
+    return true;
+  } catch (e) {
+    console.error('  (could not file a copy in Sent:', e.message + ')');
+    return false;
+  } finally {
+    await im.logout();
+  }
+}
+
 /** Must be called when a run finishes, or the pool holds the process open. */
 export function closeTransport() {
   if (_transport) {
@@ -178,7 +223,17 @@ export async function send(msg, { env = loadEnv(), dry = false } = {}) {
              attachments: (mail.attachments || []).map((a) => a.filename) };
   }
 
-  const info = await transport(env).sendMail(mail);
-  logSent(to, mail.subject, info.messageId);
-  return { sent: true, to, messageId: info.messageId, response: info.response };
+  // Compose once, then send those exact bytes and file those exact bytes.
+  const built = await composer().sendMail(mail);
+  const raw = built.message.toString();
+
+  const info = await transport(env).sendMail({
+    envelope: { from: env.SMTP_USER, to: [to] },
+    raw,
+  });
+
+  logSent(to, mail.subject, info.messageId || built.messageId);
+  const filed = await fileInSent(raw, env);
+
+  return { sent: true, to, messageId: info.messageId || built.messageId, response: info.response, filedInSent: filed };
 }

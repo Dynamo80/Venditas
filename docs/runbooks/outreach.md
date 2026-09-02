@@ -30,6 +30,33 @@ strangers from a domain that cannot be un-burned.
   25 individually-personalised messages is correspondence, not bulk, and sits
   inside both the number and the intent.
 
+## Why the Sent folder looked empty
+
+Sending is SMTP. The Sent folder is IMAP. A mail client writes that copy itself
+after sending; a script talking SMTP never does — so the first batch of 25 went
+out and left an empty Sent folder, which looked exactly like nothing had
+happened.
+
+Every send now files a copy over IMAP, using the same bytes that were
+transmitted rather than a rebuild, so the record cannot drift from what the
+recipient actually received. It is best-effort: failing to file a copy never
+fails a send that already reached its destination.
+
+**The first 25 are not in Sent and cannot be put there retroactively** — their
+raw bytes were not kept. The documents and the manifest for that batch are in
+`outreach/batches/2026-09-02/`.
+
+## Proving a batch actually went
+
+```bash
+node outreach/inbox.mjs
+```
+
+Reads the mailbox for bounces and replies. A delivery failure arrives within
+minutes, so an inbox with no bounces a few hours after a batch is real evidence
+of delivery — better evidence than the relay's acceptance, which only says it
+took responsibility.
+
 ## Guarantees already enforced in code
 
 - Nobody on `outreach/suppressed.txt` is contacted, ever
