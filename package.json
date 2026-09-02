@@ -1,0 +1,23 @@
+{
+  "name": "venditas-bellwether",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent reliability monitoring for AI provider APIs.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "probe": "node probe/run.mjs",
+    "probe:dry": "node probe/run.mjs --dry",
+    "rollup": "node probe/rollup.mjs"
+  },
+  "dependencies": {
+    "next": "^16.3.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  }
+}

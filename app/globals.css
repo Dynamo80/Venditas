@@ -1,0 +1,213 @@
+/* Instrument palette: cool graphite ground, one cyan accent, and green/amber/red
+   reserved strictly for status. On a monitoring page those three hues have to
+   mean up/degraded/down, so they are never spent on decoration. */
+
+:root {
+  --ground: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eaeef2;
+  --ink: #14181d;
+  --ink-2: #454e5a;
+  --ink-3: #6e7885;
+  --line: #dce2e8;
+  --line-2: #c8d1da;
+  --accent: #0e7490;
+  --accent-ink: #0b5a70;
+  --accent-soft: #dceef3;
+  --ok: #15803d;
+  --ok-soft: #dff1e4;
+  --warn: #b45309;
+  --warn-soft: #faecd9;
+  --crit: #b42318;
+  --crit-soft: #fbe4e2;
+  --shadow: 0 1px 2px rgba(20, 24, 29, 0.05), 0 4px 14px rgba(20, 24, 29, 0.045);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0e1216;
+    --surface: #161b21;
+    --surface-2: #1d242b;
+    --ink: #e8edf2;
+    --ink-2: #a6b1bc;
+    --ink-3: #78838f;
+    --line: #28313a;
+    --line-2: #36414c;
+    --accent: #4cc9dd;
+    --accent-ink: #8fe0ee;
+    --accent-soft: #0f323c;
+    --ok: #4cb782;
+    --ok-soft: #12291f;
+    --warn: #d9a441;
+    --warn-soft: #2c2213;
+    --crit: #e8705f;
+    --crit-soft: #2e1917;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: Archivo, "IBM Plex Sans", system-ui, sans-serif; text-wrap: balance; }
+a { color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrap { max-width: 1000px; margin: 0 auto; padding: 52px 24px 88px; }
+
+/* ---------------------------------------------------------------- masthead */
+.masthead { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 30px; }
+.brand { display: flex; align-items: baseline; gap: 11px; flex-wrap: wrap; }
+.brand-name {
+  font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.brand-tag {
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+h1 {
+  font-size: clamp(27px, 4.2vw, 38px); font-weight: 800; letter-spacing: -0.032em;
+  line-height: 1.08; margin: 18px 0 0;
+}
+.standfirst { font-size: 17px; color: var(--ink-2); max-width: 58ch; margin: 14px 0 0; }
+
+/* -------------------------------------------------------------- meta strip */
+.meta {
+  display: flex; gap: 22px; flex-wrap: wrap; margin-top: 20px;
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.meta b { color: var(--ink-2); font-weight: 500; }
+
+/* ------------------------------------------------------------------- table */
+.board {
+  border: 1px solid var(--line); border-radius: 11px; background: var(--surface);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.board-head, .row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.5fr) 92px 1fr 88px 88px;
+  align-items: center; gap: 16px; padding: 13px 20px;
+}
+.board-head {
+  background: var(--surface-2); border-bottom: 1px solid var(--line);
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.row { border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: none; }
+.num { text-align: right; }
+
+.pname { font-weight: 600; letter-spacing: -0.01em; }
+.psub {
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* status pill: shape carries the state as well as colour, so it survives
+   being read by someone who can't distinguish the hues */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 99px; white-space: nowrap;
+}
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 99px; background: currentColor; }
+.pill.up { background: var(--ok-soft); color: var(--ok); }
+.pill.slow { background: var(--warn-soft); color: var(--warn); }
+.pill.down { background: var(--crit-soft); color: var(--crit); }
+.pill.none { background: var(--surface-2); color: var(--ink-3); }
+
+.metric { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; font-size: 14px; }
+.metric .unit { font-size: 10.5px; color: var(--ink-3); margin-left: 2px; }
+.metric.empty { color: var(--ink-3); }
+
+/* --------------------------------------------------------------- sparkline */
+.spark { display: flex; align-items: flex-end; gap: 2px; height: 30px; }
+.spark i {
+  flex: 1; min-width: 2px; border-radius: 1px; background: var(--accent);
+  opacity: 0.75; display: block;
+}
+.spark i.gap { background: var(--line-2); opacity: 0.5; height: 2px !important; }
+.spark i.bad { background: var(--crit); opacity: 0.85; }
+
+/* ------------------------------------------------------------- empty state */
+.empty-state {
+  border: 1px dashed var(--line-2); border-radius: 11px; padding: 40px 28px;
+  text-align: center; color: var(--ink-2); background: var(--surface);
+}
+.empty-state h2 { margin: 0 0 8px; font-size: 18px; }
+.empty-state p { margin: 0 auto; max-width: 46ch; font-size: 14.5px; }
+
+/* ------------------------------------------------------------------ signup */
+.cta {
+  margin-top: 30px; border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 11px; background: var(--surface); padding: 24px 26px; box-shadow: var(--shadow);
+}
+.cta h2 { margin: 0 0 7px; font-size: 19px; letter-spacing: -0.02em; }
+.cta p { margin: 0 0 16px; color: var(--ink-2); font-size: 14.5px; max-width: 56ch; }
+.form { display: flex; gap: 9px; flex-wrap: wrap; }
+.form input {
+  flex: 1 1 240px; padding: 10px 13px; font: inherit; font-size: 14.5px;
+  color: var(--ink); background: var(--ground);
+  border: 1px solid var(--line-2); border-radius: 7px;
+}
+.form input::placeholder { color: var(--ink-3); }
+.form button {
+  padding: 10px 20px; font: inherit; font-size: 14.5px; font-weight: 600;
+  color: var(--ground); background: var(--ink); border: 1px solid var(--ink);
+  border-radius: 7px; cursor: pointer;
+}
+.form button:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: #fff; }
+.note { font-size: 12.5px; color: var(--ink-3); margin: 11px 0 0; }
+
+/* ------------------------------------------------------------------ footer */
+footer {
+  border-top: 1px solid var(--line); margin-top: 46px; padding-top: 20px;
+  font-size: 13px; color: var(--ink-3);
+}
+footer a { color: var(--ink-2); }
+
+@media (max-width: 780px) {
+  .wrap { padding: 34px 16px 64px; }
+  .board-head { display: none; }
+  .row {
+    grid-template-columns: 1fr auto; gap: 8px 14px; padding: 15px 16px;
+    grid-template-areas: "name status" "spark spark" "p50 p95";
+  }
+  .row > :nth-child(1) { grid-area: name; }
+  .row > :nth-child(2) { grid-area: status; justify-self: end; }
+  .row > :nth-child(3) { grid-area: spark; }
+  .row > :nth-child(4) { grid-area: p50; text-align: left; }
+  .row > :nth-child(5) { grid-area: p95; text-align: right; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* --------------------------------------------------------------- flash msg */
+.flash {
+  margin: 0 0 22px; padding: 13px 17px; border-radius: 9px; font-size: 14.5px;
+  border: 1px solid var(--line); border-left: 3px solid currentColor;
+}
+.flash.ok   { background: var(--ok-soft);   color: var(--ok); }
+.flash.warn { background: var(--warn-soft); color: var(--warn); }
+.flash.crit { background: var(--crit-soft); color: var(--crit); }
