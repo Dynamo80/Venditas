@@ -258,3 +258,33 @@ footer {
   .foot-cols { grid-template-columns: 1fr 1fr; gap: 24px; }
   .nav { padding: 16px 16px 0; }
 }
+
+/* ============================================================ legal documents */
+.legal { max-width: 72ch; }
+.legal h2 { font-size: 21px; margin: 36px 0 10px; }
+.legal h3 { font-size: 16.5px; margin: 26px 0 6px; }
+.legal h4 { font-size: 15px; margin: 20px 0 6px; color: var(--ink); }
+.legal p, .legal li { font-size: 15.5px; color: var(--ink-2); }
+.legal li { margin-bottom: 5px; }
+.legal hr { border: none; border-top: 1px solid var(--line); margin: 34px 0; }
+.legal code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px;
+  background: var(--surface-2); padding: 1px 5px; border-radius: 4px;
+}
+.legal blockquote {
+  margin: 22px 0; padding: 14px 18px; border-left: 3px solid var(--accent);
+  background: var(--accent-soft); border-radius: 0 8px 8px 0;
+}
+.legal blockquote p { margin: 0; color: var(--ink); }
+/* Tables in the DPA carry the sub-processor list and must not clip. */
+.legal table {
+  width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;
+  display: block; overflow-x: auto; white-space: nowrap;
+}
+.legal thead th {
+  text-align: left; padding: 9px 13px; background: var(--surface-2);
+  border-bottom: 1px solid var(--line-2); font-size: 12px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+.legal tbody td { padding: 9px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.legal tbody tr:last-child td { border-bottom: none; }

@@ -37,15 +37,18 @@ def build(path=OUT):
     doc = pymupdf.open()
     page = doc.new_page(width=W, height=H)
 
-    def text(x, y, s, size=9, font="helv", color=INK, width=None):
-        if width:
-            rc = page.insert_textbox(
-                pymupdf.Rect(x, y, x + width, y + 500), s,
-                fontsize=size, fontname=font, color=color, align=0,
-            )
-            return y + (500 - rc if rc > 0 else 14)
+    def text(x, y, s, size=9, font="helv", color=INK):
+        """Baseline-anchored single line."""
         page.insert_text((x, y), s, fontsize=size, fontname=font, color=color)
         return y + size + 4
+
+    def flow(x, y, w, s, size=9, font="helv", color=INK):
+        """Top-anchored wrapped block. Returns the y below it."""
+        rc = page.insert_textbox(
+            pymupdf.Rect(x, y, x + w, y + 400), s,
+            fontsize=size, fontname=font, color=color, align=0,
+        )
+        return y + (400 - rc if rc > 0 else size * 1.4)
 
     def hline(y):
         page.draw_line(pymupdf.Point(L, y), pymupdf.Point(R, y),
@@ -63,20 +66,16 @@ def build(path=OUT):
         return y + 15
 
     def row(y, dates, body_lines, pad=5):
-        """Two-cell table row: dates left, content right."""
+        """Two-cell table row: dates left, content right. Cells flow top-down."""
         cx = L + DATE_W + 7
         cw = R - cx - 7
-        yy = y + pad + 8
-        for i, (s, size, font, col) in enumerate(body_lines):
-            if len(s) > 78:
-                yy = text(cx, yy, s, size, font, col, width=cw)
-                yy += 1
-            else:
-                yy = text(cx, yy, s, size, font, col)
-        dy = y + pad + 8
+        yy = y + pad
+        for s, size, font, col in body_lines:
+            yy = flow(cx, yy, cw, s, size, font, col) + 2
+        dy = y + pad
         for d in dates:
-            dy = text(L + 6, dy, d, 8, "helv", MUTED)
-        bottom = max(yy, dy) + pad - 2
+            dy = flow(L + 6, dy, DATE_W - 12, d, 8, "helv", MUTED)
+        bottom = max(yy, dy) + pad
         hline(bottom)
         vline(y, bottom)
         return bottom
@@ -84,18 +83,17 @@ def build(path=OUT):
     # ---- title block (itself a table row) ----------------------------------
     top = 52
     hline(top)
-    y = top + 22
-    text(L + 6, y, "FIONA MARCHETTI-DOYLE  ACMA CGMA", 15, "hebo", INK)
-    y += 14
-    text(L + 6, y, "Financial Controller", 10, "helv", ACCENT)
-    text(L + DATE_W + 7, top + 20, "fiona.marchetti-doyle@example.com", 8.5,
-         "helv", MUTED)
-    text(L + DATE_W + 7, top + 32, "07700 900247", 8.5, "helv", MUTED)
-    text(L + DATE_W + 7, top + 44, "Leeds LS8  |  full UK driving licence", 8.5,
-         "helv", MUTED)
-    y = top + 56
+    text(L + 6, top + 22, "FIONA MARCHETTI-DOYLE", 15, "hebo", INK)
+    text(L + 6, top + 36, "ACMA CGMA  -  Financial Controller", 10, "helv", ACCENT)
+    cx = 330
+    text(cx, top + 18, "fiona.marchetti-doyle@example.com", 8.5, "helv", MUTED)
+    text(cx, top + 30, "07700 900247", 8.5, "helv", MUTED)
+    text(cx, top + 42, "Leeds LS8", 8.5, "helv", MUTED)
+    text(cx, top + 54, "Full UK driving licence", 8.5, "helv", MUTED)
+    y = top + 62
     hline(y)
-    vline(top, y)
+    page.draw_line(pymupdf.Point(cx - 12, top), pymupdf.Point(cx - 12, y),
+                   color=RULE, width=0.6)
 
     # ---- profile -----------------------------------------------------------
     y = band(y, "PROFILE")

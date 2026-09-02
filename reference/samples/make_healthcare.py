@@ -80,6 +80,7 @@ def build(path=OUT):
         return y + size + 4
 
     def heading(y, label):
+        y += 6
         y = text(ML, y, label, 9, "hebo", ACCENT)
         state["page"].draw_line(pymupdf.Point(ML, y - 1),
                                 pymupdf.Point(MR, y - 1), color=ACCENT, width=0.4)
@@ -158,10 +159,7 @@ def build(path=OUT):
     ]:
         y = text(ML + 10, y, "- " + b, 8.5, "helv", INK, width=colw - 10)
         y += 1
-
-    # ======================= page 2 =========================================
-    state["page"] = new_page(2)
-    y = BODY_TOP
+    y += 9
 
     y = text(ML, y, "Brackenhill Day Surgery Unit", 10, "hebo")
     y = text(ML, y - 1, "Staff Nurse (Band 5)", 9, "heit", MUTED)
@@ -181,7 +179,10 @@ def build(path=OUT):
     y += 3
     y = text(ML + 10, y, "- Bank shifts alongside preceptorship; medicines "
              "management and end-of-life care.", 8.5, "helv", INK, width=colw - 10)
-    y += 12
+
+    # ======================= page 2 =========================================
+    state["page"] = new_page(2)
+    y = BODY_TOP
 
     y = heading(y, "EDUCATION AND REGISTRATION")
     for line, sub in [
@@ -205,7 +206,33 @@ def build(path=OUT):
     for c in courses:
         y = text(ML + 10, y, "- " + c, 8.5, "helv", INK)
         y += 1
-    y += 10
+    y += 8
+
+    y = heading(y, "AUDIT, QUALITY AND SERVICE IMPROVEMENT")
+    for line in [
+        "Led the local re-audit of WHO Surgical Safety Checklist compliance "
+        "(two cycles, n=180 cases); documented pause-for-sign-out compliance rose "
+        "from 71% to 96% after the team brief was moved and the checklist was "
+        "read aloud rather than ticked retrospectively.",
+        "Member of the theatre productivity group that reduced average turnaround "
+        "between orthopaedic cases from 31 to 22 minutes.",
+        "Contributed to the trust-wide review of swab count practice following a "
+        "never event elsewhere in the directorate; the resulting two-person count "
+        "standard is still in use.",
+    ]:
+        y = text(ML + 10, y, "- " + line, 8.5, "helv", INK, width=colw - 10)
+        y += 2
+    y += 8
+
+    y = heading(y, "ADDITIONAL INFORMATION")
+    y = text(ML, y,
+             "Available at six weeks' notice. Happy to consider substantive Band 6 "
+             "or Band 7 posts, and open to a rotational post that includes "
+             "anaesthetics. Full clean UK driving licence. DBS enhanced check "
+             "renewed January 2026. Occupational health clearance including "
+             "hepatitis B titre in date. Conversational Yoruba.",
+             8.5, "helv", INK, width=colw)
+    y += 8
 
     y = heading(y, "REFERENCES")
     y = text(ML, y,

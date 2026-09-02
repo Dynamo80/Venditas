@@ -8,19 +8,33 @@
 
 ## 1. Recommendation up front
 
-**Do not launch at £149/$199 flat in the product's current shape. Launch at £79/$99 for the core plan, and hold £149/$199 back until CRM integration ships.**
+**£149/$199 is a defensible price for this job — it is close to the UK market median — but it is not yet a defensible price for *this product*. Launch the core plan at £79/$99 and promote £149/$199 to the core tier once CRM integration ships.**
 
-The single biggest determinant of what you can charge here is not the quality of the output — it is whether the tool is inside the recruiter's CRM. Every credible competitor integrates with Bullhorn, JobAdder, Vincere or Mercury. Venditas does not. Without integration the workflow is *export from CRM → upload to Venditas → download → re-attach*, which is exactly the manual handling the product claims to remove.
+Two things drive that.
+
+**First, the price you can hold is set by CRM integration, not output quality.** Every credible competitor integrates with Bullhorn, JobAdder, Vincere or Mercury. Venditas does not. Without it the workflow is *export from CRM → upload to Venditas → download → re-attach* — exactly the manual handling the product claims to remove. The two vendors priced above £149 both have integrations, brand and public references; you have none of the three yet.
+
+**Second, and more urgently: the current free tier is giving the product away.** Five CVs/day is ~110 CVs/month. HireAra's *paid* £180/month Starter plan allows ~125/month. Almost no 3–15 person agency will ever exceed your free tier, so there is currently no reason for any of them to pay you anything. Fix this before touching the price.
 
 ### Recommended packaging
 
 | Plan | UK | US | Allowance | Notes |
 |---|---|---|---|---|
 | **Trial** | free | free | 10 CVs, 14 days | Email gate, no card. **Replaces the current 5/day free tier.** |
-| **Solo** | £39 +VAT | £49 | 40 CVs/mo | 1 template. For 1–4 person firms and independents. |
+| **Solo** | £29 +VAT | £39 | 40 CVs/mo | 1 template. For 1–4 person firms and independents. |
 | **Agency** ← lead with this | £79 +VAT | £99 | 150 CVs/mo | 3 templates, unlimited users. |
 | **Agency Plus** | £149 +VAT | £199 | 400 CVs/mo | Unlimited templates, priority support. |
 | Overage | £0.45/CV | $0.55/CV | — | Or prompt an upgrade. |
+
+This ladder is deliberately set to undercut the closest UK-priced competitor on **unit price at every tier** while staying below it on absolute monthly cost:
+
+| | Venditas (recommended) | Formatix.AI (verified) |
+|---|---|---|
+| Entry | £29 / 40 CVs = **£0.73/CV** | £20 / 20 CVs = £1.00/CV |
+| Agency | £79 / 150 CVs = **£0.53/CV** | £100 / 120 CVs = £0.83/CV |
+| Top | £149 / 400 CVs = **£0.37/CV** | £200 / 260 CVs = £0.77/CV |
+
+Gross margin is comfortable throughout — inference, but per-CV inference cost should be well under £0.10, so even the £0.37/CV tier holds a wide margin.
 
 - **Flat per agency, not per seat.** Unlimited users on every paid plan.
 - **Allowance pooled over a rolling 12 months, billed monthly.** Copy HireAra, which sells "1,500 candidates/year" rather than a monthly cap ([HireAra pricing](https://www.hireara.ai/pricing)). CV volume in a small agency is bursty; a hard monthly cap creates support tickets and a hard monthly *over*-allowance feels wasteful in quiet months.
@@ -29,7 +43,29 @@ The single biggest determinant of what you can charge here is not the quality of
 
 ### Why not £149/$199 as the entry price
 
-Because there is a near-exact feature match at $79/month. **CVFormatter** offers agency-branded templates, resume anonymisation, Word/PDF/weblink output *and* a native JobAdder integration for $79/mo (100 resumes) or $299/mo (500 resumes), with a free tier of 5 ([CVFormatter pricing](https://www.cvformatter.co/pricing), [JobAdder integration listing](https://jobadder.com/integration/cv-formatter/)). A buyer who searches "CV formatting software" will find it. £149/$199 for a tool with no CRM integration is a harder sell than the same money for one with it.
+Because there are near-exact feature matches at half the price, and a buyer who searches "CV formatting software" will find them in the first page of results.
+
+- **CVFormatter** — agency-branded templates, resume anonymisation, Word/PDF/weblink output *and* a native JobAdder integration, for **$79/mo** (100 resumes) or $299/mo (500), free tier of 5 ([pricing](https://www.cvformatter.co/pricing), [JobAdder listing](https://jobadder.com/integration/cv-formatter/)).
+- **Formatix.AI** — UK-priced, and its tier for your exact buyer is literally called *Agency*: **£100/mo** for 120 credits, free 10-credit start, no card ([pricing](https://formatix.ai/pricing)).
+
+£149/$199 asks a UK agency to pay ~50% more than a competitor's identically-named tier, for a tool with **no CRM integration**, from a vendor they have never heard of. That is three disadvantages stacked on a price premium.
+
+#### Important calibration — £149 is *not* above market, and I should not overstate this
+
+Benchmarking everything to a comparable ~120–150 CVs/month, the UK market actually spans a 4x range:
+
+| Vendor | Monthly | CVs/mo | £/CV | CRM integrations? |
+|---|---|---|---|---|
+| Venditas (recommended) | **£79** | 150 | £0.53 | **None** |
+| Formatix.AI | £100 | 120 | £0.83 | Not stated |
+| HireAra Starter | £180 | ~125 | £1.44 | 9 CRMs |
+| RapidRecruit Starter | £299 | 150 | £1.99 | Not stated |
+
+**The median is around £140.** So £149 sits almost exactly at the market midpoint for the volume — the objection is *not* "the market won't pay £149 for this job." It plainly will.
+
+The objection is narrower and it is about **your** product, not the category: the two vendors charging *above* £149 have either nine CRM integrations and 1,000+ agency customers (HireAra) or an established brand with published customer testimonials (RapidRecruit). Venditas today has neither, plus a free tier that gives away 110 CVs/month.
+
+**So this is a launch-price question, not a market-ceiling question.** £149/$199 is the right *destination*. £79/$99 is the right *starting point*, and the gap between them is closed by shipping CRM integration and accumulating references — not by discounting forever. Price to where you are, then re-tier upward. ([RapidRecruit pricing](https://rapidrecruit.ai/pricing))
 
 ### Reasoning, condensed
 
@@ -68,6 +104,16 @@ Because there is a near-exact feature match at $79/month. **CVFormatter** offers
 
 **But be clear-eyed: these are feature gaps, not moats.** They are the kind of thing a CRM closes in a release or two, and the direction of travel is obvious — Recruit CRM shipped its formatting agent in November 2025 ([Recruit CRM blog](https://recruitcrm.io/blogs/cv-formatting-feature/)).
 
+### One genuinely good piece of news: the CRM upgrade path is expensive
+
+Where the native feature is **tier-gated**, the cost of unlocking it is often higher than the cost of buying a standalone tool — and that is a sales argument you can use directly.
+
+Recruit CRM gates Resume/CV Formatting to **Business plan and above** ([Recruit CRM help](https://help.recruitcrm.io/en/articles/5659171-resume-cv-formatting)). Third-party pricing (GetApp, updated Aug 2026 — **second-hand, Recruit CRM does not render prices on its own page**) lists Pro at **$95/user/mo** and Business at **$135/user/mo** ([GetApp](https://www.getapp.com/hr-employee-management-software/a/recruit-crm/pricing/)).
+
+For a 5-person agency on Pro, upgrading the whole team to Business to get CV formatting costs **+$40/user/mo = +$200/month**. A standalone tool at **$99/month flat with unlimited users is half that** — and does not force an upgrade the other four features of which they did not ask for.
+
+The same logic applies to Zoho Recruit, where formatted resumes require a paid **Staffing** edition ([Zoho docs](https://help.zoho.com/portal/en/kb/recruit/talent-management/formatted-resume/articles/formatted-resume-overview)). **This "cheaper than your CRM upgrade" framing is the single most concrete pricing argument available to you, and it works precisely at $99 and stops working at $199.**
+
 ### The actionable consequence
 
 **Target agencies on Bullhorn, JobAdder and Mercury, and agencies with no CRM at all. Do not sell into Loxo, Zoho Recruit, Vincere or Recruit CRM shops** unless you can demonstrate the Word-template and fidelity gap in a side-by-side. Bullhorn alone is the largest agency CRM by installed base, and it has no native formatting — that is your beachhead.
@@ -89,7 +135,9 @@ Sources: [Recruit CRM help](https://help.recruitcrm.io/en/articles/5659171-resum
 | [**FormaCV**](https://formacv.ai/pricing) | **$0.99/CV** | per CV | unlimited | 30-day trial | No seats, no minimum, no commitment. Anonymisation + audit log standard. |
 | [**Candidately**](https://www.candidately.com/pricing) | **$1.00** | per exported resume | unlimited | none | Unlimited users. Anonymisation included. Client Portal is separate at $99/mo + $49/extra user, **billed annually, no month-to-month**. |
 | [**RemakeCV**](https://www.remakecv.com/pricing) | $25/user/mo | **per seat**, annual | 30 credits/mo | waitlist trial | Auto-anonymisation included. |
-| [**HireAra**](https://www.hireara.ai/pricing) | **£180/mo +VAT** | flat | 1,500 candidates/**year** | none | Starter tier. Unlimited users, 5 templates. Then £450 (5,000/yr), £950 (12,000/yr), Enterprise custom. |
+| [**Formatix.AI**](https://formatix.ai/pricing) | £20 / £50 / **£100** / £200 per mo | flat, GBP | 20 / 55 / **120** / 260 credits | 10 credits, no card | UK-priced. "Agency" tier = £100. Credits never expire; annual = pay 10 get 12. |
+| [**HireAra**](https://www.hireara.ai/pricing) | **£180/mo +VAT** | flat | 1,500 candidates/**year** | none | Starter tier. Unlimited users, 5 templates. Then £450 (5,000/yr), £950 (12,000/yr), Enterprise custom. Nine CRM integrations. |
+| [**RapidRecruit**](https://rapidrecruit.ai/pricing) | £299 / £499 / £999 +VAT | flat, GBP | 150 / 300 / 1,000 credits | none | Extra credits £2 each. Branded layouts; **anonymisation not mentioned**. Premium end of the UK market. |
 | [**Textkernel**](https://www.textkernel.com/pricing/) (inc. Sovren) | from $99/mo | credits | 500–25,000 credits | 500 free credits | **This is a parsing API for developers, not a recruiter-facing formatting tool.** Not a direct competitor. |
 | [**idibu**](https://ww2.idibu.com/pricing) | **£125/mo** | 5 user licences | — | none | 12-month contract. Job multiposting, **not** CV formatting. Included as a spend benchmark. |
 
@@ -103,6 +151,39 @@ Sources: [Recruit CRM help](https://help.recruitcrm.io/en/articles/5659171-resum
 - **CV Partner** — **now rebranded Flowcase**, quote only, and **not a competitor**: it sells to management/IT/engineering consultancies for bids and RFPs, not recruitment agencies. No anonymisation mentioned. ([Flowcase pricing](https://www.flowcase.com/pricing))
 - **Hinterview** — no public pricing. The pricing URL 404s and the main site redirects to a login at `my.hinterview.com`, so the marketing site is effectively gated. It is a video-interviewing / candidate-presentation product, adjacent rather than competing.
 - **Represend** (JobAdder integration) — quote only. Merges branded coversheets and legal conditions with the candidate's resume and tracks views/downloads. **No redaction** — not a competitor on the anonymisation job. ([JobAdder × Represend](https://jobadder.com/integration/represend/))
+
+### 3b-ii. Further entrants — **second-hand, not verified on the vendor's own page**
+
+A competitor-authored roundup ([FormaCV](https://formacv.ai/blog/best-cv-formatting-tools)) names several more tools in this exact niche. **I did not verify these on the vendors' own sites and you should not quote them without doing so** — the source has an obvious interest in how rivals are presented. They matter anyway, because they show the field is broader and cheaper than the verified table above:
+
+| Vendor | Price as reported (unverified) |
+|---|---|
+| **RefineCV** | Free 10 CVs; **$0.40/CV** pay-as-you-go; **Pro $50/mo for 200 CVs** (= $0.25/CV) |
+| **CV-Transformer** | €97.50/mo minimum + €1.95 per additional CV (pricing page renders only a language selector; could not confirm) |
+
+*(RapidRecruit and Formatix.AI were also named in that roundup; I verified both directly and moved them into the table in §3a.)*
+
+**Formatix.AI is worth pulling out separately** ([Formatix pricing](https://formatix.ai/pricing)), and it is the most instructive competitor in this whole document because it is UK-priced in GBP and its tiers are named for exactly your buyer:
+
+| Formatix plan | Price | Credits | £/CV |
+|---|---|---|---|
+| Solo | £20/mo | 20 | £1.00 |
+| Team | £50/mo | 55 | £0.91 |
+| **Agency** | **£100/mo** | **120** | **£0.83** |
+| Enterprise | £200/mo | 260 | £0.77 |
+
+Free tier: 10 credits, no card. Annual: pay 10 months get 12. **Credits do not expire.**
+
+Three things follow directly:
+1. **The market has already named and priced your segment: "Agency" = £100/month.** £149 asks a UK agency to pay ~50% more than a competitor's identically-named tier, for fewer CVs.
+2. **Its free tier is 10 credits, no card** — precisely the trial shape recommended in §6, and a fraction of your current 5/day.
+3. **"Credits do not expire" and "pay 10 months, get 12"** independently confirm the two structural recommendations in §6 (pool the allowance rather than capping monthly; ~17% annual discount).
+
+If RefineCV's numbers are even roughly right, **the floor of this market is ~$0.25/CV**, not $0.99. That does not mean you should match it — racing a pay-as-you-go competitor to the bottom is how you end up as Quibench. It does mean **a flat $199 with no integration has no price-based defence at all**, and every part of your value story has to be non-price.
+
+I tried to verify RefineCV directly and **`refinecv.com` returned HTTP 522 (origin unreachable) on both the homepage and the pricing page** at time of checking. That may be a transient outage, so treat it as unconfirmed rather than as evidence of another shutdown — but it does mean the $0.25/CV figure is doubly unverified.
+
+*(Note: the same roundup still lists Quibench as active with a free Starter tier. Quibench has in fact shut down — see §3d. A useful reminder of how stale these listicles are, and of the churn rate in this niche.)*
 
 ### 3c. Do they sell to small agencies?
 
@@ -148,7 +229,10 @@ Partial. The verified anchors available:
 - **HireAra Starter: £180/mo +VAT**, the top of the small-agency range for this specific job.
 - **Candidately Client Portal: $99/mo for 1 user + $49/additional user, annual only** — so a 5-user agency is ~$295/mo.
 - **Textkernel Professional: from $99/mo.**
-- **Crelate (core CRM): $85/user/mo (Essentials, annual, up to 2 users) and $119/user/mo (Business)** ([Crelate pricing](https://www.crelate.com/pricing)). This is one of the few agency CRMs with fully public per-seat pricing, and it is the best available proxy for core-system cost.
+- **Crelate (core CRM): $85/user/mo (Essentials, annual, up to 2 users) and $119/user/mo (Business)** ([Crelate pricing](https://www.crelate.com/pricing)). One of the few agency CRMs with fully public per-seat pricing, and the best available proxy for core-system cost.
+- **Recruit CRM: $95/user/mo (Pro), $135/user/mo (Business), $215/user/mo (Enterprise)** — *second-hand, via GetApp, updated Aug 2026; Recruit CRM's own pricing page does not render figures* ([GetApp](https://www.getapp.com/hr-employee-management-software/a/recruit-crm/pricing/)).
+
+Both land in the same band: **roughly $85–135 per user per month for the core CRM**.
 
 ### The ratio test — the most useful way to read this
 
@@ -197,11 +281,24 @@ Ranked by how defensible each is:
 3. **Fee protection as the framing.** Every competitor frames anonymisation as DE&I/bias/GDPR compliance (Allsorter explicitly, JobAdder via Diversely, FormaCV "GDPR-safe blind submissions"). **Nobody frames it as "stop your client going around you."** That is a sharper, more commercial, more emotive story and it is available. This costs nothing to adopt and is the cheapest differentiation on this list.
 4. **Robustness on bad inputs** — two-column, sidebars, tables, scans. Plausible but hard to prove in marketing and easy for competitors to claim.
 
-**A caution on the Word-output wedge.** The brief may be over-relying on it. HireAra outputs PDF + trackable link, and Loxo outputs PDF only — but **CVFormatter outputs "Word, PDF & Weblink"** and Daxtra Styler applies full templates ([JobAdder × CVFormatter](https://jobadder.com/integration/cv-formatter/)). Editable Word output is a differentiator against the CRMs and against HireAra, but **not** against the closest-priced direct competitor.
+**A caution on the Word-output wedge — it is weaker than it looks.** HireAra outputs PDF + trackable link and Loxo outputs PDF only, so Word *is* a real differentiator against the CRMs and against the category leader. But **CVFormatter outputs "Word, PDF & Weblink"** ([JobAdder × CVFormatter](https://jobadder.com/integration/cv-formatter/)) and **FormaCV outputs DOCX and PDF, "ATS-safe"** ([FormaCV](https://formacv.ai/resume-formatter)). Both are cheaper than $199. Do not build the price story on Word output alone.
+
+**Conversely, the fee-protection framing is genuinely unclaimed.** FormaCV markets anonymisation as "one-click blind resumes for **bias-free** submittals"; Allsorter frames it as DE&I; JobAdder's is bias-reduction via Diversely. Across every competitor checked, **not one leads with "your client can't go around you."** That positioning is free, it is more commercially urgent than DEI compliance, and it maps directly onto a fee the buyer can quantify.
 
 ---
 
-## 7. Could not verify / open items
+## 7. What to do next, in order
+
+1. **Change the free tier this week.** 5 CVs/day → 10 CVs over 14 days. This is a one-line change and it is currently the largest single leak in the funnel. Everything else can wait; this cannot.
+2. **Pull your own volume telemetry before setting caps.** You already have free-tier usage data. The distribution of CVs-per-account-per-month is the number that should set the 150-CV allowance, and no external research can substitute for it.
+3. **Ask every inbound signup which CRM they use.** Two reasons: it tells you whether your ICP is already served natively (Loxo/Zoho/Vincere/Recruit CRM) or exposed (Bullhorn/JobAdder/Mercury/none), and it tells you which integration to build first.
+4. **Rewrite the positioning around fee protection.** It is unclaimed by every competitor checked, costs nothing, and is more urgent to the buyer than the DEI framing everyone else uses.
+5. **Build the Bullhorn integration.** It is the price unlock from $99 to $199, and Bullhorn is the CRM with the largest installed base and no native formatting.
+6. **Do not compete on price with FormaCV/CVFormatter.** You will lose; they are already at $0.60–0.99/CV. Compete on fidelity ("nothing gets rewritten"), on bad-input robustness, and on the fee argument.
+
+---
+
+## 8. Could not verify / open items
 
 **Commissioned but not returned at time of writing.** Two parallel research threads were still running when this document was written; their findings are not reflected above:
 - **Q2 primary sources** — recruiter forum/Reddit/LinkedIn discussion of CV formatting as a chore; job adverts listing CV formatting as a duty (Recruitment Administrator/Resourcer roles, UK) and offshore VA equivalents with salary levels; outsourced per-CV formatting service prices; evidence on backdoor-hire/fee-protection motivation.

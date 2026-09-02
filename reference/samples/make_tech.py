@@ -153,12 +153,36 @@ def build(path=OUT):
             y += 1
         y += 9
 
+    y += 2
     y = text(x, y, "EDUCATION", 8.5, "hebo", ACCENT)
     page.draw_line(pymupdf.Point(x, y + 1), pymupdf.Point(x + colw, y + 1),
                    color=ACCENT, width=0.5)
     y += 9
     y = text(x, y, "BSc (Hons) Computer Science, Kesterwick University", 9, "hebo")
     y = text(x, y - 2, "2012 - 2015, 2:1", 8, "helv", MUTED)
+    y += 10
+
+    y = text(x, y, "OPEN SOURCE AND WRITING", 8.5, "hebo", ACCENT)
+    page.draw_line(pymupdf.Point(x, y + 1), pymupdf.Point(x + colw, y + 1),
+                   color=ACCENT, width=0.5)
+    y += 9
+    for b in [
+        "Maintainer of ledgerfmt, a small Go library for ISO 20022 message "
+        "validation (about 900 stars, used by two payment institutions I know of).",
+        "Wrote up the Postgres advisory-lock pattern behind our settlement "
+        "scheduler; it is the most-read post on the Halloway engineering blog.",
+        "Speaker, Bristol Backend Meetup - 'Idempotency is not a header' (2024).",
+    ]:
+        y = text(x + 10, y, "- " + b, 8.5, "helv", INK, width=colw - 10)
+        y += 1
+    y += 10
+
+    y = text(x, y, "REFERENCES", 8.5, "hebo", ACCENT)
+    page.draw_line(pymupdf.Point(x, y + 1), pymupdf.Point(x + colw, y + 1),
+                   color=ACCENT, width=0.5)
+    y += 9
+    y = text(x, y, "Available on request. Please do not contact Halloway "
+             "Digital before offer stage.", 8.5, "helv", INK, width=colw)
 
     doc.save(path)
     doc.close()
