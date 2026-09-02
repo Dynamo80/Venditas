@@ -58,6 +58,11 @@ export default async function Pricing({ searchParams }) {
             {price.amount.toLocaleString()}
           </div>
           <div className="per">per month · {price.code} · cancel any time</div>
+          <p className="founding">
+            Founding price for the first {PRO.foundingSeats} agencies, and it stays at this rate
+            for as long as you keep the subscription. It goes to{' '}
+            {region === 'us' ? `$${PRO.standardUsd}` : region === 'in' ? '₹12,000' : `£${PRO.standardGbp}`} after that.
+          </p>
           <p className="blurb">{PRO.blurb}</p>
           <ul>
             {PRO.features.map((f) => (
