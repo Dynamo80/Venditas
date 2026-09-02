@@ -64,7 +64,7 @@ If you want to try it on your own candidates: ${SENDER.site}, ten free, no card,
 
 Anything it handles badly, tell me and I will fix it — that is more useful to me than a compliment.
 
-Arseny`,
+${SENDER.person}`,
 
   price: (c) => `£79 a month, everyone at ${c.company || 'your agency'} included — no per-seat charge. Unlimited CVs. Monthly, cancel whenever.
 
@@ -72,7 +72,7 @@ That is a founding rate for the first twenty agencies and it stays at £79 for a
 
 Ten free first at ${SENDER.site} — I would rather you decided on your own CVs than on my sample.
 
-Arseny`,
+${SENDER.person}`,
 
   data: (c) => `Fair question, and the honest answer is short: we do not keep candidate CVs. The file is read in memory, turned into a document, returned, and gone when the request ends. No bucket, no backup, no candidate database.
 
@@ -80,7 +80,7 @@ What we do store is your email, your agency name and a count of CVs run.
 
 The detail is at ${SENDER.site}/security, and there is a data processing agreement at ${SENDER.site}/dpa if your client needs one signed. If your legal team wants changes to it, send them over — it is a draft, not a hostage situation.
 
-Arseny`,
+${SENDER.person}`,
 
   crm: (c) => `If your CRM already does branded CV formatting, honestly, use it. Loxo, Recruit CRM, Zoho Recruit and Vincere all ship it, and a second tool is not worth the money.
 
@@ -88,13 +88,13 @@ Where this tends to earn its place is Bullhorn, JobAdder, or no CRM at all — a
 
 Which are you on? If the answer is one of the first four I will say so and leave you alone.
 
-Arseny`,
+${SENDER.person}`,
 
   no: (c) => `Understood, thanks for replying — most people do not, and it is genuinely useful to know.
 
 You are off the list. I will not contact you again.
 
-Arseny`,
+${SENDER.person}`,
 };
 
 async function main() {
@@ -139,7 +139,7 @@ async function main() {
       // allowRepeat: they wrote to us. The already-contacted guard exists to
       // stop cold duplicates, not to stop us answering someone.
       const r = await send({
-        to, fromName: 'Arseny at Venditas', subject: 'Re: your template, four seconds',
+        to, fromName: `${SENDER.person} at ${SENDER.company}`, subject: 'Re: your template, four seconds',
         text, attachments, allowRepeat: true,
       });
       console.log(JSON.stringify(r, null, 2));

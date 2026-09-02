@@ -63,7 +63,7 @@ expensive failure, so it is the one thing that does not get to fail quietly.
 
 Ten free at ${SENDER.site} if you want to run your own.
 
-Arseny`;
+${SENDER.person}`;
 }
 
 async function main() {
@@ -106,7 +106,7 @@ async function main() {
     }
     const r = await send({
       to: p.email,
-      fromName: 'Arseny at Venditas',
+      fromName: `${SENDER.person} at ${SENDER.company}`,
       // Same subject, so it threads under the original rather than arriving as
       // a fresh pitch they have to place.
       subject: 'Re: your template, four seconds',

@@ -30,6 +30,12 @@ export const DAILY_CAP = 25;
  * postal address, and a working way out.
  */
 export const SENDER = {
+  // The human who signs the emails. Must match the LinkedIn profile the
+  // recipient will find; a mismatch reads as a fabricated persona, which is
+  // precisely what a recruiter is trained to notice.
+  person: 'Abin',
+  fullName: 'Abin Johnson',
+
   postal: 'Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India',
   company: 'Venditas',
   site: 'https://venditas.in',

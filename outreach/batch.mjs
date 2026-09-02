@@ -168,7 +168,7 @@ tables, a scan - comes back looking like this.
 Reply and I will send the editable Word file, or run one of your own at
 ${SENDER.site} - ten free, no card.
 
-Arseny`;
+${SENDER.person}`;
 
   const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
 <p>${greeting}</p>
@@ -177,7 +177,7 @@ Arseny`;
 <p>If anyone there still rebuilds CVs into your template by hand before they go to a client, that is the job it does. Whatever the candidate sent &mdash; two columns, tables, a scan &mdash; comes back looking like this.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
 <p>Reply and I will send the editable Word file, or run one of your own at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
-<p>Arseny</p>
+<p>${SENDER.person}</p>
 </div>`;
 
   return { subject: 'your template, four seconds', text, html };
@@ -318,7 +318,7 @@ Cannot read the mailbox: ${e.message}`);
     if (DO_SEND) {
       const r = await send({
         to: p.email,
-        fromName: 'Arseny at Venditas',
+        fromName: `${SENDER.person} at ${SENDER.company}`,
         subject,
         text,
         html,

@@ -45,3 +45,19 @@ Applied by pasting into the Supabase SQL editor. All are idempotent.
 | `sql/001_leads.sql` | run |
 | `sql/002_retention.sql` | run |
 | `sql/003_customers.sql` | **not run** — no way to record a paying customer until it is |
+
+## Sender identity
+
+The person who signs outbound email is `SENDER.person` in `outreach/send.mjs`,
+alongside the postal address and company name. It is **not** to be inferred from
+an email address again.
+
+Currently: **Abin** / Abin Johnson, matching
+[linkedin.com/in/abin-johnson-120017397](https://www.linkedin.com/in/abin-johnson-120017397/).
+
+**Why this is not cosmetic.** The first batch of 25 went out signed "Arseny", a
+name taken from an account email address and never checked against the founder.
+His LinkedIn says Abin Johnson. A recruiter who looks up the sender and finds a
+different name reads it as a fabricated persona — and recruiters check, because
+spotting manufactured outreach is part of the job. The mismatch is now limited
+to those 25; everything after uses one name from one place.
