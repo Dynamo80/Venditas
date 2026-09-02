@@ -10,11 +10,15 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+import { SUPABASE_URL, supabaseKey, geminiKey } from '../../../lib/config.mjs';
+
 export async function GET() {
   const checks = {};
 
-  checks.hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
-  checks.hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
+  checks.hasGeminiKey = Boolean(geminiKey.value);
+  checks.hasSupabase = Boolean(SUPABASE_URL && supabaseKey.value);
+  checks.supabaseKeyFrom = supabaseKey.name;
+  checks.rejectedSecrets = [...supabaseKey.rejected, ...geminiKey.rejected];
 
   /**
    * Shape of a secret, never the secret. Length and "is it plain ASCII" are
@@ -37,6 +41,7 @@ export async function GET() {
   checks.env = {
     SUPABASE_URL: shape('SUPABASE_URL'),
     SUPABASE_SERVICE_KEY: shape('SUPABASE_SERVICE_KEY'),
+    SUPABASE_SECRET: shape('SUPABASE_SECRET'),
     GEMINI_API_KEY: shape('GEMINI_API_KEY'),
   };
 
@@ -44,11 +49,11 @@ export async function GET() {
   // env vars being present says nothing about whether the SQL has been run.
   if (checks.hasSupabase) {
     try {
-      const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/rpc/bump_usage`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/bump_usage`, {
         method: 'POST',
         headers: {
-          apikey: process.env.SUPABASE_SERVICE_KEY,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          apikey: supabaseKey.value,
+          Authorization: `Bearer ${supabaseKey.value}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ p_key: 'healthcheck', p_kind: 'ip' }),
