@@ -96,7 +96,7 @@ what it does.
 >
 > Last one from me.
 >
-> £X/month, unlimited CVs, no contract. If it isn't saving your team real hours
+> £79/month, unlimited CVs, no contract. If it isn't saving your team real hours
 > in the first fortnight, don't pay for the second.
 >
 > If it's not for you, no reply needed — I won't chase.
@@ -110,8 +110,12 @@ reply rate from the people who *are* interested. Never send a fourth.
 
 ## What still needs deciding
 
-- **Price.** $199/mo was the working number. For UK agencies £149/mo reads more
-  naturally and lands in the same place. Needs a decision before email 3.
+- **Price: settled at £79/$99.** A founding rate for the first 20 agencies,
+  honoured for as long as they stay; £149 standard after. Reasoning in
+  `docs/decisions/004-pricing.md`. The single source of truth is
+  `lib/pricing.mjs` — if this document and that file ever disagree, the file
+  wins, and quoting two prices across two channels is a credibility problem the
+  moment a prospect compares them.
 - **Sender identity.** Emails sign off as a person, not a company. Confirm which
   name goes on them.
 - **Sample CV.** The attachment should be a plausible candidate in a sector the

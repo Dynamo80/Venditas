@@ -160,13 +160,13 @@ irrelevant with specifics only someone who actually built the thing would know.
 
 Paste-ready. LinkedIn allows 220 characters.
 
-**Primary (170 chars):**
+**Primary (169 chars):**
 
 ```
 I build Venditas — candidate CVs into your agency's branded template in four seconds, contact details swapped for a reference code. Solo founder. Ten free at venditas.in
 ```
 
-**Alternative, leads on the commercial reason (192 chars):**
+**Alternative, leads on the commercial reason (191 chars):**
 
 ```
 Solo founder, Venditas. Your client can't go around you if they can't see the candidate's name. CV reformatted into your agency's template, contact details redacted, four seconds. venditas.in
@@ -412,7 +412,8 @@ The profile does the work. This is why Section A comes first.
 real, specific, checkable reason — the person posted this week about the exact problem, or
 you have a genuine mutual connection. Never on an ordinary prospect.
 
-**Note template for those rare cases** (198 chars, within the 200 limit):
+**Note template for those rare cases** (194 chars — the 200 limit leaves almost no slack, so
+re-count after swapping the name and agency in):
 
 ```
 Hi James — saw your post about rebuilding CVs into the template at 11pm. I built a tool that does exactly that bit. Not pitching; happy to just send you one in Hartley's branding if it's useful.

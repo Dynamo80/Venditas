@@ -18,9 +18,11 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { render } from '../lib/render.mjs';
+import { render, makeReference } from '../lib/render.mjs';
+import { preview } from '../lib/preview.mjs';
 import { extract } from '../lib/extract.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
+import { recentlyContacted, record, COOLING_DAYS } from './contacted.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const SAMPLES = path.join(ROOT, 'reference', 'samples');
@@ -119,23 +121,38 @@ function compose(p) {
   const greeting = first ? `Hi ${first},` : 'Hi,';
   const agency = p.company || 'your agency';
 
+  // The image is shown inline, not attached. A .docx from a stranger is a thing
+  // security-aware people do not open, it raises spam scores, and some mail
+  // gateways quarantine it outright - and the entire pitch depends on them
+  // seeing the document. So they see it, with nothing to open and nothing to
+  // trust. The real Word file goes out when they reply.
   const text = `${greeting}
 
-I've attached a candidate CV in ${agency}'s branding — your colours, contact
-details stripped out, a reference code in place of the name.
+The image below is a candidate CV rebuilt in ${agency}'s branding - your
+colours, the contact details stripped out, a reference code where the name was.
 
 It took four seconds. I built the thing that made it.
 
 If anyone there still rebuilds CVs into your template by hand before they go to
-a client, that's the job it does. Whatever the candidate sent — the two-column
-ones, the ones built in tables, the scans — comes back looking like the
-attachment.
+a client, that is the job it does. Whatever the candidate sent - two columns,
+tables, a scan - comes back looking like this.
 
-Worth a look? ${SENDER.site} — ten free, no card, run one of your own.
+Reply and I will send the editable Word file, or run one of your own at
+${SENDER.site} - ten free, no card.
 
 Arseny`;
 
-  return { subject: `your template, four seconds`, text };
+  const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
+<p>${greeting}</p>
+<p>The image below is a candidate CV rebuilt in <strong>${agency}</strong>'s branding &mdash; your colours, the contact details stripped out, a reference code where the name was.</p>
+<p>It took four seconds. I built the thing that made it.</p>
+<p>If anyone there still rebuilds CVs into your template by hand before they go to a client, that is the job it does. Whatever the candidate sent &mdash; two columns, tables, a scan &mdash; comes back looking like this.</p>
+<p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
+<p>Reply and I will send the editable Word file, or run one of your own at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
+<p>Arseny</p>
+</div>`;
+
+  return { subject: 'your template, four seconds', text, html };
 }
 
 // --------------------------------------------------------------------- main
@@ -163,6 +180,13 @@ async function main() {
     if (skip.has(e)) return false;
     if (sentLog.includes(e)) return false;
     if (FLAGGED.test(p.company || '')) return false;
+
+    // Has LinkedIn already approached this agency? A connection request on
+    // Tuesday and a cold email on Thursday, same sender, same product, reads as
+    // a machine working a list - and recruiters spot that professionally.
+    const seen = recentlyContacted(p.email || p.website);
+    if (seen.contacted) return false;
+
     return true;
   });
 
@@ -207,6 +231,11 @@ async function main() {
     const colour = (p.brand_colour || '').replace(/^#/, '') || '1F4E5F';
     const logo = await fetchLogo(p.logo_url);
 
+    // One reference per candidate, shared by the image and the document. Two
+    // different codes for the same person is the kind of detail that makes a
+    // careful reader distrust everything else on the page.
+    const reference = makeReference(data.name);
+
     const docx = await render(data, {
       name: p.company,
       colour,
@@ -214,11 +243,16 @@ async function main() {
       contact: p.website || null,
       logo: logo?.data,
       logoType: logo?.type,
-    });
+    }, { reference });
 
-    const { subject, text } = compose(p);
+    const { subject, text, html } = compose(p);
+    const png = await preview(data, {
+      name: p.company, colour, footer: p.company, logo: logo?.data, logoType: logo?.type,
+    }, reference);
     const safe = (p.company || 'agency').replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40);
+    // Both are written for review. Only the PNG is sent.
     writeFileSync(path.join(outDir, `${safe}.docx`), docx);
+    writeFileSync(path.join(outDir, `${safe}.png`), png);
 
     manifest.push({
       company: p.company, email: p.email, country: p.country,
@@ -232,8 +266,14 @@ async function main() {
         fromName: 'Arseny at Venditas',
         subject,
         text,
-        attachments: [{ filename: 'sample-candidate.docx', content: docx }],
+        html,
+        attachments: [
+          // Inline, not an attachment they must open. `cid` binds it to the
+          // <img> in the html above.
+          { filename: 'cv-preview.png', content: png, cid: 'cvpreview', contentDisposition: 'inline' },
+        ],
       });
+      if (r.sent) record(p.email, 'email', p.company || '');
       console.log(`  ${r.sent ? 'sent' : `skipped (${r.skipped})`}  ${p.email}`);
     } else {
       console.log(`  built  ${(p.company || '').padEnd(34).slice(0, 34)} ${file.replace('.pdf', '').padEnd(28)} ${logo ? 'logo' : '    '} #${colour}`);
