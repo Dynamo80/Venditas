@@ -45,8 +45,12 @@ export async function POST(request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     data = await extract(buffer, file.name);
   } catch (e) {
-    // Messages from extract() are written for the person who uploaded the file.
-    return bad(e.message || 'Could not read that CV.', 422);
+    // Only errors explicitly marked user-facing are shown. Anything else is a
+    // fault on our side: log it in full, tell them something true and useful,
+    // and never hand a stranger the name of an environment variable.
+    if (e?.userFacing) return bad(e.message, 422);
+    console.error('extraction failed', e);
+    return bad("We couldn't process that CV. This one is on us — try again shortly.", 500);
   }
 
   if (!data.name && !data.experience?.length) {
