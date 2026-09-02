@@ -3,7 +3,7 @@
 **Only things that cannot be measured belong here.** For anything else run
 `node ops/status.mjs`, which fetches it live.
 
-Last reviewed: 2026-09-02
+Last reviewed: 2026-09-02 (batch 1 sent)
 
 ## Goal
 
@@ -13,9 +13,12 @@ Last reviewed: 2026-09-02
 
 Everything else is secondary to this sequence:
 
-1. Founder reviews a batch of outreach emails and approves sending
-2. Send 25/day from `founder@venditas.in` + ~20 LinkedIn touches/day
-3. A recruiter replies → runs their own CV on the site → invoice via Skydo
+1. ~~Founder reviews and approves~~ — waived; the founder authorised sending
+   directly on 2026-09-02
+2. **Batch 1 sent: 25 UK agencies, 2026-09-02.** Inline branded preview image,
+   no attachment. All 25 accepted for delivery
+3. Watch for replies, then: recruiter runs their own CV → invoice via Skydo
+4. Batch 2 tomorrow — the cap is 25/day and it exists to protect the domain
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
@@ -24,7 +27,6 @@ Razorpay link collects £79 by hand perfectly well for the first customers.
 
 | Item | Why it matters |
 |---|---|
-| Approve the first outreach batch | Nothing sends without this. The only real blocker |
 | Run `sql/003_customers.sql` | There is nowhere to record that someone paid |
 | Razorpay business category | Account is registered for dropshipping; selling SaaS through it risks a settlement hold, and invoices carry the wrong business name |
 | Supabase region | One line from the dashboard; the DPA has a placeholder without it |

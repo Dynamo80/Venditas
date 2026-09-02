@@ -70,6 +70,33 @@ const SAMPLE_FOR = [
   [/\b(tech|software|it|develop|data|digital|devops|cloud|cyber)\b/i, 'tech-backend-engineer.pdf'],
 ];
 
+/**
+ * Hex values that are a framework's default, not an agency's identity.
+ *
+ * The list-building agent warned that only 41 of 244 colours came from a
+ * verified source, and #22d3ee — Tailwind's cyan-400 — reached this batch as
+ * "Cloud Recruit UK's brand colour". Rendering a CV in a stranger's CSS default
+ * and calling it their branding is worse than not personalising at all: it is
+ * visibly, checkably wrong.
+ *
+ * When in doubt, fall back to our own neutral. An unbranded document still
+ * demonstrates the product; a wrongly-branded one demonstrates carelessness.
+ */
+const FRAMEWORK_DEFAULTS = new Set([
+  '007cba', '0073aa', '0693e3',                     // WordPress
+  '007bff', '0d6efd', '6c757d', '17a2b8', '28a745', // Bootstrap
+  '3b82f6', '1e40af', '22d3ee', '06b6d4', '2563eb', // Tailwind
+  '4285f4', '1a73e8',                               // Google
+  '000000', 'ffffff', 'cccccc', '333333', '666666', '999999',
+]);
+
+function safeColour(raw) {
+  const hex = String(raw || '').replace(/^#/, '').trim().toLowerCase();
+  if (!/^[0-9a-f]{6}$/.test(hex)) return null;
+  if (FRAMEWORK_DEFAULTS.has(hex)) return null;
+  return hex;
+}
+
 function sampleFor(specialism) {
   for (const [re, file] of SAMPLE_FOR) {
     if (re.test(specialism || '')) {
@@ -228,7 +255,8 @@ async function main() {
     const data = samples[file];
     if (!data) continue;
 
-    const colour = (p.brand_colour || '').replace(/^#/, '') || '1F4E5F';
+    const verified = safeColour(p.brand_colour);
+    const colour = verified || '1F4E5F';
     const logo = await fetchLogo(p.logo_url);
 
     // One reference per candidate, shared by the image and the document. Two
@@ -276,7 +304,7 @@ async function main() {
       if (r.sent) record(p.email, 'email', p.company || '');
       console.log(`  ${r.sent ? 'sent' : `skipped (${r.skipped})`}  ${p.email}`);
     } else {
-      console.log(`  built  ${(p.company || '').padEnd(34).slice(0, 34)} ${file.replace('.pdf', '').padEnd(28)} ${logo ? 'logo' : '    '} #${colour}`);
+      console.log(`  built  ${(p.company || '').padEnd(34).slice(0, 34)} ${file.replace('.pdf', '').padEnd(28)} ${logo ? 'logo' : '    '} #${colour}${verified ? '' : ' (default - unverified colour rejected)'}`);
     }
   }
 
