@@ -60,6 +60,30 @@ async function sb(pathAndQuery, extraHeaders = {}) {
   }
 }
 
+/** Minimal CSV reader: header row, quoted fields, newlines inside quotes. */
+function readCsv(file) {
+  const f = path.join(ROOT, 'outreach', file);
+  if (!existsSync(f)) return [];
+  const text = readFileSync(f, 'utf8');
+  const rows = [];
+  let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n') { row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const [head, ...body] = rows.filter((r) => r.some((x) => x.trim()));
+  if (!head) return [];
+  return body.map((r) => Object.fromEntries(head.map((h, i) => [h.trim(), r[i] ?? ''])));
+}
+
 function countCsv(file) {
   const f = path.join(ROOT, 'outreach', file);
   if (!existsSync(f)) return null;
@@ -167,6 +191,37 @@ async function main() {
     ? readFileSync(supp, 'utf8').split('\n').filter((l) => l.trim() && !l.startsWith('#')).length
     : 0;
   console.log(`  suppressed       ${suppN}`);
+
+  // ---- funnel -----------------------------------------------------------
+  // The arithmetic in docs/plan-30-days.md, recomputed rather than copied.
+  // Sending is capped at 25/day, so the question every morning is not "did we
+  // send" but "how many days of list are left, and how far from the goal".
+  console.log('\nFUNNEL');
+  {
+    const GOAL_GBP = 1000, PRICE_GBP = 79, CAP = 25, DEADLINE = '2026-10-02';
+    const need = Math.ceil(GOAL_GBP / PRICE_GBP);
+    const sentAddrs = new Set(
+      existsSync(sentLog)
+        ? readFileSync(sentLog, 'utf8').split('\n').map((l) => l.split('\t')[1]).filter(Boolean).map((e) => e.toLowerCase())
+        : [],
+    );
+    const isUK = (c) => /united kingdom|\buk\b|england|scotland|wales|ireland/i.test(c || '');
+    let ukLeft = 0, usLeft = 0, ukTotal = 0;
+    for (const f of lists) {
+      for (const p of readCsv(f)) {
+        const e = (p.email || '').trim().toLowerCase();
+        const uk = isUK(p.country);
+        if (uk) ukTotal++;
+        if (!e.includes('@') || sentAddrs.has(e)) continue;
+        if (uk) ukLeft++; else usLeft++;
+      }
+    }
+    const daysLeft = Math.max(0, Math.round((Date.parse(DEADLINE) - Date.now()) / 86400_000));
+    console.log(`  goal             ${need} agencies at GBP ${PRICE_GBP} = GBP ${need * PRICE_GBP}/mo, by ${DEADLINE} (${daysLeft} days left)`);
+    console.log(`  UK prospects     ${ukLeft} uncontacted of ${ukTotal}  ->  ${(ukLeft / CAP).toFixed(1)} days of sending at ${CAP}/day`);
+    console.log(`  US prospects     ${usLeft} uncontacted  (last in the queue; see decision 005)`);
+    if (ukLeft < CAP * 5) console.log(`  LIST RUNS OUT    in under a week — build prospects-uk-2.csv (docs/plan-30-days.md, item 3)`);
+  }
 
   // ---- local config -----------------------------------------------------
   console.log('\nLOCAL CONFIG  (names only, never values)');

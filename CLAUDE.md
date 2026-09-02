@@ -23,6 +23,8 @@ blocked, what happens next, and why.
 | Where | What it answers |
 |---|---|
 | `docs/state.md` | What is blocked right now, and what to do next |
+| `docs/plan-30-days.md` | The arithmetic from zero to £1,000 MRR, and the four things that have to be true |
+| `legal/` | Customer-facing privacy, terms, DPA; founder-only compliance notes, LIA, Article 30 record, breach plan |
 | `docs/decisions/` | Why we did it this way. Numbered, dated, immutable |
 | `docs/runbooks/` | How to perform a task, step by step |
 | `docs/reference/` | Facts that do not change often — competitors, accounts, market |

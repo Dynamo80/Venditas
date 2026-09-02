@@ -23,14 +23,39 @@ Everything else is secondary to this sequence:
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
 
-## Blocked on the founder
+## Is this a proper company yet? — reviewed 2026-09-02
 
-| Item | Why it matters |
-|---|---|
-| Run `sql/003_customers.sql` | There is nowhere to record that someone paid |
-| Razorpay business category | Account is registered for dropshipping; selling SaaS through it risks a settlement hold, and invoices carry the wrong business name |
-| Supabase region | One line from the dashboard; the DPA has a placeholder without it |
-| Solicitor review of privacy, terms, DPA | A UK agency will not sign an unreviewed DPA from an overseas sole trader |
+The thirty-day plan and its arithmetic are in `docs/plan-30-days.md`. Cold email
+alone lands at two or three customers by 2026-10-02, not thirteen; the plan
+needs a self-serve pay path, the warm audience, a 500-agency UK list and a
+trial that closes itself.
+
+**Already true:** live site; privacy, terms, DPA and security pages at real
+URLs; working one-click unsubscribe; SPF, DKIM and DMARC passing; retention
+purge scheduled; nothing about a candidate stored; a legitimate interests
+assessment, an Article 30 record and a breach plan in `legal/`.
+
+**Not yet true, and only the founder can make it true.** Ranked by how
+directly each blocks money.
+
+| # | Item | Why it matters | Effort |
+|---|---|---|---|
+| 1 | Run `sql/003_customers.sql` | There is nowhere to record that someone paid | 5 min |
+| 2 | A payment page, its URL in `NEXT_PUBLIC_PAY_URL` on Vercel, redeploy | Pricing page button is `mailto:`. Nobody can pay without a reply, an invoice and a bank transfer | 1 hour, plus Razorpay category fix or a Skydo page |
+| 3 | Enable billing on the Gemini project | DPA clause 3.4 ("we do not train on your data") is untrue on the free tier. First compliance question every UK agency asks. Cost ~£0.0001 per CV | 10 min |
+| 4 | **One founder identity.** The repo names two people: `send.mjs` and the DPA path say Abin Johnson; `outreach/linkedin.md` says Arseny runs LinkedIn outreach; batch 1 was signed Arseny | A prospect who gets an email from Abin and a LinkedIn request from Arseny for the same product reads it as a machine working a list. The DPA needs one legal name in `[FOUNDER FULL LEGAL NAME]` | Decision, then 10 min of edits |
+| 5 | Fix the LinkedIn About that says Venditas was shut down | Every cold email that gets looked up finds the founder disowning the product. Rewrite in `outreach/profile.md` | 10 min |
+| 6 | Supabase region | One line from the dashboard; DPA Annex 3 and the Article 30 record have placeholders without it | 2 min |
+| 7 | Solicitor review of privacy, terms, DPA; settle liability and governing law | A UK agency will not sign an unreviewed DPA from an overseas sole trader | 1–3 hours of fees |
+| 8 | Article 27 UK representative, or a written opinion that none is needed; ICO fee question | A line on every supplier questionnaire | £100–500/yr |
+| 9 | Back up `.env.local` somewhere encrypted | Every key and the SMTP password exist on one laptop | 5 min |
+| 10 | Legal entity | Sole trader now is fine for the first customers. Revisit at the first five-figure contract: Indian Pvt Ltd or UK Ltd, see `legal/compliance-notes.md` §14 | Later |
+
+Items 1 to 3 are the difference between a project and a business: after them a
+stranger can try it, pay for it, and be recorded as having paid.
+
+Also blocked on the founder, lower stakes: Razorpay's business category is
+"dropshipping", so invoices carry the wrong business name until it is changed.
 
 ## Not blocked, worth doing
 

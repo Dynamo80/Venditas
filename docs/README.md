@@ -8,6 +8,8 @@ present for the conversation that built it.
 1. **`node ops/status.mjs`** — measured, live. Never trust a document for
    anything this can tell you.
 2. **`state.md`** — what is blocked and what happens next. Short by design.
+   **`plan-30-days.md`** — the funnel arithmetic and the four things that have
+   to be true to reach £1,000 MRR by 2026-10-02.
 3. **`decisions/`** — why things are the way they are. Read before proposing a
    change of direction.
 4. **`runbooks/`** — how to actually perform a task. `replies.md` first if

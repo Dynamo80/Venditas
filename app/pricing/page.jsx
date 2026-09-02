@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FREE, PRO, priceFor, GUARANTEE } from '../../lib/pricing.mjs';
+import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL } from '../../lib/pricing.mjs';
 
 export const metadata = {
   title: 'Pricing — Venditas',
@@ -69,9 +69,21 @@ export default async function Pricing({ searchParams }) {
               <li key={f}>{f}</li>
             ))}
           </ul>
-          <a href="mailto:founder@venditas.in?subject=Venditas%20Agency%20plan" className="act primary">
-            Get set up
-          </a>
+          {PAY_URL ? (
+            <>
+              <a href={PAY_URL} className="act primary" rel="noopener">
+                Start — {price.symbol}{price.amount}/month
+              </a>
+              <p className="per" style={{ marginTop: 10 }}>
+                Card or bank transfer. Cancel any time. Questions first?{' '}
+                <a href={CONTACT_URL}>Email the founder</a>.
+              </p>
+            </>
+          ) : (
+            <a href={CONTACT_URL} className="act primary">
+              Get set up
+            </a>
+          )}
         </div>
       </div>
 
