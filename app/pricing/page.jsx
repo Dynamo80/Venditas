@@ -4,7 +4,7 @@ import { FREE, PRO, priceFor, GUARANTEE } from '../../lib/pricing.mjs';
 export const metadata = {
   title: 'Pricing — Venditas',
   description:
-    'Five CVs a day free. £149/month for unlimited, everyone in your agency included, no per-seat charge.',
+    'Ten CVs free to try. £79/month for unlimited, everyone in your agency included, no per-seat charge.',
 };
 
 const REGIONS = [
@@ -39,7 +39,7 @@ export default async function Pricing({ searchParams }) {
         <div className="plan">
           <h2>{FREE.name}</h2>
           <div className="amount">{price.symbol}0</div>
-          <div className="per">no card, no trial clock</div>
+          <div className="per">ten CVs, no card, no clock</div>
           <p className="blurb">{FREE.blurb}</p>
           <ul>
             {FREE.features.map((f) => (

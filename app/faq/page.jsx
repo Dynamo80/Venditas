@@ -85,8 +85,9 @@ const QUESTIONS = [
     q: 'How is it priced?',
     a: (
       <>
-        Five CVs a day free. £{PRO.gbp} a month for unlimited, with everyone in your agency
-        included — no per-seat charge. <Link href="/pricing">Pricing in full</Link>.
+        Ten CVs free to try. £{PRO.gbp} a month for unlimited after that, with everyone in
+        your agency included — no per-seat charge.{' '}
+        <Link href="/pricing">Pricing in full</Link>.
       </>
     ),
   },

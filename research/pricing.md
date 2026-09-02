@@ -26,7 +26,7 @@ Two things drive that.
 | **Agency Plus** | £149 +VAT | £199 | 400 CVs/mo | Unlimited templates, priority support. |
 | Overage | £0.45/CV | $0.55/CV | — | Or prompt an upgrade. |
 
-This ladder is deliberately set to undercut the closest UK-priced competitor on **unit price at every tier** while staying below it on absolute monthly cost:
+This ladder is deliberately set to beat the closest UK-priced competitor on **unit price at every tier**, and on absolute monthly cost at the two tiers that matter most:
 
 | | Venditas (recommended) | Formatix.AI (verified) |
 |---|---|---|
@@ -215,7 +215,18 @@ Evidence gathered so far is **supportive but heavily vendor-sourced**, which is 
 - Allsorter: "up to 80% time savings per formatting transaction." ([Bullhorn Marketplace](https://www.bullhorn.com/marketplace/allsorter/))
 - iReformat: claims manual reformatting averages "30 to 60 minutes per resume" — this is the highest claim found and comes from a vendor blog with no methodology. **Treat with scepticism.**
 
-**The useful cross-check** is that four CRM vendors independently built this feature into their products. Companies do not build features nobody asks for. That is decent indirect evidence the pain is real — but note it cuts both ways: it is also evidence the pain is *being solved by someone other than you*.
+### The strongest available evidence is structural, not anecdotal
+
+I could not reach recruiter forums or job boards directly (Reddit, Indeed UK and CV-Library all block automated fetching — see §8). But the market structure itself is stronger evidence than any single quote would be:
+
+1. **At least 14 distinct commercial products exist to do this one job** — HireAra, Allsorter, Daxtra Styler, Candidately, CVFormatter, FormaCV, iReformat, RemakeCV, Formatix.AI, RapidRecruit, RefineCV, CV-Transformer, Represend, Kyloe AwesomeDocs — several of them venture-scale, one (HireAra) claiming 1,000+ agency customers.
+2. **Four CRM vendors independently built it natively** (Recruit CRM, Vincere, Loxo, Zoho Recruit), and three more sell integrations for it (Bullhorn, JobAdder, Mercury).
+3. **Prices cluster tightly at £0.50–£2.00 per CV** across a dozen independent vendors, which is what a market looks like when buyers have a settled sense of what the job is worth.
+4. **A £299/month UK product (RapidRecruit) sustains a business at this**, claiming "10K+" CVs processed monthly.
+
+Markets do not sustain fourteen vendors, four native CRM implementations and a £299/month price point for a problem nobody has. **The pain is real. You are not overestimating it.**
+
+**But the same evidence carries the warning:** you are not early, you are not alone, and the pain is *already being solved by a dozen other people*. The risk to this business is not "nobody wants it." It is "everybody already sells it." That reframes the entire job from *proving the problem* to *finding a wedge and a distribution channel* — which is why §6's positioning argument (fee protection, unclaimed by all fourteen) matters more than any pricing decision in this document.
 
 > Deeper primary-source research (recruiter forum discussions, job adverts listing CV formatting as a duty, offshore per-CV formatting services, and the fee-protection/backdoor-hire motivation) was commissioned but **had not returned at the time of writing**. See §7.
 
@@ -232,14 +243,18 @@ Partial. The verified anchors available:
 - **Crelate (core CRM): $85/user/mo (Essentials, annual, up to 2 users) and $119/user/mo (Business)** ([Crelate pricing](https://www.crelate.com/pricing)). One of the few agency CRMs with fully public per-seat pricing, and the best available proxy for core-system cost.
 - **Recruit CRM: $95/user/mo (Pro), $135/user/mo (Business), $215/user/mo (Enterprise)** — *second-hand, via GetApp, updated Aug 2026; Recruit CRM's own pricing page does not render figures* ([GetApp](https://www.getapp.com/hr-employee-management-software/a/recruit-crm/pricing/)).
 
-Both land in the same band: **roughly $85–135 per user per month for the core CRM**.
+- **Bullhorn: $99/user/mo (Starter), $165/user/mo (Core)** — published on Bullhorn's own pricing page; everything above Core (Pro, Max, Bullhorn One, Analytics, Automation, Onboarding) is quote-only ([Bullhorn pricing](https://www.bullhorn.com/pricing/)).
+
+- **JobAdder: quote-only.** Plans are named (Recruiter Lite / Essential / Pro / Business) but no rates, seat minimums or contract terms are published — "we work to understand what you need... and create a tailored proposal" ([JobAdder pricing](https://jobadder.com/pricing)).
+
+All three that publish land in the same band: **roughly $85–165 per user per month for the core CRM.** For a 5-person agency that is **$425–825/month on the CRM alone**, before job boards, sourcing data or anything else.
 
 ### The ratio test — the most useful way to read this
 
-A 5-person agency on Crelate Business pays roughly **$500–600/month for its CRM**. Point solutions in most SaaS stacks land at **10–25% of the core system's cost**; above that, they start attracting "do we really need this?" scrutiny at renewal.
+A 5-person agency pays roughly **$425–825/month for its CRM** (Bullhorn Starter to Core; Crelate and Recruit CRM land inside the same band). Point solutions in most SaaS stacks land at **10–25% of the core system's cost**; above that, they start attracting "do we really need this?" scrutiny at renewal. *(The 10–25% heuristic is inference — I found no published benchmark for it — but the two bounds below are calculated from verified CRM prices.)*
 
-- 10–25% of $500–600 = **$50–150/month**. → The recommended **$99** sits squarely inside it.
-- **$199 is ~35–40% of core CRM spend for a single-purpose tool with no CRM integration.** That is the number that will get the subscription cancelled in month four.
+- 10–25% of $425–825 = **$43–206/month**. → The recommended **$99** sits comfortably inside it; $199 sits at the very top edge.
+- On the more common **Bullhorn Starter** stack ($495/mo for 5 users), $199 is **40% of core CRM spend** for a single-purpose tool with no CRM integration. That is the ratio that gets a subscription cancelled in month four.
 
 The idibu comparison makes the same point from the other direction: **£125/month buys a 5-user agency its entire job-board distribution platform** ([idibu pricing](https://ww2.idibu.com/pricing)). A CV formatting tool at £149 would cost *more* than the system that sources the candidates in the first place. That ordering is very hard to defend in a renewal conversation, and it is the strongest single argument against £149 as an entry price.
 
@@ -300,9 +315,18 @@ Ranked by how defensible each is:
 
 ## 8. Could not verify / open items
 
-**Commissioned but not returned at time of writing.** Two parallel research threads were still running when this document was written; their findings are not reflected above:
-- **Q2 primary sources** — recruiter forum/Reddit/LinkedIn discussion of CV formatting as a chore; job adverts listing CV formatting as a duty (Recruitment Administrator/Resourcer roles, UK) and offshore VA equivalents with salary levels; outsourced per-CV formatting service prices; evidence on backdoor-hire/fee-protection motivation.
-- **Q4 primary sources** — published per-user pricing for Bullhorn, Vincere, JobAdder, Loxo, Crelate, Zoho Recruit, Manatal, Recruiterflow etc.; industry benchmarks on agency technology spend (Bullhorn GRID, REC, APSCo, SIA); placement fee and revenue-per-recruiter economics.
+**Still outstanding.** Two parallel research threads were commissioned and had not returned when this document was finalised. Q4 was substantially back-filled by hand (Bullhorn, Crelate, Recruit CRM, idibu, Candidately all now verified above); Q2's primary-source gap remains real. Specifically still missing:
+
+- **Q2 primary sources** — recruiter forum/Reddit/LinkedIn discussion of CV formatting as a chore; job adverts listing CV formatting as a duty (Recruitment Administrator / Resourcer roles, UK) and offshore VA equivalents with salary levels; outsourced per-CV formatting service prices; direct evidence on the backdoor-hire / fee-protection motivation. **The structural argument in §4 is a substitute for this, not a replacement.** In particular, I found **no direct evidence** that agencies employ people specifically to format CVs, and **no direct evidence** quantifying how often clients go direct to candidates — the latter is the load-bearing assumption behind the entire product positioning and it is currently unevidenced.
+- **Q4 benchmark reports** — published industry research on agency technology spend as a % of revenue or per recruiter (Bullhorn GRID Industry Trends, REC UK Recruitment Industry Status Report, APSCo, Staffing Industry Analysts), and placement-fee / revenue-per-recruiter economics. Without these I could not express the price as a fraction of one placement fee, which would have been the most persuasive framing available. **This is worth doing** — if a typical UK placement fee is £5–8k, then £79/month is ~1% of a single placement, which is a very easy argument to make in a sales call.
+
+**Sources that actively blocked automated access** (so the primary-source evidence for Q2 is genuinely missing, not merely unfound):
+- **Reddit** (r/recruiting) — fetching disallowed.
+- **Indeed UK** — HTTP 403.
+- **CV-Library** — HTTP 403.
+- **Reed.co.uk** — returned fragmented HTML; job titles visible (Document Production Specialist, Document Controller, Audio Typist at Eversheds Sutherland, Matchtech, Reed Business Support) but **no readable duty descriptions**, so I cannot honestly claim these adverts list CV formatting as a responsibility.
+
+This means the "recruiters employ people partly to do this" hypothesis is **untested**, not disproven. It is worth 20 minutes of manual searching on Reed and Indeed for "CV formatting" in Recruitment Administrator / Resourcer adverts — that is the one piece of evidence that would most strengthen the business case, and it is easy to gather by hand.
 
 **Could not verify at all:**
 - **Hinterview pricing** — pricing page 404s and the site redirects to a login; no published figures found.

@@ -79,8 +79,8 @@ export default function Page() {
       <form className="panel" onSubmit={submit}>
         <h2>Try it on a real CV</h2>
         <p className="hint">
-          Five free CVs a day. No card, no account to set up — just your work email so we
-          know who you are. The CV itself is processed and discarded, never stored.
+          Ten CVs free. No card, no account to set up — just your work email so we know
+          who you are. The CV itself is processed and discarded, never stored.
         </p>
 
         <div className="grid">

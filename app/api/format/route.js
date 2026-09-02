@@ -1,6 +1,6 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
-import { check, recordLead, FREE_WITH_EMAIL } from '../../../lib/meter.mjs';
+import { check, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
 import mammoth from 'mammoth';
 
 // Extraction takes ten seconds or so, most of it waiting on the model.
@@ -46,7 +46,8 @@ export async function POST(request) {
   if (!verdict.allow) {
     const messages = {
       disposable: 'Please use your work email — throwaway addresses are blocked.',
-      'daily-cap': `That's ${FREE_WITH_EMAIL} CVs today, which is the free limit. It resets tomorrow, or reply to the email we sent you and we'll sort you out properly.`,
+      'daily-cap': `That's ${FREE_PER_DAY} today. Come back tomorrow, or get in touch and we'll lift it.`,
+      'trial-used': `You've used all ${FREE_TOTAL} of your trial CVs - which means it's working. Email founder@venditas.in and we'll get you set up properly.`,
       'ip-cap': "You've hit today's limit from this connection. It resets tomorrow.",
       'need-email': 'Enter your work email to run a CV.',
     };
