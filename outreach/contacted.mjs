@@ -96,3 +96,24 @@ if (import.meta.url === `file://${process.argv[1]}`.replace(/\\/g, '/') || proce
     console.log();
   }
 }
+
+/**
+ * Is it a sensible moment to email a UK recruitment agency?
+ *
+ * Saturday and Sunday are out: a cold email landing then is read on Monday
+ * under the weekend's backlog, if at all. Before 07:00 and after 18:00 UK are
+ * also poor — an email at 4am is at the bottom of the pile by the time anyone
+ * looks.
+ */
+export function isSendableNow(now = new Date()) {
+  // UK is UTC+1 from late March to late October.
+  const month = now.getUTCMonth();
+  const ukOffset = month >= 2 && month <= 9 ? 1 : 0;
+  const uk = new Date(now.getTime() + ukOffset * 3600_000);
+  const day = uk.getUTCDay();
+  const hour = uk.getUTCHours();
+  if (day === 0 || day === 6) return { ok: false, why: 'weekend in the UK' };
+  if (hour < 7) return { ok: false, why: `${hour}:00 UK — too early` };
+  if (hour >= 18) return { ok: false, why: `${hour}:00 UK — after hours` };
+  return { ok: true, why: `${hour}:00 UK, weekday` };
+}

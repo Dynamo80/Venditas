@@ -20,7 +20,7 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
-import { domainOf, record } from './contacted.mjs';
+import { domainOf, record, isSendableNow } from './contacted.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const LEDGER = path.join(ROOT, 'outreach', 'contacted.csv');
@@ -72,7 +72,16 @@ async function main() {
 
   const replied = new Set(rows.filter((r) => r.channel === 'replied').map((r) => r.domain));
   const followed = new Set(rows.filter((r) => r.channel === 'followup').map((r) => r.domain));
-  const cutoff = Date.now() - AFTER_DAYS * 86400_000;
+  // Business days, not calendar days. Three days after a Wednesday send is
+  // Saturday, and a follow-up delivered then is the one touch in the
+  // sequence most likely to be wasted.
+  let cutoff = Date.now();
+  let counted = 0;
+  while (counted < AFTER_DAYS) {
+    cutoff -= 86400_000;
+    const d = new Date(cutoff).getUTCDay();
+    if (d !== 0 && d !== 6) counted++;
+  }
 
   const due = [];
   for (const r of rows) {
@@ -85,6 +94,13 @@ async function main() {
     if (!due.some((d) => d.domain === r.domain)) {
       due.push({ domain: r.domain, at: r.at, ...entry });
     }
+  }
+
+  const when = isSendableNow();
+  if (DO_SEND && !when.ok) {
+    console.error(`\nRefusing to send: ${when.why}.`);
+    console.error('Pass --anyway if you have a reason.');
+    if (!flag('anyway')) { closeTransport(); process.exit(1); }
   }
 
   const batch = due.slice(0, WANT);

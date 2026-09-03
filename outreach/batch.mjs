@@ -22,7 +22,7 @@ import { render, makeReference } from '../lib/render.mjs';
 import { preview } from '../lib/preview.mjs';
 import { extract } from '../lib/extract.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
-import { recentlyContacted, record, COOLING_DAYS } from './contacted.mjs';
+import { recentlyContacted, record, COOLING_DAYS, isSendableNow } from './contacted.mjs';
 import { scanInbox } from './inbox.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
@@ -264,6 +264,13 @@ Cannot read the mailbox: ${e.message}`);
     return uk + logo + colour;
   };
   eligible.sort((a, b) => score(a) - score(b));
+
+  const when = isSendableNow();
+  if (DO_SEND && !when.ok) {
+    console.error(`\nRefusing to send: ${when.why}.`);
+    console.error('Pass --anyway if you have a reason.');
+    if (!flag('anyway')) { closeTransport(); process.exit(1); }
+  }
 
   const batch = eligible.slice(0, WANT);
   console.log(`\n${all.length} prospects · ${eligible.length} eligible · taking ${batch.length}`);
