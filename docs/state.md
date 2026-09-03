@@ -57,6 +57,19 @@ stranger can try it, pay for it, and be recorded as having paid.
 Also blocked on the founder, lower stakes: Razorpay's business category is
 "dropshipping", so invoices carry the wrong business name until it is changed.
 
+## Payment is manual, by decision
+
+The pricing page's button opens an email, not a checkout. No payment URL is
+configured and that is deliberate: at zero customers the first few
+conversations teach more than a checkout does.
+
+The cost is that nothing is captured automatically — no webhook, no receipt,
+no row appearing on its own. A sale exists only in an inbox unless someone
+writes it down. See `docs/runbooks/closing.md`.
+
+Switching it on later is one Vercel environment variable,
+`NEXT_PUBLIC_PAY_URL`, and a redeploy. The pricing page picks it up itself.
+
 ## Not blocked, worth doing
 
 - Batch upload (whole shortlist at once) — asked for on the pricing page, does
