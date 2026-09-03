@@ -15,5 +15,6 @@ outreach/prospects.csv
 outreach/prospects-notes.md
 outreach/batches/
 outreach/sample-cache.json
+outreach/contacted.csv
 outreach/sent.log
 outreach/suppressed.txt
