@@ -12,7 +12,7 @@ present for the conversation that built it.
    to be true to reach £1,000 MRR by 2026-10-02.
 3. **`decisions/`** — why things are the way they are. Read before proposing a
    change of direction.
-4. **`runbooks/`** — how to actually perform a task. `replies.md` first if
+4. **`runbooks/`** — how to actually perform a task. `closing.md` when someone says yes; `replies.md` first if
    someone has written back; that is the time-critical one.
 5. **`reference/`** — slow-moving facts: competitors, market, accounts.
 
