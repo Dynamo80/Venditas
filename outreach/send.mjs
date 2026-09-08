@@ -95,6 +95,10 @@ export function footerText(unsubUrl) {
     '—',
     `${SENDER.company} · ${SENDER.postal}`,
     `Not interested? ${unsubUrl} — one click, and I won't contact you again.`,
+    // Article 14: we did not get this address from the recipient, so every
+    // message says what we hold and where it came from. legal/lia.md relies
+    // on this line existing.
+    `Why you got this, and what we hold: ${SENDER.site}/privacy`,
   ].join('\n');
 }
 
@@ -102,7 +106,8 @@ export function footerHtml(unsubUrl) {
   return `<hr style="border:none;border-top:1px solid #dfe3e9;margin:22px 0 12px">
 <p style="font:12px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#78838f;margin:0">
 ${SENDER.company} · ${SENDER.postal}<br>
-Not interested? <a href="${unsubUrl}" style="color:#78838f">Unsubscribe</a> — one click, and I won't contact you again.
+Not interested? <a href="${unsubUrl}" style="color:#78838f">Unsubscribe</a> — one click, and I won't contact you again.<br>
+<a href="${SENDER.site}/privacy" style="color:#78838f">Why you got this, and what we hold</a>
 </p>`;
 }
 

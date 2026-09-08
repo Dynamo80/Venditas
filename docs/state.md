@@ -3,7 +3,7 @@
 **Only things that cannot be measured belong here.** For anything else run
 `node ops/status.mjs`, which fetches it live.
 
-Last reviewed: 2026-09-02 (batch 1 sent)
+Last reviewed: 2026-09-08 (outreach blocked; daily routine scheduled)
 
 ## Goal
 
@@ -11,14 +11,29 @@ Last reviewed: 2026-09-02 (batch 1 sent)
 
 ## The critical path
 
-Everything else is secondary to this sequence:
+**Outreach is stopped. Nothing else matters until it is not.**
 
-1. ~~Founder reviews and approves~~ — waived; the founder authorised sending
-   directly on 2026-09-02
-2. **Batch 1 sent: 25 UK agencies, 2026-09-02.** Inline branded preview image,
-   no attachment. All 25 accepted for delivery
-3. Watch for replies, then: recruiter runs their own CV → invoice via Skydo
-4. Batch 2 tomorrow — the cap is 25/day and it exists to protect the domain
+`node ops/preflight.mjs` says BLOCKED: every port on `smtpout.secureserver.net`
+and `imap.secureserver.net` times out from this machine, port 80 included, while
+`smtp.gmail.com:587` answers and `godaddy.com:443` loads. DNS resolves fine. That
+is a blocked route to GoDaddy's mail IPs (`92.204.80.21`, `148.72.44.1`), not an
+ISP closing mail ports.
+
+Batches went out on 2 and 3 September. Nothing since — five working days, 125
+sends, gone. Try in this order:
+
+1. **Phone hotspot**, two minutes. Settles whether the block follows the network
+   or the machine.
+2. **GoDaddy support** with both IPs, the symptom, and the start date. A block
+   placed after a burst of outbound mail from a residential address is ordinary
+   and they can lift it.
+3. **Any free-tier SMTP relay**, same domain, same SPF/DKIM/DMARC. It is one
+   environment variable; `send.mjs` does not care who relays.
+
+Then, and only then:
+
+4. Watch for replies → recruiter runs their own CV → invoice via Skydo
+5. The daily routine, scheduled: `ops\install-schedule.ps1`. Decision 010
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
@@ -41,10 +56,11 @@ directly each blocks money.
 | # | Item | Why it matters | Effort |
 |---|---|---|---|
 | 1 | Run `sql/003_customers.sql` | There is nowhere to record that someone paid | 5 min |
-| 2 | A payment page, its URL in `NEXT_PUBLIC_PAY_URL` on Vercel, redeploy | Pricing page button is `mailto:`. Nobody can pay without a reply, an invoice and a bank transfer | 1 hour, plus Razorpay category fix or a Skydo page |
+| 2 | Skydo GBP/USD account details and an INR account or UPI ID ready to put on an invoice | Money is collected by invoice (decision 007). The pricing page already asks for what the invoice needs; `docs/runbooks/invoice.md` is the ten-minute routine | 15 min |
 | 3 | Enable billing on the Gemini project | DPA clause 3.4 ("we do not train on your data") is untrue on the free tier. First compliance question every UK agency asks. Cost ~£0.0001 per CV | 10 min |
-| 4 | **One founder identity.** The repo names two people: `send.mjs` and the DPA path say Abin Johnson; `outreach/linkedin.md` says Arseny runs LinkedIn outreach; batch 1 was signed Arseny | A prospect who gets an email from Abin and a LinkedIn request from Arseny for the same product reads it as a machine working a list. The DPA needs one legal name in `[FOUNDER FULL LEGAL NAME]` | Decision, then 10 min of edits |
+| 4 | ~~One founder identity~~ — done 2026-09-03: emails, DPA, Article 30 record and the LinkedIn playbook all say Abin Johnson | | |
 | 5 | Fix the LinkedIn About that says Venditas was shut down | Every cold email that gets looked up finds the founder disowning the product. Rewrite in `outreach/profile.md` | 10 min |
+| 5a | Submit the sitemap to Google Search Console and Bing; list on the free directories | The Quibench page only works if it is crawled. `docs/runbooks/inbound.md` | 1 hour |
 | 6 | Supabase region | One line from the dashboard; DPA Annex 3 and the Article 30 record have placeholders without it | 2 min |
 | 7 | Solicitor review of privacy, terms, DPA; settle liability and governing law | A UK agency will not sign an unreviewed DPA from an overseas sole trader | 1–3 hours of fees |
 | 8 | Article 27 UK representative, or a written opinion that none is needed; ICO fee question | A line on every supplier questionnaire | £100–500/yr |
@@ -54,8 +70,45 @@ directly each blocks money.
 Items 1 to 3 are the difference between a project and a business: after them a
 stranger can try it, pay for it, and be recorded as having paid.
 
-Also blocked on the founder, lower stakes: Razorpay's business category is
-"dropshipping", so invoices carry the wrong business name until it is changed.
+Razorpay is out entirely (decision 007); nothing waits on it.
+
+**India list: deferred, deliberately.** Decision 008 added India to fill the
+cap on days the UK list could not. The Companies House list builder then
+produced 45 days of UK prospects in one run, so the cap is the binding limit
+and India is no longer needed inside the thirty days. The research agent for
+`outreach/prospects-in-1.csv` was cut off by a usage limit before writing
+anything; re-run it when the UK list is under two weeks from empty, or when
+the first UK customers prove the pitch and it is worth a second market.
+
+## The daily routine, scheduled
+
+It is one command now, and it should not need running by hand at all:
+
+```bash
+node ops/daily.mjs --send --confirm
+```
+
+Preflight, inbox, nurture, follow-ups, then new prospects — spending one shared
+25/day budget across all three senders, which the separate commands did not do.
+Register it once and stop thinking about it:
+
+```bash
+powershell -ExecutionPolicy Bypass -File ops\install-schedule.ps1
+```
+
+Installs a dry run at 14:00 IST on weekdays; add `-Live` to arm it. Catches up a
+day missed to a sleeping laptop. Decision 010, and the reason it exists is that
+the hand-run version stopped on 3 September and nobody noticed for five days.
+
+When FUNNEL says the UK list is under a week from empty:
+
+```bash
+node ops/build-prospects.mjs discover --in <path>/ch-agencies.csv --limit 2000
+```
+
+The Companies House file behind that is regenerated monthly by them and
+downloaded once by us; the command to fetch and filter it is at the top of
+`ops/build-prospects.mjs`.
 
 ## Payment is manual, by decision
 
@@ -77,10 +130,23 @@ Switching it on later is one Vercel environment variable,
 - Saved branding per account — same
 - `.doc` support — currently refused with a clear message
 
+## Waiting on one paste into Supabase
+
+`sql/005_trial_limits.sql` has not been run. Until it is, the daily cap holds
+but the ten-CV trial resets every 90 days when the retention job clears the
+counters it was summed from. `node ops/status.mjs` prints `trial limits NOT RUN`
+while that is true. Paste the file into the Supabase SQL editor and Run; it is
+safe to re-run, and it replaces `purge_old_data` from `sql/002_retention.sql`.
+
 ## Known and accepted
 
 - **No SOC 2, no penetration test.** Stated plainly on `/security` rather than
   discovered later.
+- **The trial email is never verified.** Anyone can type a stranger's address,
+  or an invention, and get ten CVs. Verification would mean an interstitial in
+  front of the highest-intent moment on the site, so the IP cap does the real
+  bounding instead — 12 a day. See
+  [decision 009](decisions/009-enforceable-trial-limits.md).
 - **Scanned CVs bypass local de-identification** and reach Google as page
   images. Disclosed in the privacy policy.
 - **Brand colours in the prospect list are unreliable** — only 41 of 244 came

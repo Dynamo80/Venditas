@@ -16,3 +16,7 @@ exists: without it, the eighth conversation starts from scratch.
 | 004 | [£79 founding price, £149 standard](004-pricing.md) | 2026-09-02 |
 | 005 | [UK agencies, and which CRMs to avoid](005-target-market.md) | 2026-09-02 |
 | 006 | [Nothing about a candidate is stored](006-no-candidate-data.md) | 2026-09-02 |
+| 007 | [Collect money by invoice; annual prepay counts](007-invoice-not-checkout.md) | 2026-09-03 |
+| 008 | [India is the second market, not a replacement for the UK](008-india-second-market.md) | 2026-09-03 |
+| 009 | [Trial limits count against keys a visitor cannot mint](009-enforceable-trial-limits.md) | 2026-09-08 |
+| 010 | [The daily routine runs itself, on the laptop](010-the-routine-runs-itself.md) | 2026-09-08 |

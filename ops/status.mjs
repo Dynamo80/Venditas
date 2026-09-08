@@ -16,6 +16,7 @@
  */
 
 import { readFileSync, existsSync } from 'node:fs';
+import net from 'node:net';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
@@ -33,6 +34,26 @@ const env = (() => {
 })();
 
 const ok = (b) => (b ? 'yes' : 'NO');
+
+/**
+ * Can we reach the mail host at all? A TCP handshake, nothing more — no login,
+ * nothing sent.
+ *
+ * This is here because on 3 September the batch sent and on 4 September it did
+ * not, and the only difference visible from this file was a number that had
+ * stopped moving. An unreachable mail server and a quiet morning looked the
+ * same. They do not any more.
+ */
+function reachable(host, port, ms = 6000) {
+  return new Promise((resolve) => {
+    if (!host) return resolve(null);
+    const sock = net.connect({ host, port });
+    const done = (v) => { clearTimeout(timer); try { sock.destroy(); } catch { /* gone */ } resolve(v); };
+    const timer = setTimeout(() => done(false), ms);
+    sock.on('connect', () => done(true));
+    sock.on('error', () => done(false));
+  });
+}
 const pad = (s, n) => String(s).padEnd(n);
 
 async function jget(url, opts = {}) {
@@ -112,6 +133,12 @@ async function main() {
     console.log(`  gemini key      ${ok(health.hasGeminiKey)}`);
     console.log(`  supabase        ${ok(health.hasSupabase)}  (via ${health.supabaseKeyFrom || '-'})`);
     console.log(`  metering ready  ${ok(health.meteringReady)}${health.meteringError ? '  ' + health.meteringError.slice(0, 60) : ''}`);
+    console.log(
+      `  trial limits    ${ok(health.trialLimitsReady)}` +
+      (health.trialLimitsReady === false
+        ? '  NOT RUN - paste sql/005_trial_limits.sql; the ten-CV trial resets every 90 days until you do'
+        : '')
+    );
     console.log(`  region          ${health.region}`);
     const bad = (health.rejectedSecrets || []);
     if (bad.length) console.log(`  REJECTED SECRETS  ${bad.join(', ')}  <- bad paste, re-enter`);
@@ -138,6 +165,23 @@ async function main() {
     : purge === 404 ? 'NOT RUN - paste sql/002_retention.sql into Supabase'
     : `unknown (could not check${purge ? `, http ${purge}` : ', no local credentials'})`;
   console.log(`  retention sql   ${retention}`);
+
+  // The outreach plan has exactly one single point of failure, and this is it.
+  const smtpHost = env.SMTP_HOST;
+  const imapHost = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^smtpout\./, 'imap.');
+  const [smtpUp, imapUp] = await Promise.all([
+    reachable(smtpHost, Number(env.SMTP_PORT || 465)),
+    reachable(imapHost, Number(env.IMAP_PORT || 993)),
+  ]);
+  if (smtpUp === null) {
+    console.log('  mail            no local credentials to check with');
+  } else {
+    console.log(`  mail out        ${ok(smtpUp)}  ${smtpHost}`);
+    console.log(`  mail in         ${ok(imapUp)}  ${imapHost}`);
+    if (!smtpUp || !imapUp) {
+      console.log('                  NO OUTREACH CAN GO OUT. Run: node ops/preflight.mjs');
+    }
+  }
 
   // ---- the business -----------------------------------------------------
   console.log('\nCUSTOMERS AND LEADS');

@@ -18,3 +18,7 @@ outreach/sample-cache.json
 outreach/contacted.csv
 outreach/sent.log
 outreach/suppressed.txt
+
+# Every prospect list, whatever the suffix, and the nurture log.
+outreach/prospects*.csv
+outreach/nurture.log

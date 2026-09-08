@@ -1,5 +1,26 @@
 # Runbook — send a day's outreach
 
+## Normally, you do not
+
+The routine is scheduled. `ops/install-schedule.ps1` registers it on weekdays at
+14:00 IST and it catches up a day the laptop slept through. Decision 010.
+
+To run it by hand — a first look, or a day the scheduler was off:
+
+```bash
+node ops/preflight.mjs                 # can mail leave at all?
+node ops/daily.mjs                     # what would go out; sends nothing
+node ops/daily.mjs --send --confirm    # the real run
+```
+
+`daily.mjs` does preflight, inbox, nurture, follow-ups and the batch in that
+order, spending one shared 25/day budget across all three senders. Running the
+individual commands below still works, but each defaults to a cap of 25 *of its
+own* — run three of them by hand on a busy day and the domain sends fifty.
+
+Everything after this section is the manual path and the reasoning behind the
+limits. Read it once; it is why the automated version behaves as it does.
+
 ## Before the first send of a new list
 
 ```bash
@@ -71,3 +92,29 @@ Reply personally, from the same address. Do not send a sequence to someone who
 has answered — that is the fastest way to be marked as automated.
 
 Recording a sale: see the comment at the bottom of `sql/003_customers.sql`.
+
+## The rest of the daily routine
+
+Sending new prospects is the last step, not the first. Before it:
+
+```bash
+node outreach/inbox.mjs                # replies and bounces; marks repliers
+node outreach/nurture.mjs --send       # trial users who hit 5 and 10 CVs
+node outreach/followup.mjs --send      # day-3 and day-8 follow-ups
+```
+
+Follow-ups and nurture emails count toward the same 25-a-day cap; the batch
+takes whatever is left.
+
+## When the list runs low
+
+`node ops/status.mjs` prints days of UK list remaining. Under a week:
+
+```bash
+node ops/build-prospects.mjs discover --in <scratch>/ch-agencies.csv --limit 2000
+```
+
+It appends verified agencies to `outreach/prospects-uk-2.csv`, which the batch
+already reads. First-time setup (the 490 MB Companies House download and the
+filter) is documented at the top of the script. Nothing in it guesses an
+email address; every row's address was read off the agency's own site.

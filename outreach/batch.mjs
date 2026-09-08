@@ -185,9 +185,15 @@ ${SENDER.person}`;
 
 // --------------------------------------------------------------------- main
 async function main() {
-  const csv = path.join(ROOT, 'outreach', 'prospects.csv');
-  if (!existsSync(csv)) {
-    console.error('outreach/prospects.csv not found');
+  // Every list, not just the first one. prospects.csv was hand-researched;
+  // prospects-uk-2.csv comes from ops/build-prospects.mjs; prospects-in-1.csv
+  // is India. One agency can appear in two lists, so rows are merged on the
+  // email domain (or the site's domain when no address is published), first
+  // list wins.
+  const dir = path.join(ROOT, 'outreach');
+  const csvs = readdirSync(dir).filter((f) => /^prospects.*\.csv$/i.test(f)).sort();
+  if (!csvs.length) {
+    console.error('no outreach/prospects*.csv found');
     process.exit(1);
   }
 
@@ -217,7 +223,17 @@ Cannot read the mailbox: ${e.message}`);
     if (!flag('skip-inbox')) { closeTransport(); process.exit(1); }
   }
 
-  const all = parseCsv(readFileSync(csv, 'utf8'));
+  const byKey = new Map();
+  for (const f of csvs) {
+    for (const p of parseCsv(readFileSync(path.join(dir, f), 'utf8'))) {
+      const e = (p.email || '').trim().toLowerCase();
+      let key = e.includes('@') ? e.split('@')[1] : '';
+      if (!key) { try { key = new URL(p.website).hostname.replace(/^www\./, ''); } catch { key = p.company; } }
+      if (!byKey.has(key)) byKey.set(key, { ...p, list: f });
+    }
+  }
+  const all = [...byKey.values()];
+  console.log(`lists: ${csvs.map((f) => f.replace(/^prospects-?|\.csv$/g, '') || '1').join(', ')} · ${all.length} agencies after merging`);
   const skip = suppressed();
   const sentLog = existsSync(path.join(ROOT, 'outreach', 'sent.log'))
     ? readFileSync(path.join(ROOT, 'outreach', 'sent.log'), 'utf8').toLowerCase()
