@@ -1,6 +1,6 @@
 # LinkedIn playbook — Venditas
 
-Founder-led outreach from Arseny's personal profile. ~20 touches a day, under 20 minutes,
+Founder-led outreach from Abin's personal profile. ~20 touches a day, under 20 minutes,
 executed by hand. UK recruitment agencies, 5–30 people.
 
 Researched and written 2 September 2026. Platform limits change without notice — re-check
@@ -73,7 +73,7 @@ window rather than a calendar week, identical across Free, Premium and Sales Nav
 paying does not raise it. New or low-trust accounts are throttled lower, ~50–80/week.
 Withdrawing pending invites does **not** return quota; the count is of requests sent.
 
-**New vs. established.** Arseny's account is old and has ~500 real connections, which is
+**New vs. established.** Abin's account is old and has ~500 real connections, which is
 established. But it has never sent outreach, so its behavioural baseline is "occasional
 browsing." Jumping from that to 20 invites a day is itself an anomaly. Ramp:
 
@@ -96,7 +96,7 @@ volume as such.
 
 ### 0.4 What gets automation detected
 
-Arseny is sending by hand, so most of this is moot. Recording where the line is, because
+Abin is sending by hand, so most of this is moot. Recording where the line is, because
 the temptation to "just install one tool" arrives around week three.
 
 Flagged, per 2026 reporting from Cleverly, Dux-Soup, LinkedInsider and Northlight:
@@ -115,7 +115,7 @@ Flagged, per 2026 reporting from Cleverly, Dux-Soup, LinkedInsider and Northligh
 Two practical notes for this specific case:
 
 1. **Do not use a UK VPN.** The instinct is to look local to the prospects. LinkedIn does not
-   care where Arseny sits — his profile says India and that is fine — but it does care about a
+   care where Abin sits — his profile says India and that is fine — but it does care about a
    session location that changes. A consistent Navi Mumbai IP is safer than an inconsistent
    UK one.
 2. **Spreadsheets, keyboard shortcuts and pre-written text are not automation.** Preparing all
@@ -125,7 +125,7 @@ Two practical notes for this specific case:
 **One limit that will bite before any of the above:** the free-account
 **Commercial Use Limit**, which throttles search after roughly 250–350 profile searches a
 month (community-observed; LinkedIn does not publish the number) and resets on the 1st.
-At 12 prospects a day Arseny will approach it. Mitigation in [§B.5](#b5-working-around-the-commercial-use-limit).
+At 12 prospects a day Abin will approach it. Mitigation in [§B.5](#b5-working-around-the-commercial-use-limit).
 
 ### 0.5 What I'm not certain about
 
@@ -141,7 +141,7 @@ Read this before treating any number above as a rule.
 | LinkedIn suppresses posts with external links | **Low** | Widely repeated, never confirmed by LinkedIn. Putting the link in the first comment costs nothing, so do it, but don't believe it's decisive. |
 | Everything in §0.3 quoted from linkedin.com/help | **High** | Official source, quoted verbatim. |
 
-**Rule for Arseny: if the platform tells you something different from this document, the
+**Rule for Abin: if the platform tells you something different from this document, the
 platform is right and this document is stale.**
 
 ---
@@ -347,7 +347,7 @@ several named prospects.
 
 ### B.5 Working around the Commercial Use Limit
 
-At ~12 prospects a day, Arseny will run near the throttle. Reduce search consumption:
+At ~12 prospects a day, Abin will run near the throttle. Reduce search consumption:
 
 - **Build lists weekly in one sitting, work from the list daily.** A saved list of 60 names
   costs a handful of searches; looking up 12 people a day costs 60 a week.
@@ -544,7 +544,7 @@ problem the moment anyone compares. Pick one before either sequence runs at volu
 
 ### D.1 Why posting matters here specifically
 
-Arseny has no audience, so a post will not reach strangers. That is fine, because the job of
+Abin has no audience, so a post will not reach strangers. That is fine, because the job of
 these posts is not reach — **it is to be visible to the ~60 recruiters a week who just accepted
 a connection with no note and have no idea who he is.** Content converts a silent connection
 into a recognised name, so that the message in touch 2 arrives from someone rather than from

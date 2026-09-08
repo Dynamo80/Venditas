@@ -19,7 +19,7 @@
 number [NUMBER], whose registered office is at [ADDRESS] (the **"Customer"**);
 and
 
-**(2) Venditas**, a sole proprietorship operated by [FOUNDER FULL LEGAL NAME] of
+**(2) Venditas**, a sole proprietorship operated by Abin Johnson of
 Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India (**"Venditas"**),
 
 each a "party" and together the "parties".
@@ -123,7 +123,7 @@ back up.
 except as permitted by this agreement.
 
 5.2 Venditas is a one-person business. Access to production systems is held by
-[FOUNDER FULL LEGAL NAME] alone, who is bound by the confidentiality obligations
+Abin Johnson alone, who is bound by the confidentiality obligations
 in this agreement. Venditas shall ensure that any person it later authorises to
 process Personal Data is subject to an appropriate written confidentiality
 obligation before being given access, and shall maintain a current record of who

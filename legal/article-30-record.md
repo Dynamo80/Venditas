@@ -22,7 +22,7 @@ notice.
 
 | | |
 |---|---|
-| Name | Venditas, a sole trader business operated by [FOUNDER FULL LEGAL NAME] |
+| Name | Venditas, a sole trader business operated by Abin Johnson |
 | Address | Bhoomi Elite, Sector 28, Nerul, Navi Mumbai 400706, India |
 | Contact | founder@venditas.in |
 | Data protection officer | None appointed; not required at this scale. Contact above. |
