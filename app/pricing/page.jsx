@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL } from '../../lib/pricing.mjs';
+import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL, MEETING_URL, invoiceMailto } from '../../lib/pricing.mjs';
 
 export const metadata = {
   title: 'Pricing — Venditas',
@@ -69,21 +69,36 @@ export default async function Pricing({ searchParams }) {
               <li key={f}>{f}</li>
             ))}
           </ul>
+          <p className="per">
+            Or {price.symbol}{price.annual.toLocaleString('en-GB')} a year — two months free.
+          </p>
           {PAY_URL ? (
             <>
               <a href={PAY_URL} className="act primary" rel="noopener">
                 Start — {price.symbol}{price.amount}/month
               </a>
               <p className="per" style={{ marginTop: 10 }}>
-                Card or bank transfer. Cancel any time. Questions first?{' '}
-                <a href={CONTACT_URL}>Email the founder</a>.
+                Card or bank transfer. Cancel any time.
               </p>
             </>
           ) : (
-            <a href={CONTACT_URL} className="act primary">
-              Get set up
-            </a>
+            <>
+              <a href={invoiceMailto(region)} className="act primary">
+                Start — we invoice you
+              </a>
+              {/* Only true while there is no checkout. Left inside this branch
+                  on purpose: it promises "no card details", and the other
+                  branch is a card checkout. */}
+              <p className="per" style={{ marginTop: 10 }}>
+                An invoice from the founder within one business day, paid by bank transfer
+                {region === 'in' ? ' or UPI' : ' to a local account'}. No card details, no contract.
+              </p>
+            </>
           )}
+          <p className="per" style={{ marginTop: 10 }}>
+            Questions first? <a href={MEETING_URL} target="_blank" rel="noopener noreferrer">
+            Book 30 minutes with Abin</a> or <a href={CONTACT_URL}>email him</a>.
+          </p>
         </div>
       </div>
 
