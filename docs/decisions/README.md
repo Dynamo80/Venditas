@@ -20,3 +20,4 @@ exists: without it, the eighth conversation starts from scratch.
 | 008 | [India is the second market, not a replacement for the UK](008-india-second-market.md) | 2026-09-03 |
 | 009 | [Trial limits count against keys a visitor cannot mint](009-enforceable-trial-limits.md) | 2026-09-08 |
 | 010 | [The daily routine runs itself, on the laptop](010-the-routine-runs-itself.md) | 2026-09-08 |
+| 011 | [A demo account is a confirmed work address, nothing more](011-demo-accounts.md) | 2026-09-08 |

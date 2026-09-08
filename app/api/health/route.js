@@ -84,9 +84,27 @@ export async function GET() {
       checks.trialLimitsReady = false;
       checks.trialLimitsError = String(e?.message || e).slice(0, 160);
     }
+    // sql/006. Probed with a deliberately empty body: a present function
+    // answers 400 (wrong arguments), an absent one answers 404. Nothing is
+    // written either way, which a real probe signup would.
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/demo_signup`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseKey.value,
+          Authorization: `Bearer ${supabaseKey.value}`,
+          'Content-Type': 'application/json',
+        },
+        body: '{}',
+      });
+      checks.demoAccountsReady = res.status !== 404;
+    } catch {
+      checks.demoAccountsReady = false;
+    }
   } else {
     checks.meteringReady = false;
     checks.trialLimitsReady = false;
+    checks.demoAccountsReady = false;
   }
   checks.node = process.version;
   checks.region = process.env.VERCEL_REGION || 'local';

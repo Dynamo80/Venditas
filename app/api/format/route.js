@@ -1,6 +1,7 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
 import { check, guard, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
+import { readSession, SESSION_COOKIE } from '../../../lib/demo-account.mjs';
 import { coverage, COVERAGE_FLOOR } from '../../../lib/coverage.mjs';
 import mammoth from 'mammoth';
 
@@ -55,14 +56,26 @@ export async function POST(request) {
     return bad("That email doesn't look right — mind checking it?", 400);
   }
 
+  // A verified demo account, if this browser has one. The cookie is signed and
+  // was only ever issued after a link was clicked in the mailbox, so the address
+  // inside it is the one address here that has actually been proven.
+  const session = readSession(
+    request.cookies?.get?.(SESSION_COOKIE)?.value ||
+    (request.headers.get('cookie') || '')
+      .split(';').map((c) => c.trim())
+      .find((c) => c.startsWith(`${SESSION_COOKIE}=`))?.slice(SESSION_COOKIE.length + 1)
+  );
+
   // Metered before anything expensive happens. Extraction spends a finite
   // quota, so the decision to spend it has to come first.
-  const verdict = await check(request, email);
+  const verdict = await check(request, email, { account: session?.email || null });
   if (!verdict.allow) {
     const messages = {
       disposable: 'Please use your work email — throwaway addresses are blocked.',
-      'daily-cap': `That's ${FREE_PER_DAY} today. Come back tomorrow, or get in touch and we'll lift it.`,
-      'trial-used': `You've used all ${FREE_TOTAL} of your trial CVs - which means it's working. Email founder@venditas.in and we'll get you set up properly.`,
+      'daily-cap': `That's ${verdict.limit ?? FREE_PER_DAY} today. Come back tomorrow, or get in touch and we'll lift it.`,
+      'trial-used': session
+        ? `That's all ${verdict.limit ?? FREE_TOTAL} on your demo account - which means it's working. Reply to Abin and we'll get you set up properly.`
+        : `You've used all ${FREE_TOTAL} of your trial CVs - which means it's working. Email founder@venditas.in and we'll get you set up properly.`,
       'ip-cap': "You've hit today's limit from this connection. It resets tomorrow.",
       'need-email': 'Enter your work email to run a CV.',
     };
@@ -164,7 +177,7 @@ export async function POST(request) {
 
   // Recorded only once the document exists. Capturing an address off a request
   // that then failed would put someone on the list who never got anything.
-  await recordLead(email, brand.name);
+  await recordLead(session?.email || email, brand.name);
 
   const safeName = (brand.redact ? reference : data.name || reference)
     .replace(/[^A-Za-z0-9._-]+/g, '-')

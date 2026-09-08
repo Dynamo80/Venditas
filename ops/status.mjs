@@ -133,6 +133,7 @@ async function main() {
     console.log(`  gemini key      ${ok(health.hasGeminiKey)}`);
     console.log(`  supabase        ${ok(health.hasSupabase)}  (via ${health.supabaseKeyFrom || '-'})`);
     console.log(`  metering ready  ${ok(health.meteringReady)}${health.meteringError ? '  ' + health.meteringError.slice(0, 60) : ''}`);
+    console.log(`  demo accounts   ${ok(health.demoAccountsReady)}${health.demoAccountsReady === false ? '  NOT RUN - paste sql/006_demo_accounts.sql' : ''}`);
     console.log(
       `  trial limits    ${ok(health.trialLimitsReady)}` +
       (health.trialLimitsReady === false

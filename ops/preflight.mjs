@@ -134,6 +134,9 @@ async function main() {
     record('trial limits', h.trialLimitsReady === true,
       h.trialLimitsReady ? 'sql/005 applied' : 'sql/005 not run',
       h.trialLimitsReady ? null : 'Paste sql/005_trial_limits.sql into Supabase.');
+    record('demo accounts', h.demoAccountsReady === true,
+      h.demoAccountsReady ? 'sql/006 applied' : 'sql/006 not run',
+      h.demoAccountsReady ? null : 'Paste sql/006_demo_accounts.sql into Supabase — signup 500s without it.');
   } catch (err) {
     record('site', false, String(err?.message || err).slice(0, 60), 'venditas.in is not answering.');
   }
