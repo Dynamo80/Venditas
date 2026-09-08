@@ -43,7 +43,19 @@ export async function GET() {
     SUPABASE_SERVICE_KEY: shape('SUPABASE_SERVICE_KEY'),
     SUPABASE_SECRET: shape('SUPABASE_SECRET'),
     GEMINI_API_KEY: shape('GEMINI_API_KEY'),
+    // The demo signup sends its confirmation link from here, not from the
+    // laptop, so these have to exist in the hosting environment. Presence and
+    // shape only — never a value, and never the password's contents.
+    SMTP_HOST: shape('SMTP_HOST'),
+    SMTP_PORT: shape('SMTP_PORT'),
+    SMTP_USER: shape('SMTP_USER'),
+    SMTP_PASS: shape('SMTP_PASS'),
   };
+
+  // The single question that decides whether anyone can sign up.
+  checks.mailerReady = Boolean(
+    process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+  );
 
   // Whether the metering tables and the counter function actually exist. The
   // env vars being present says nothing about whether the SQL has been run.

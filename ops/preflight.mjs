@@ -134,6 +134,9 @@ async function main() {
     record('trial limits', h.trialLimitsReady === true,
       h.trialLimitsReady ? 'sql/005 applied' : 'sql/005 not run',
       h.trialLimitsReady ? null : 'Paste sql/005_trial_limits.sql into Supabase.');
+    record('signup mail', h.mailerReady === true,
+      h.mailerReady ? 'SMTP set in the hosting environment' : 'SMTP missing in production',
+      h.mailerReady ? null : 'Add SMTP_HOST, SMTP_USER and SMTP_PASS to Vercel, then redeploy — nobody can sign up without them.');
     record('demo accounts', h.demoAccountsReady === true,
       h.demoAccountsReady ? 'sql/006 applied' : 'sql/006 not run',
       h.demoAccountsReady ? null : 'Paste sql/006_demo_accounts.sql into Supabase — signup 500s without it.');
