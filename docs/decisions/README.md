@@ -21,3 +21,4 @@ exists: without it, the eighth conversation starts from scratch.
 | 009 | [Trial limits count against keys a visitor cannot mint](009-enforceable-trial-limits.md) | 2026-09-08 |
 | 010 | [The daily routine runs itself, on the laptop](010-the-routine-runs-itself.md) | 2026-09-08 |
 | 011 | [A demo account is a confirmed work address, nothing more](011-demo-accounts.md) | 2026-09-08 |
+| 012 | [Five CVs on a demo account, €80, and Gmail is a customer](012-five-cv-demo-and-euro.md) | 2026-09-08 |

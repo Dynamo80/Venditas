@@ -3,7 +3,7 @@ import DemoSignup from './DemoSignup.jsx';
 export const metadata = {
   title: 'Set up your Venditas account',
   description:
-    'Confirm your work email and your Venditas account is ready — your branded template, contact details stripped, on your own candidate CVs.',
+    'Confirm your email and your Venditas account is ready — five of your own candidate CVs in your branded template, contact details stripped.',
   alternates: { canonical: 'https://venditas.in/demo' },
   // Nothing here belongs in a search index: it is the page you land on from a
   // demo invitation, and half its states are error messages.
@@ -18,7 +18,8 @@ export default async function DemoPage({ searchParams }) {
         <h1>Set up your account</h1>
         <p className="standfirst">
           One confirmation email, and the tool is yours to point at your own candidate CVs —
-          your branding, contact details stripped, as many as the trial allows.
+          your branding, contact details stripped. Five of them, which is enough to see
+          whether it holds up on the ones you actually send.
         </p>
       </header>
       <DemoSignup state={params?.state || null} />

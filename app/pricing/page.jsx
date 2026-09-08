@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL, MEETING_URL, invoiceMailto } from '../../lib/pricing.mjs';
+import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL, MEETING_URL } from '../../lib/pricing.mjs';
 
 export const metadata = {
   title: 'Pricing — Venditas',
@@ -9,6 +9,7 @@ export const metadata = {
 
 const REGIONS = [
   { key: 'uk', label: 'GBP' },
+  { key: 'eu', label: 'EUR' },
   { key: 'us', label: 'USD' },
   { key: 'in', label: 'INR' },
 ];
@@ -61,7 +62,7 @@ export default async function Pricing({ searchParams }) {
           <p className="founding">
             Founding price for the first {PRO.foundingSeats} agencies, and it stays at this rate
             for as long as you keep the subscription. It goes to{' '}
-            {region === 'us' ? `$${PRO.standardUsd}` : region === 'in' ? '₹12,000' : `£${PRO.standardGbp}`} after that.
+            {price.symbol}{price.standard.toLocaleString('en-GB')} after that.
           </p>
           <p className="blurb">{PRO.blurb}</p>
           <ul>
@@ -83,21 +84,21 @@ export default async function Pricing({ searchParams }) {
             </>
           ) : (
             <>
-              <a href={invoiceMailto(region)} className="act primary">
-                Start — we invoice you
+              <a href={MEETING_URL} className="act primary" target="_blank" rel="noopener noreferrer">
+                Book 30 minutes with Abin
               </a>
-              {/* Only true while there is no checkout. Left inside this branch
-                  on purpose: it promises "no card details", and the other
-                  branch is a card checkout. */}
+              {/* Kept inside this branch: it says there is no checkout, and the
+                  other branch is a checkout. */}
               <p className="per" style={{ marginTop: 10 }}>
-                An invoice from the founder within one business day, paid by bank transfer
-                {region === 'in' ? ' or UPI' : ' to a local account'}. No card details, no contract.
+                No checkout, deliberately. We are early enough that every conversation
+                teaches us something, so buying starts with half an hour: bring a CV your
+                team actually struggles with, and if it holds up we sort out payment on the
+                call. Unlimited CVs from that point.
               </p>
             </>
           )}
           <p className="per" style={{ marginTop: 10 }}>
-            Questions first? <a href={MEETING_URL} target="_blank" rel="noopener noreferrer">
-            Book 30 minutes with Abin</a> or <a href={CONTACT_URL}>email him</a>.
+            Rather write first? <a href={CONTACT_URL}>Email Abin</a>.
           </p>
         </div>
       </div>
@@ -112,7 +113,7 @@ export default async function Pricing({ searchParams }) {
         <h2>How to think about the price</h2>
         <p>
           A recruiter on a modest salary costs somewhere around {price.symbol}
-          {region === 'in' ? '600' : region === 'us' ? '25' : '20'} an hour once you count
+          {price.hourly} an hour once you count
           everything. If reformatting CVs takes even two hours a week across your team, this pays
           for itself several times over in the first month — and if it doesn't, the paragraph
           above applies.

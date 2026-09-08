@@ -1,9 +1,13 @@
 # Runbook — someone wants to pay
 
-**If they want to talk first**, send the booking link rather than proposing times:
-<https://calendly.com/aventis61/30min>. It is on `/pricing`, `/contact` and in the
-site footer, and it lives in `lib/pricing.mjs` as `MEETING_URL` — change it there,
-not in three pages.
+**Buying starts with the call now**, so most people arrive here having already
+booked: <https://calendly.com/aventis61/30min>. It is the primary button on
+`/pricing`, and also on `/contact` and in the footer. It lives in
+`lib/pricing.mjs` as `MEETING_URL` — change it there, not in three pages.
+
+Payment is settled on the call and no rail is named on the site, so ask what
+suits them rather than leading with one. Whatever they choose, the invoice below
+is still what makes it a recorded sale.
 
 There is no checkout. Razorpay cannot be used (decision 007), so money is
 collected by invoice and bank transfer. This is fine for the first twenty

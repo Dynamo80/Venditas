@@ -102,8 +102,8 @@ export default function DemoSignup({ state }) {
 
       <h2>Your details</h2>
       <p className="hint">
-        A work email, because the account has to reach you later — an invoice, a change to
-        the template, an answer to something you asked on the call.
+        Your work email if you have one — the account has to reach you later, for an invoice
+        or a change to the template. Five CVs on your own candidates, then we talk.
       </p>
 
       <div className="grid">
