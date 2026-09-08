@@ -96,20 +96,29 @@ export async function GET() {
       checks.trialLimitsReady = false;
       checks.trialLimitsError = String(e?.message || e).slice(0, 160);
     }
-    // sql/006. Probed with a deliberately empty body: a present function
-    // answers 400 (wrong arguments), an absent one answers 404. Nothing is
-    // written either way, which a real probe signup would.
+    // sql/006, probed through demo_verify rather than demo_signup.
+    //
+    // The obvious probe — POST {} at demo_signup and call 404 "absent" — is
+    // wrong, and reported a migration that had run as missing. PostgREST
+    // resolves a function by name AND argument signature, so an empty body
+    // against a six-argument function is 404 PGRST202 either way. There is no
+    // status that distinguishes "no such function" from "wrong arguments".
+    //
+    // demo_verify takes one argument, so it can be called for real. A hash of
+    // all zeroes matches no row, updates nothing and returns [] — a complete
+    // answer with no side effect.
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/demo_signup`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/demo_verify`, {
         method: 'POST',
         headers: {
           apikey: supabaseKey.value,
           Authorization: `Bearer ${supabaseKey.value}`,
           'Content-Type': 'application/json',
         },
-        body: '{}',
+        body: JSON.stringify({ p_hash: '0'.repeat(64) }),
       });
-      checks.demoAccountsReady = res.status !== 404;
+      checks.demoAccountsReady = res.ok;
+      if (!res.ok) checks.demoAccountsError = (await res.text()).slice(0, 160);
     } catch {
       checks.demoAccountsReady = false;
     }
