@@ -170,7 +170,7 @@ async function main() {
 
   // The outreach plan has exactly one single point of failure, and this is it.
   const smtpHost = env.SMTP_HOST;
-  const imapHost = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^smtpout\./, 'imap.');
+  const imapHost = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^(?:smtpout|smtp)\./, 'imap.');
   const [smtpUp, imapUp] = await Promise.all([
     reachable(smtpHost, Number(env.SMTP_PORT || 465)),
     reachable(imapHost, Number(env.IMAP_PORT || 993)),

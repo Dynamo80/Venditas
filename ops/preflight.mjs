@@ -87,7 +87,7 @@ async function main() {
   // hosts are unreachable, no email goes out today and no reply is read,
   // whatever else is healthy.
   const smtpHost = e.SMTP_HOST;
-  const imapHost = (e.IMAP_HOST || e.SMTP_HOST || '').replace(/^smtpout\./, 'imap.');
+  const imapHost = (e.IMAP_HOST || e.SMTP_HOST || '').replace(/^(?:smtpout|smtp)\./, 'imap.');
   const smtpPort = Number(e.SMTP_PORT || 465);
   const imapPort = Number(e.IMAP_PORT || 993);
 

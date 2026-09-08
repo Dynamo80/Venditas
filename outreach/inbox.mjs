@@ -54,7 +54,7 @@ function decodeSubject(raw) {
 }
 
 export async function scanInbox({ apply = false, sinceDays = 14 } = {}) {
-  const host = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^smtpout\./, 'imap.');
+  const host = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^(?:smtpout|smtp)\./, 'imap.');
   const im = new Imap({ host, port: Number(env.IMAP_PORT || 993), user: env.SMTP_USER, pass: env.SMTP_PASS });
   const found = { replies: [], bounces: [], auto: [], other: 0 };
 
