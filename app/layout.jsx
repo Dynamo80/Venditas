@@ -31,7 +31,7 @@ export const metadata = {
   openGraph: {
     title: 'Venditas — branded CVs in four seconds',
     description:
-      "Candidate CVs in your template, with the contact details stripped. Five a day free.",
+      "Candidate CVs in your template, with the contact details stripped. Ten CVs free, then £79/month for the whole agency.",
     type: 'website',
     url: 'https://venditas.in',
   },

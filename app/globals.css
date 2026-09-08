@@ -181,8 +181,8 @@ footer {
   border-top: 1px solid var(--line); margin-top: 64px; background: var(--surface-2);
 }
 .foot-cols {
-  max-width: 940px; margin: 0 auto; padding: 40px 24px 26px;
-  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 30px;
+  max-width: 1100px; margin: 0 auto; padding: 40px 24px 26px;
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1.2fr; gap: 30px;
 }
 .foot-head {
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;

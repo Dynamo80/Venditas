@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { MEETING_URL } from '../lib/pricing.mjs';
 
 /**
  * Site chrome.
@@ -17,6 +18,7 @@ export function Nav() {
       </Link>
       <div className="nav-links">
         <Link href="/pricing">Pricing</Link>
+        <Link href="/cv-formatting-for-recruitment-agencies">For agencies</Link>
         <Link href="/security">Security</Link>
         <Link href="/faq">FAQ</Link>
         <Link href="/about">About</Link>
@@ -53,7 +55,17 @@ export function SiteFooter() {
         <div>
           <div className="foot-head">Company</div>
           <Link href="/about">About</Link>
+          <Link href="/contact">Contact</Link>
+          <a href={MEETING_URL} target="_blank" rel="noopener noreferrer">Book a call</a>
           <a href="mailto:founder@venditas.in">founder@venditas.in</a>
+        </div>
+        <div>
+          <div className="foot-head">Read</div>
+          <Link href="/gdpr-cv-redaction-recruitment-agencies">GDPR CV handling</Link>
+          <Link href="/candidate-cv-anonymisation-fee-protection">Anonymising CVs</Link>
+          <Link href="/cv-formatting-house-style-consistency">House-style consistency</Link>
+          <Link href="/bulk-cv-formatting-shortlist">Formatting a shortlist</Link>
+          <Link href="/how-long-does-it-take-to-reformat-a-cv">How long reformatting takes</Link>
         </div>
       </div>
       <div className="foot-legal">
