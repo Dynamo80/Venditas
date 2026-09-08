@@ -1,6 +1,6 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
-import { check, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
+import { check, guard, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
 import { coverage, COVERAGE_FLOOR } from '../../../lib/coverage.mjs';
 import mammoth from 'mammoth';
 
@@ -11,7 +11,21 @@ export const runtime = 'nodejs';
 const bad = (message, status = 400) =>
   Response.json({ error: message }, { status });
 
+// A refusal that still costs us the upload is only half a refusal.
+const tooMany = (message, seconds) =>
+  Response.json(
+    { error: message, reason: 'ip-cap' },
+    { status: 429, headers: { 'Retry-After': String(seconds) } }
+  );
+
 export async function POST(request) {
+  // Before the body is touched. Everything below this line reads up to 10MB off
+  // the wire, and someone looping the endpoint should not get us to do that.
+  // Costs no round trip — the counter is in memory.
+  if (!guard(request).allow) {
+    return tooMany("You've hit today's limit from this connection. It resets tomorrow.", 3600);
+  }
+
   let form;
   try {
     form = await request.formData();
@@ -52,9 +66,20 @@ export async function POST(request) {
       'ip-cap': "You've hit today's limit from this connection. It resets tomorrow.",
       'need-email': 'Enter your work email to run a CV.',
     };
+    if (verdict.reason === 'disposable') {
+      return Response.json({ error: messages.disposable, reason: verdict.reason }, { status: 400 });
+    }
+    // Seconds until midnight UTC, which is when the daily counters roll over.
+    // A bare 429 invites an immediate retry; this says when it is worth one.
+    const midnight = Date.UTC(
+      new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate() + 1
+    );
     return Response.json(
       { error: messages[verdict.reason] || 'Limit reached.', reason: verdict.reason },
-      { status: verdict.reason === 'disposable' ? 400 : 429 }
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.max(60, Math.ceil((midnight - Date.now()) / 1000))) },
+      }
     );
   }
 

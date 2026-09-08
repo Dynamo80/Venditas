@@ -4,6 +4,10 @@
 -- A privacy policy that promises deletion while nothing is ever deleted is
 -- worse than one that promises nothing: it is a written, dated, provable false
 -- statement. This makes the promise true.
+--
+-- SUPERSEDED IN PART: sql/005_trial_limits.sql redefines purge_old_data to also
+-- clear the trial-total counters it adds. Re-running this file reverts that, so
+-- if you do, run 005 again afterwards.
 
 create or replace function purge_old_data()
 returns table (usage_deleted int, leads_deleted int)

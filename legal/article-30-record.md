@@ -87,8 +87,9 @@ As described in DPA Annex 2, sections A to G. In summary: no retention of
 candidate data; TLS in transit; secrets held only in the hosting provider's
 environment and on one encrypted machine; single-person access; local
 de-identification before the model call; post-render leak assertion that fails
-closed; rate limiting by salted IP hash; a scheduled purge of usage counters
-after 90 days and dormant accounts after 24 months. Measures **not** in place
+closed; rate limiting by salted IP hash, with the email counters salted and
+hashed the same way; a scheduled purge of usage counters after 90 days, trial
+totals after 24 months of disuse, and dormant accounts after 24 months. Measures **not** in place
 (no certifications, no penetration test, no insurance) are stated in Annex 2
 section G rather than omitted.
 
@@ -104,9 +105,9 @@ section G rather than omitted.
 | Lawful basis | Contract (Article 6(1)(b)) for the service; legitimate interests (6(1)(f)) for abuse control |
 | Data subjects | People at recruitment agencies who use the site |
 | Data | Work email, agency name, first and last seen, CV count, contact preference, unsubscribe token, plan and payment reference |
-| Also stored | Per-day request counters keyed to a salted hash of the IP address; never the address |
+| Also stored | Request counters keyed to a salted hash of the IP address, and to a salted hash of the email address; never either address itself |
 | Recipients | Supabase (database host). Nobody else |
-| Retention | Counters: 90 days. Dormant accounts: 24 months from last seen. Opt-out records: never deleted, so the opt-out is never forgotten |
+| Retention | Per-day counters: 90 days. Trial totals: 24 months from last use — deleting one earlier would hand back a trial already spent. Dormant accounts: 24 months from last seen. Opt-out records: never deleted, so the opt-out is never forgotten |
 | Transfers | To Supabase, AWS [REGION — CONFIRM] |
 
 ### 7. Marketing list (direct outreach to agencies)

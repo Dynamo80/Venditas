@@ -64,8 +64,29 @@ export async function GET() {
       checks.meteringReady = false;
       checks.meteringError = String(e?.message || e).slice(0, 160);
     }
+
+    // And whether sql/005 has been run. Without it the daily cap still holds,
+    // but the ten-CV trial silently becomes ten per ninety days — a limit that
+    // is quietly weaker than the one we advertise is worth a line here.
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/bump_trial`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseKey.value,
+          Authorization: `Bearer ${supabaseKey.value}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ p_ip_key: 'healthcheck', p_email_key: null }),
+      });
+      checks.trialLimitsReady = res.ok;
+      if (!res.ok) checks.trialLimitsError = (await res.text()).slice(0, 160);
+    } catch (e) {
+      checks.trialLimitsReady = false;
+      checks.trialLimitsError = String(e?.message || e).slice(0, 160);
+    }
   } else {
     checks.meteringReady = false;
+    checks.trialLimitsReady = false;
   }
   checks.node = process.version;
   checks.region = process.env.VERCEL_REGION || 'local';

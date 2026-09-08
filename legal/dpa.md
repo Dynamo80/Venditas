@@ -363,8 +363,8 @@ decommissioned disk. Every other measure below is secondary to this one.
 ## E. Application controls
 
 - Uploads are limited to 10 MB and to PDF, DOCX, TXT and MD file types.
-- Rate limiting: five documents per day per email address, and a hard daily cap
-  per source IP hash, applied atomically in the database so that concurrent
+- Rate limiting: five documents per day and ten in total per email address, and
+  a hard daily cap per source IP hash, applied atomically in the database so that concurrent
   requests cannot both pass the same limit.
 - Disposable email domains are rejected.
 - Output verification: after the document is built it is read back and asserted
@@ -408,7 +408,7 @@ As at the effective date.
 | Sub-processor | Entity and location | What it processes | Retention |
 | --- | --- | --- | --- |
 | **Google LLC** (Gemini API, `generativelanguage.googleapis.com`) | Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA. Processing in the United States and other Google locations. | The text extracted from the CV, or images of up to the first four pages where the CV is a scan. Sent up to three times per upload if a call fails and is retried. | Governed by Google's terms for the Gemini API. Venditas stores nothing returned by Google. **[CONFIRM: the applicable Google terms, the tier in use, and Google's stated retention and human-review position — see `legal/compliance-notes.md`, item 1.]** |
-| **Supabase** (Postgres database, hosted on Amazon Web Services) | Supabase, Inc., USA; infrastructure operated by Amazon Web Services in **[REGION — CONFIRM]**. | Account and metering data only: user email address, agency name, first/last seen timestamps, usage count, contact flag, unsubscribe token, and per-day counters keyed to salted IP hashes. **No candidate data.** | Until deleted on request; see clause 4.3. |
+| **Supabase** (Postgres database, hosted on Amazon Web Services) | Supabase, Inc., USA; infrastructure operated by Amazon Web Services in **[REGION — CONFIRM]**. | Account and metering data only: user email address, agency name, first/last seen timestamps, usage count, contact flag, unsubscribe token, and request counters keyed to salted hashes of the IP and email address. **No candidate data.** | Until deleted on request; see clause 4.3. |
 | **Vercel** (application hosting) | Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Serverless functions execute in region `iad1` (US East, Washington D.C.). | Executes the application. Processes the uploaded CV in memory for the duration of the request. Writes no candidate data to storage. Operational logs may exist — see `legal/compliance-notes.md`, item 3. | Per the provider's log retention. |
 | **GoDaddy** (SMTP relay, `smtpout.secureserver.net`) | GoDaddy.com, LLC, 2155 E GoDaddy Way, Tempe, AZ 85284, USA. | The user's email address and the content of email Venditas sends them. **No candidate data.** | Per the provider's terms. |
 

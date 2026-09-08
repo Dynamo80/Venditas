@@ -89,10 +89,12 @@ cannot send it again.
 | First seen and last seen timestamps, and a count of CVs you have run | To apply the free daily limit and to see whether the tool is being used | Same | Same |
 | Whether you have unsubscribed, and an unsubscribe token | So that an unsubscribe sticks | Same | Retained after unsubscribe, so we do not email you again by mistake |
 | A daily request counter keyed to a salted SHA-256 hash of your IP address | To stop one visitor draining the service | Same | One row per day, deleted after 90 days |
+| A trial counter keyed to a salted SHA-256 hash of your email address | So the ten-CV trial is ten CVs, rather than ten for every variation of an address | Same | Deleted 24 months after your last CV |
 
 **We never store your IP address.** We hash it with a secret salt and keep only
 the hash, because we need to count requests from a source, not know who the
-source is.
+source is. The counters do the same with your email address — we hold the
+address itself only in the row that identifies you, never in a counter.
 
 We do **not** store: the CV, the candidate's name or contact details, the text of
 the CV, the structured fields, the Word document we produced, your uploaded logo,
@@ -108,8 +110,8 @@ your brand colour, or the footer contact line you typed.
   next to the field where you type your address, before you submit it, and every
   email carries a one-click unsubscribe link. You can opt out at any time and we
   will stop.
-- **The hashed IP counters** — our legitimate interests in security and abuse
-  prevention (Article 6(1)(f)).
+- **The hashed IP and email counters** — our legitimate interests in security
+  and abuse prevention (Article 6(1)(f)).
 
 ## Marketing email
 

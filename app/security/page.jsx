@@ -66,6 +66,11 @@ export default function Security() {
             itself — we need to count requests, not identify people, and a hash without a salt can
             be reversed by brute force.
           </li>
+          <li>
+            <strong>A salted hash of your email address</strong>, so the trial counts the mailbox
+            rather than the spelling. Same reasoning, same treatment: the counter never holds an
+            address.
+          </li>
         </ul>
 
         <h2>Redaction, and why we verify it</h2>
