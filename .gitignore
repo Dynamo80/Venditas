@@ -23,8 +23,13 @@ outreach/suppressed.txt
 outreach/prospects*.csv
 outreach/nurture.log
 
-# Samples rendered for named agencies in LinkedIn conversations.
-outreach/linkedin/
+# LinkedIn: the day packs, tracker, events and renders name real agencies and
+# stay on this machine. The tools that read and write them are code, and tracked.
+outreach/linkedin/*
+!outreach/linkedin/today.mjs
+!outreach/linkedin/board.mjs
+!outreach/linkedin/board.html
+!outreach/linkedin/board.cmd
 
 # State of the scheduled jobs: message ids, addresses, the Companies House download.
 ops/.cache/

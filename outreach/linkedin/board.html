@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn today · Venditas</title>
+<script>
+  // Before the stylesheet paints, so a saved dark choice never flashes light.
+  try {
+    const t = localStorage.getItem('board-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch {}
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f6f7f9; --surface: #fff; --surface-2: #eef0f4;
+    --ink: #151b26; --ink-2: #4a5464; --ink-3: #78838f; --line: #dfe3e9;
+    --accent: #33418f; --accent-soft: #e6e8f6; --on-accent: #fff;
+    --ok: #16794a; --on-ok: #fff;
+    --crit: #a52b1c; --crit-soft: #fae6e3; --crit-line: #e3a59b;
+    --warn: #8a5a00; --warn-soft: #fbf0d9; --warn-line: #e3c27a;
+    --toast-bg: #151b26; --toast-ink: #fff; --toast-err: #a52b1c;
+    --shadow: 0 1px 2px rgba(21, 27, 38, .04);
+  }
+  /* The site's own dark palette (app/globals.css). Twice, because CSS cannot
+     share one block between "the system is dark" and "dark was chosen". */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #10141b; --surface: #181d26; --surface-2: #202632;
+      --ink: #e9edf3; --ink-2: #a7b0bd; --ink-3: #8a94a1; --line: #2a313d;
+      --accent: #97a2f0; --accent-soft: #1c2140; --on-accent: #10141b;
+      --ok: #5fbe8d; --on-ok: #0c1a13;
+      --crit: #e8776a; --crit-soft: #2d1a18; --crit-line: #6b3129;
+      --warn: #e0b35a; --warn-soft: #2b2313; --warn-line: #6b5424;
+      --toast-bg: #e9edf3; --toast-ink: #10141b; --toast-err: #8f2a1d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #10141b; --surface: #181d26; --surface-2: #202632;
+    --ink: #e9edf3; --ink-2: #a7b0bd; --ink-3: #8a94a1; --line: #2a313d;
+    --accent: #97a2f0; --accent-soft: #1c2140; --on-accent: #10141b;
+    --ok: #5fbe8d; --on-ok: #0c1a13;
+    --crit: #e8776a; --crit-soft: #2d1a18; --crit-line: #6b3129;
+    --warn: #e0b35a; --warn-soft: #2b2313; --warn-line: #6b5424;
+    --toast-bg: #e9edf3; --toast-ink: #10141b; --toast-err: #8f2a1d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+  .side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .theme { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  .theme button { appearance: none; border: 0; background: transparent; color: var(--ink-2); font: 600 12.5px "Segoe UI", sans-serif; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .theme button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  @media (max-width: 640px) { .side { align-items: flex-start; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 90px; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  h1 { font: 600 30px/1.1 Georgia, serif; margin: 0; letter-spacing: -0.4px; }
+  .sub { color: var(--ink-3); margin-top: 6px; font-size: 14px; }
+  .meters { display: flex; gap: 10px; }
+  .meter { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; min-width: 140px; }
+  .meter b { font-size: 22px; }
+  .meter span { color: var(--ink-3); font-size: 12.5px; display: block; }
+  .meter.warn { background: var(--warn-soft); border-color: var(--warn-line); }
+  .meter.full { background: var(--crit-soft); border-color: var(--crit-line); }
+  section { margin-top: 30px; }
+  section > h2 { font: 600 13px/1 "Segoe UI", sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; display: flex; gap: 8px; align-items: center; }
+  .count { background: var(--accent-soft); border-radius: 999px; padding: 3px 9px; font-size: 12px; letter-spacing: 0; }
+  .lede { color: var(--ink-2); margin: 0 0 12px; font-size: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .card.opened { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .top { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+  .card h3 { margin: 0; font: 600 19px/1.25 Georgia, serif; }
+  .meta { color: var(--ink-3); font-size: 13.5px; }
+  .words { margin: 6px 0 0; color: var(--ink-2); font-style: italic; font-size: 14px; }
+  .why { color: var(--ink-3); font-size: 13.5px; margin-top: 6px; }
+  .step { font-size: 12px; color: var(--ink-3); margin-top: 16px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 8px 13px; font: 600 14px "Segoe UI", sans-serif; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.ok { background: var(--ok); border-color: var(--ok); color: var(--on-ok); }
+  .btn.ghost { color: var(--ink-2); font-weight: 500; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .link { color: var(--accent); font-size: 14px; }
+  input, textarea { font: 14px "Segoe UI", sans-serif; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--surface); color: var(--ink); }
+  input { flex: 1 1 260px; min-width: 0; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  textarea { width: 100%; min-height: 190px; resize: vertical; line-height: 1.5; margin-top: 8px; }
+  .render { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 12px; }
+  .render img { width: 120px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  .pill { font-size: 12px; border-radius: 999px; padding: 2px 9px; background: var(--surface-2); color: var(--ink-2); }
+  .pill.late { background: var(--warn-soft); color: var(--warn); }
+  .muted { color: var(--ink-3); }
+  .empty { color: var(--ink-3); background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 14px 18px; font-size: 14px; }
+  .banner { background: var(--crit-soft); color: var(--crit); border-radius: 10px; padding: 10px 14px; margin-top: 16px; font-weight: 600; }
+  details { margin-top: 28px; }
+  summary { cursor: pointer; color: var(--ink-2); font-weight: 600; }
+  ul.plain { list-style: none; padding: 0; margin: 10px 0 0; }
+  ul.plain li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: min(680px, calc(100% - 32px)); background: var(--toast-bg); color: var(--toast-ink); padding: 12px 16px; border-radius: 10px; font-size: 14px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25); white-space: pre-wrap; display: none; z-index: 10; }
+  #toast.err { background: var(--toast-err); color: #fff; }
+  #toast .btn { margin: 10px 0 0; display: flex; }
+  footer { margin-top: 44px; color: var(--ink-3); font-size: 13px; line-height: 1.6; }
+  code { font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>LinkedIn today</h1>
+      <div class="sub" id="date">Reading the tracker…</div>
+    </div>
+    <div class="side">
+      <div class="theme" role="group" aria-label="Theme">
+        <button type="button" data-theme-choice="system">System</button>
+        <button type="button" data-theme-choice="light">Light</button>
+        <button type="button" data-theme-choice="dark">Dark</button>
+      </div>
+      <div class="meters" id="meters"></div>
+    </div>
+  </header>
+  <div id="limit"></div>
+  <main id="main"></main>
+  <footer>
+    This page never touches LinkedIn. It opens LinkedIn for you; Connect and Send are your clicks there.
+    Log each one here straight after: the log keeps the daily limit honest, and a logged request holds that
+    agency back from cold email for 21 days. Same tracker as <code>node outreach/linkedin/today.mjs</code>.
+    <a href="#" id="refresh" class="link">Refresh</a>
+  </footer>
+</div>
+<div id="toast"></div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const TODAY = params.get('today');
+  let data = null;
+  const opened = new Set();
+  const drafts = {};
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const peopleSearch = (q) => 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent(q);
+  const companySearch = (a) => 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(a);
+  const defaultQuery = (a) => `"${a}" (director OR founder OR owner OR "managing director")`;
+  const firstName = (n) => (n || '').trim().split(/\s+/)[0] || '';
+  const renderUrl = (r) => (r ? '/' + r.replace(/^\/+/, '') : '');
+  const draft = (item, field, fallback) => drafts[`${item.agency}|${field}`] ?? fallback;
+  const personalise = (text, item) => (text || '')
+    .replaceAll('[Agency]', item.agency)
+    .replaceAll('[first name]', firstName(item.name) || '[first name]');
+
+  async function load() {
+    try {
+      const res = await fetch('/api/today' + (TODAY ? '?today=' + encodeURIComponent(TODAY) : ''));
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || res.statusText);
+      data = body;
+      render();
+    } catch (e) {
+      document.getElementById('main').innerHTML = `<div class="banner">Could not read the tracker: ${esc(e.message)}</div>`;
+    }
+  }
+
+  let toastTimer;
+  function toast(text, { err = false, action } = {}) {
+    const t = document.getElementById('toast');
+    t.className = err ? 'err' : '';
+    t.textContent = text;
+    if (action) {
+      const b = document.createElement('button');
+      b.className = 'btn';
+      b.textContent = action.label;
+      b.onclick = () => { t.style.display = 'none'; action.run(); };
+      t.appendChild(b);
+    }
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, action ? 15000 : 5000);
+  }
+
+  async function logStage(item, stage, extra = {}) {
+    const res = await fetch('/api/log', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-board': '1' },
+      body: JSON.stringify({ agency: item.agency, stage, today: TODAY || undefined, ...extra }),
+    });
+    const body = await res.json().catch(() => ({ ok: false, error: 'No answer from the board. Is board.mjs still running?' }));
+    if (body.ok) {
+      for (const k of Object.keys(drafts)) if (k.startsWith(item.agency + '|')) delete drafts[k];
+      toast(body.message || `Logged: ${item.agency}, ${stage}`);
+      await load();
+    } else if (body.canForce) {
+      toast(body.error, { err: true, action: { label: 'The request already went: log it anyway', run: () => logStage(item, stage, { ...extra, force: true }) } });
+    } else {
+      toast(body.error || 'Not logged.', { err: true });
+    }
+  }
+
+  // ------------------------------------------------------------------ cards
+
+  const idx = (item) => data.items.indexOf(item);
+
+  function connectCard(item, blocked) {
+    const q = item.query || defaultQuery(item.agency);
+    return `<article class="card ${opened.has(item.agency) ? 'opened' : ''}" data-i="${idx(item)}">
+      <div class="top">
+        <h3>${esc(item.agency)}</h3>
+        ${item.about ? `<span class="meta">${esc(item.about)}</span>` : ''}
+        ${/carried over/.test(item.why) ? '<span class="pill late">carried over</span>' : ''}
+      </div>
+      ${item.words ? `<p class="words">“${esc(item.words)}”</p>` : ''}
+      <div class="step">1 · Find the person</div>
+      <div class="row">
+        <a class="btn primary" data-open href="${esc(peopleSearch(q))}" target="_blank" rel="noopener">Search people on LinkedIn ↗</a>
+        <a class="btn" data-open href="${esc(companySearch(item.agency))}" target="_blank" rel="noopener">Company page ↗</a>
+        ${item.site ? `<a class="link" href="https://${esc(item.site)}" target="_blank" rel="noopener">${esc(item.site)}</a>` : ''}
+      </div>
+      <p class="why">The managing director, founder, owner or operations lead, whose current role names ${esc(item.agency)}. Not in-house talent acquisition, not a trainee. Check the company shows roughly 3 to 50 staff.</p>
+      <div class="step">2 · Press Connect on their profile, no note, then log it</div>
+      <div class="row">
+        <input name="name" placeholder="Their full name" value="${esc(draft(item, 'name', item.name))}">
+        <input name="profile" placeholder="Their profile link: https://www.linkedin.com/in/…" value="${esc(draft(item, 'profile', item.profile))}">
+      </div>
+      <div class="row">
+        <button class="btn ok" data-log="requested" ${blocked ? 'disabled title="Request limit reached"' : ''}>I sent the request ✓</button>
+        <button class="btn ghost" data-log="closed" data-note="nobody suitable on LinkedIn" data-confirm="Close ${esc(item.agency)}? It leaves the LinkedIn list for good.">Nobody suitable</button>
+      </div>
+    </article>`;
+  }
+
+  function profileButton(item, primary) {
+    if (item.profile) {
+      return `<a class="btn ${primary ? 'primary' : ''}" href="${esc(item.profile)}" target="_blank" rel="noopener">${esc(firstName(item.name) || 'Their')}'s profile ↗</a>`;
+    }
+    const q = item.name ? `"${item.name}" "${item.agency}"` : (item.query || defaultQuery(item.agency));
+    return `<a class="btn ${primary ? 'primary' : ''}" href="${esc(peopleSearch(q))}" target="_blank" rel="noopener">Find them on LinkedIn ↗</a>`;
+  }
+
+  function pendingCard(item) {
+    const stale = /withdraw/.test(item.why);
+    // A request logged without a name can still get one here, before message one
+    // needs it for the greeting.
+    const missing = !item.name || !item.profile;
+    return `<article class="card" data-i="${idx(item)}">
+      <div class="top"><h3>${esc(item.agency)}</h3><span class="meta">${esc(item.name || 'name not logged')}</span></div>
+      <div class="why">${esc(item.why)}</div>
+      ${missing ? `<div class="row">
+        ${item.name ? '' : `<input name="name" placeholder="Their full name, for message one" value="${esc(draft(item, 'name', ''))}">`}
+        ${item.profile ? '' : `<input name="profile" placeholder="Their profile link: https://www.linkedin.com/in/…" value="${esc(draft(item, 'profile', ''))}">`}
+      </div>` : ''}
+      <div class="row">
+        ${profileButton(item, false)}
+        <a class="btn" href="https://www.linkedin.com/mynetwork/invitation-manager/sent/" target="_blank" rel="noopener">Sent invitations ↗</a>
+        <button class="btn ok" data-log="accepted">They accepted ✓</button>
+        ${stale ? '<button class="btn ghost" data-log="closed" data-note="request withdrawn after 4 weeks">I withdrew it</button>' : ''}
+      </div>
+    </article>`;
+  }
+
+  function messageCard(item, stage) {
+    const m = data.messages || {};
+    const template = stage === 'msg1' ? (item.variant === 'B' ? m.B : m.A) : m.two;
+    const label = stage === 'msg1' ? `Message one ${item.variant || 'A'}` : 'Message two, the last one';
+    const needsName = !firstName(item.name) && /\[first name\]/.test(template || '');
+    const img = stage === 'msg1' && item.render ? `
+      <div class="render">
+        <img src="${esc(renderUrl(item.render))}" alt="Sample CV for ${esc(item.agency)}">
+        <div class="row" style="margin:0">
+          <button class="btn" data-copy-image="${esc(renderUrl(item.render))}">Copy image</button>
+          <a class="btn" href="${esc(renderUrl(item.render))}" download>Download image</a>
+        </div>
+      </div>` : '';
+    return `<article class="card" data-i="${idx(item)}">
+      <div class="top">
+        <h3>${esc(item.agency)}</h3><span class="meta">${esc(item.name)}</span>
+        ${item.late ? '<span class="pill late">past the window</span>' : ''}
+      </div>
+      <div class="why">${esc(item.why)}</div>
+      <div class="row">${profileButton(item, true)}</div>
+      <div class="step">${esc(label)}${needsName ? ' · put their first name where it says [first name]' : ''}</div>
+      ${template
+        ? `<textarea name="text">${esc(draft(item, 'text', personalise(template, item)))}</textarea>
+           <div class="row"><button class="btn" data-copy-text>Copy message</button></div>`
+        : '<div class="banner">The message text was not found in the day packs.</div>'}
+      ${img}
+      <div class="row">
+        <button class="btn ok" data-log="${stage}">I sent ${stage === 'msg1' ? 'message one' : 'message two'} ✓</button>
+        <button class="btn ghost" data-log="replied">They replied</button>
+        ${item.late ? '<button class="btn ghost" data-log="closed" data-note="missed the message window">Close it</button>' : ''}
+      </div>
+    </article>`;
+  }
+
+  function talkCard(item) {
+    return `<article class="card" data-i="${idx(item)}">
+      <div class="top"><h3>${esc(item.agency)}</h3><span class="meta">${esc(item.name)}</span><span class="pill">${esc(item.stage)}</span></div>
+      <div class="why">${esc(item.why)}</div>
+      <div class="row">
+        ${profileButton(item, false)}
+        <a class="btn primary" href="https://www.linkedin.com/messaging/" target="_blank" rel="noopener">LinkedIn messages ↗</a>
+        ${item.stage === 'replied' ? '<button class="btn" data-log="trial">They started the trial</button>' : ''}
+        <button class="btn ok" data-log="paid">They paid</button>
+        <button class="btn ghost" data-log="closed" data-confirm="Close ${esc(item.agency)}?">Closed</button>
+      </div>
+    </article>`;
+  }
+
+  function section(title, lede, list, card, emptyText) {
+    if (!list.length && !emptyText) return '';
+    return `<section>
+      <h2>${esc(title)} <span class="count">${list.length}</span></h2>
+      <p class="lede">${esc(lede)}</p>
+      ${list.length ? list.map(card).join('') : `<div class="empty">${esc(emptyText)}</div>`}
+    </section>`;
+  }
+
+  function listDetails(title, list) {
+    if (!list.length) return '';
+    return `<details><summary>${esc(title)} (${list.length})</summary><ul class="plain">${
+      list.map((i) => `<li><b>${esc(i.agency)}</b>${i.name ? ` · ${esc(i.name)}` : ''} <span class="muted">· ${esc(i.why)}</span></li>`).join('')
+    }</ul></details>`;
+  }
+
+  function render() {
+    const { items, counters, limits, today } = data;
+    const day = new Date(today + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    document.getElementById('date').textContent = `${day} · best between 12:30 and 14:30 IST, 08:00 to 10:00 in the UK`;
+
+    const meter = (n, max, label) => `<div class="meter ${n >= max ? 'full' : n >= max * 0.8 ? 'warn' : ''}"><b>${n}</b> / ${max}<span>${label}</span></div>`;
+    document.getElementById('meters').innerHTML = meter(counters.today, limits.day, 'requests today') + meter(counters.week, limits.week, 'requests, last 7 days');
+    const blocked = counters.today >= limits.day || counters.week >= limits.week;
+    document.getElementById('limit').innerHTML = blocked
+      ? `<div class="banner">${counters.today >= limits.day ? 'Daily limit reached: no more requests today.' : 'Seven-day limit reached: no more requests until the count drops.'} Messages to people who accepted are still fine.</div>`
+      : '';
+
+    const open = items.filter((i) => !i.done);
+    const talking = open.filter((i) => i.conversation);
+    const msg1 = open.filter((i) => i.due === 'msg1' || i.late === 'msg1');
+    const msg2 = open.filter((i) => i.due === 'msg2' || i.late === 'msg2');
+    const connect = open.filter((i) => i.due === 'connect');
+    const pending = open.filter((i) => i.stage === 'requested' && !i.excluded);
+    const waiting = open.filter((i) => ['accepted', 'msg1', 'msg2'].includes(i.stage) && !i.due && !i.late && !i.excluded);
+    const later = open.filter((i) => i.stage === 'planned' && !i.due && !i.excluded);
+    const skipped = open.filter((i) => i.excluded);
+
+    document.getElementById('main').innerHTML = [
+      section('Answer these first', 'They replied. Answer the same day, in your own words. What to say: outreach/linkedin.md §C.5.', talking, talkCard),
+      section('Message one', 'Accepted 1 to 3 days ago. Paste the message, attach their sample CV, send.', msg1, (i) => messageCard(i, 'msg1')),
+      section('Message two', 'Five to seven days after message one, and no reply. After this, no more messages.', msg2, (i) => messageCard(i, 'msg2')),
+      section('Connect', 'Find the person, press Connect with no note, then log it here.', connect, (i) => connectCard(i, blocked), 'Nobody is planned for today.'),
+      section('Did they accept?', 'Check your sent invitations and log each one that accepted. Message one comes the day after, never the same day.', pending, pendingCard),
+      listDetails('Coming up', [...waiting, ...later]),
+      listDetails('Emailed recently, so skipped for now', skipped),
+    ].join('');
+  }
+
+  // ----------------------------------------------------------------- events
+
+  document.addEventListener('input', (e) => {
+    const card = e.target.closest('.card');
+    if (!card || !e.target.name) return;
+    drafts[`${data.items[Number(card.dataset.i)].agency}|${e.target.name}`] = e.target.value;
+  });
+
+  // ------------------------------------------------------------------ theme
+
+  /** System follows Windows; Light and Dark are remembered in this browser. */
+  function applyTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem('board-theme'); } catch {}
+    if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    else delete document.documentElement.dataset.theme;
+    for (const b of document.querySelectorAll('[data-theme-choice]')) {
+      b.setAttribute('aria-pressed', String(b.dataset.themeChoice === (saved || 'system')));
+    }
+  }
+
+  function setTheme(choice) {
+    try {
+      if (choice === 'system') localStorage.removeItem('board-theme');
+      else localStorage.setItem('board-theme', choice);
+    } catch {}
+    applyTheme();
+  }
+
+  applyTheme();
+
+  document.addEventListener('click', async (e) => {
+    const themeChoice = e.target.closest('[data-theme-choice]');
+    if (themeChoice) { setTheme(themeChoice.dataset.themeChoice); return; }
+    if (e.target.id === 'refresh') { e.preventDefault(); load(); return; }
+    const el = e.target.closest('[data-log],[data-open],[data-copy-text],[data-copy-image]');
+    if (!el) return;
+    const card = el.closest('.card');
+    const item = card ? data.items[Number(card.dataset.i)] : null;
+
+    if (el.hasAttribute('data-open')) {
+      if (item) { opened.add(item.agency); card.classList.add('opened'); }
+      return;
+    }
+    if (el.hasAttribute('data-copy-text')) {
+      await navigator.clipboard.writeText(card.querySelector('textarea').value);
+      toast(/\[first name\]/.test(card.querySelector('textarea').value)
+        ? 'Copied, but it still says [first name]. Fix that before sending.'
+        : 'Message copied. Paste it into the LinkedIn message.');
+      return;
+    }
+    if (el.hasAttribute('data-copy-image')) {
+      try {
+        const blob = await (await fetch(el.dataset.copyImage)).blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        toast('Image copied. Paste it into the LinkedIn message.');
+      } catch {
+        toast('This browser would not copy the image. Use Download image, then attach it.', { err: true });
+      }
+      return;
+    }
+    if (el.hasAttribute('data-log') && item) {
+      if (el.dataset.confirm && !confirm(el.dataset.confirm)) return;
+      const extra = {};
+      const name = card.querySelector('input[name=name]');
+      const profile = card.querySelector('input[name=profile]');
+      if (name && name.value.trim()) extra.name = name.value.trim();
+      if (profile && profile.value.trim()) {
+        const url = profile.value.trim().split('?')[0].replace(/\/$/, '');
+        if (!/^https:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[^\s/?#;]+$/i.test(url)) {
+          toast('That is not a LinkedIn profile link. It should look like https://www.linkedin.com/in/their-name', { err: true });
+          return;
+        }
+        extra.profile = url;
+      }
+      if (el.dataset.note) extra.note = el.dataset.note;
+      el.disabled = true;
+      await logStage(item, el.dataset.log, extra);
+      el.disabled = false;
+    }
+  });
+
+  load();
+</script>
+</body>
+</html>

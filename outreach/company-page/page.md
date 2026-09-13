@@ -51,7 +51,12 @@ CVs are processed in memory and not stored. www.venditas.in/security sets out ex
 Venditas is new, and it is run by one person, Abin Johnson, in Navi Mumbai. Messages to this page are answered by the person who built it.
 ```
 
-**Specialties** (add each one):
+**Specialties** (add each one). Look under **Edit page → Details**, below
+Industry and Company size, for a "Specialties" field. If the page doesn't offer
+one (on 14 September a new page showed only **Services**), skip it: the same
+words are already in the description, which is what search reads. Don't
+enter them as Services. That builds a service-provider listing with a "Request
+proposal" button, which is the wrong shape for software.
 
 ```
 CV formatting

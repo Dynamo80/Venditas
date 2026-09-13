@@ -65,9 +65,9 @@ run. That day's dry run finished with no failures.
    found an address for 1 of the 50 agencies emailed on 2–3 September, so 49
    never got the second message. Fixed; they go out 15 a day from the
    14 September run, alongside the 15 agencies paying a competitor
-5. **Company page, 45 minutes once:** `outreach/company-page/README.md`. Fields,
-   logo, cover, a pinned post and eight posts to schedule in LinkedIn through
-   9 October. It gives a recruiter who looks up the sender a real company to find
+5. **Company page:** created 14 September from `outreach/company-page/`. Check
+   the eight posts are scheduled through 9 October and that Abin's Venditas role
+   links to the page
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
@@ -90,11 +90,11 @@ directly each blocks money.
 | # | Item | Why it matters | Effort |
 |---|---|---|---|
 | 1 | ~~Run `sql/003_customers.sql`~~ — done; preflight confirms | | |
-| 2 | Skydo GBP/USD account details and an INR account or UPI ID ready to put on an invoice | Money is collected by invoice (decision 007). The pricing page already asks for what the invoice needs; `docs/runbooks/invoice.md` is the ten-minute routine | 15 min |
+| 2 | ~~Skydo account~~ — set up by 14 September. Still worth a dry run: raise one test invoice so the first real one isn't the first attempt. INR account or UPI ID for Indian customers | Money is collected by invoice (decision 007). The pricing page already asks for what the invoice needs; `docs/runbooks/invoice.md` is the ten-minute routine | 15 min |
 | 3 | Enable billing on the Gemini project | DPA clause 3.4 ("we do not train on your data") is untrue on the free tier. First compliance question every UK agency asks. Cost ~£0.0001 per CV | 10 min |
 | 4 | ~~One founder identity~~ — done 2026-09-03: emails, DPA, Article 30 record and the LinkedIn playbook all say Abin Johnson | | |
-| 5 | Fix the LinkedIn About that says Venditas was shut down | Every cold email that gets looked up finds the founder disowning the product. Rewrite in `outreach/profile.md` | 10 min |
-| 5a | Submit `https://www.venditas.in/sitemap.xml` to Google Search Console (the www property); list on the free directories. Bing needs nothing: IndexNow is pushed every Saturday once deployed | The Quibench page only works if it is crawled. `docs/runbooks/inbound.md` | 1 hour |
+| 5 | ~~Fix the LinkedIn About that says Venditas was shut down~~ — About fixed by 14 September. **Still open: Experience.** The profile export that day showed Venditas ending in May 2026, no current role, a Hustlr entry (decision 016) and a joke entry. Fix per `outreach/profile.md` §5 | Every cold email that gets looked up finds a founder whose Venditas ended four months ago | 10 min |
+| 5a | ~~Google Search Console~~ — done 14 September. Still open: list on the free directories. Bing needs nothing: IndexNow is pushed every Saturday once deployed | The Quibench page only works if it is crawled. `docs/runbooks/inbound.md` | 1 hour |
 | 6 | Supabase region | One line from the dashboard; DPA Annex 3 and the Article 30 record have placeholders without it | 2 min |
 | 7 | Solicitor review of privacy, terms, DPA; settle liability and governing law | A UK agency will not sign an unreviewed DPA from an overseas sole trader | 1–3 hours of fees |
 | 8 | Article 27 UK representative, or a written opinion that none is needed; ICO fee question | A line on every supplier questionnaire | £100–500/yr |

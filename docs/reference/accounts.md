@@ -53,7 +53,9 @@ alongside the postal address and company name. It is **not** to be inferred from
 an email address again.
 
 Currently: **Abin** / Abin Johnson, matching
-[linkedin.com/in/abin-johnson-120017397](https://www.linkedin.com/in/abin-johnson-120017397/).
+[linkedin.com/in/abin-cooks](https://www.linkedin.com/in/abin-cooks/). This is the
+same account as the earlier `abin-johnson-120017397` URL, given a custom URL by
+14 September 2026.
 
 **Why this is not cosmetic.** The first batch of 25 went out signed "Arseny", a
 name taken from an account email address and never checked against the founder.
