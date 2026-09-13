@@ -65,6 +65,9 @@ run. That day's dry run finished with no failures.
    found an address for 1 of the 50 agencies emailed on 2–3 September, so 49
    never got the second message. Fixed; they go out 15 a day from the
    14 September run, alongside the 15 agencies paying a competitor
+5. **Company page, 45 minutes once:** `outreach/company-page/README.md`. Fields,
+   logo, cover, a pinned post and eight posts to schedule in LinkedIn through
+   9 October. It gives a recruiter who looks up the sender a real company to find
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.

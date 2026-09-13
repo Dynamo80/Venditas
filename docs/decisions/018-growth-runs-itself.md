@@ -66,6 +66,15 @@ as `<h2>` rather than extra `<h1>`s (`lib/legal.mjs`), and the home page carries
   laptop's IP is blocked within days. Search Console reports the same thing
   once the founder has verified the site.
 - **Pinging Google with the sitemap.** Google retired the endpoint in 2023.
+- **Running outreach, connection-finding or posting from a second LinkedIn
+  account** (offered by the founder on 14 September, "doesn't matter if it gets
+  banned"). A new profile messaging strangers is what LinkedIn's spam controls
+  catch first. An empty profile pitching Venditas also discredits the emails
+  that name Abin Johnson, and the complaints attach to the brand and the domain,
+  not the account. Collecting profiles breaks `ops/build-prospects.mjs`'s
+  no-LinkedIn rule and falls outside `legal/lia.md`. Instead:
+  `outreach/company-page/`, a page with a month of posts scheduled natively in
+  LinkedIn, with Abin's own profile as super admin.
 - **Generating the LinkedIn pack every week.** A pack reserves its agencies away
   from email for 21 days whether or not the invitations go out. Until the About
   section is fixed and week one is worked, a weekly pack only starves the
