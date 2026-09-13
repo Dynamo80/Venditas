@@ -73,6 +73,16 @@ function signWith(env) {
   }
 }
 
+/** The site's signing secret, for links minted before send() runs (lib/prefill.mjs). Null if none. */
+export function loadSigningSecret() {
+  try {
+    loadEnv();
+  } catch {
+    return null;
+  }
+  return process.env.UNSUB_SECRET || process.env.SUPABASE_SECRET || process.env.SUPABASE_SERVICE_KEY || null;
+}
+
 // ------------------------------------------------------------- suppression
 /**
  * Anyone who has opted out, bounced, or asked us to stop. Checked before every

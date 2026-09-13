@@ -93,6 +93,8 @@ export default function Formatter({ variant = 'full' }) {
   const [msg, setMsg] = useState(null);
   const [results, setResults] = useState([]);
   const [restored, setRestored] = useState(false);
+  /** Shown above the form when a personal link from our email set it up. */
+  const [welcome, setWelcome] = useState(null);
   const inputRef = useRef(null);
   const logoRef = useRef(null);
   const templateRef = useRef(null);
@@ -109,6 +111,24 @@ export default function Formatter({ variant = 'full' }) {
       if (saved.template?.dataUrl) setSavedTemplate(saved.template);
       setRestored(true);
     }
+
+    // A personal link from our email (lib/prefill.mjs): the agency's name, colour
+    // and logo go straight in, so one CV shows them what the email showed them.
+    // Branding they saved themselves always wins over the link.
+    const token = new URLSearchParams(window.location.search).get('for');
+    if (token && !saved?.agency) {
+      fetch(`/api/prefill?for=${encodeURIComponent(token)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((p) => {
+          if (!p?.agency) return;
+          setAgency(p.agency);
+          if (p.colour) setColour(p.colour);
+          if (p.logo) setSavedLogo({ name: 'your logo', dataUrl: p.logo, fromLink: true });
+          setWelcome(`Set up for ${p.agency}${p.logo ? ', with your logo and colour already in' : ''}. Add your work email and drop in one of your own CVs.`);
+        })
+        .catch(() => {});
+    }
+
     return () => urlsRef.current.forEach((u) => URL.revokeObjectURL(u));
   }, []);
 
@@ -335,7 +355,7 @@ export default function Formatter({ variant = 'full' }) {
         </label>
         {savedLogo && !logoFile && (
           <p className="saved">
-            Using your saved logo, {savedLogo.name}.
+            {savedLogo.fromLink ? 'Using the logo from your website.' : `Using your saved logo, ${savedLogo.name}.`}
             <button type="button" className="linkish" onClick={() => setSavedLogo(null)}>
               Don&apos;t use it
             </button>
@@ -377,6 +397,8 @@ export default function Formatter({ variant = 'full' }) {
           ? 'Ten CVs free, no card. Name, email, phone and LinkedIn come out, a reference code goes in, and the finished document is checked for them before you get it. The CV is processed and discarded, never stored.'
           : 'Ten CVs free. No card, no account to set up — just your work email so we know who you are. Drop in a whole shortlist if you like; each CV counts as one. The CVs themselves are processed and discarded, never stored.'}
       </p>
+
+      {welcome && <div className="msg ok">{welcome}</div>}
 
       <div className="grid">
         <label>

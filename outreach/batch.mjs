@@ -22,7 +22,8 @@ import { render, makeReference } from '../lib/render.mjs';
 import { preview } from '../lib/preview.mjs';
 import { sampleFor, safeColour, loadSamples, fetchLogo } from './samples.mjs';
 import { parseCsv } from './prospects.mjs';
-import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
+import { send, closeTransport, suppressed, SENDER, DAILY_CAP, loadSigningSecret } from './send.mjs';
+import { personalLink } from '../lib/prefill.mjs';
 import { recentlyContacted, record, COOLING_DAYS, isSendableNow } from './contacted.mjs';
 import { scanInbox } from './inbox.mjs';
 
@@ -48,12 +49,12 @@ const possessive = (name) => (/s$/i.test(name) ? `${name}'` : `${name}'s`);
  * calling that "your branding" to someone who pays for a branding tool is a
  * claim they can check in one glance.
  */
-function compose(p, { branded = true } = {}) {
+function compose(p, { branded = true, site = SENDER.site } = {}) {
   const first = (p.contact_first || '').trim();
   const greeting = first ? `Hi ${first},` : 'Hi,';
   const agency = p.company || 'your agency';
-  if (p.incumbent) return composeSwitch(p, greeting, agency, branded);
-  if (isNewAgency(p)) return composeNew(p, greeting, agency, branded);
+  if (p.incumbent) return composeSwitch(p, greeting, agency, branded, site);
+  if (isNewAgency(p)) return composeNew(p, greeting, agency, branded, site);
 
   // The image is shown inline, not attached. A .docx from a stranger is a thing
   // security-aware people do not open, it raises spam scores, and some mail
@@ -76,7 +77,7 @@ a client, that is the job it does. Whatever the candidate sent - two columns,
 tables, a scan - comes back looking like this.
 
 Reply and I will send the editable Word file, or run one of your own at
-${SENDER.site} - ten free, no card.
+${site} - ten free, no card.
 
 ${SENDER.person}`;
 
@@ -88,7 +89,7 @@ ${SENDER.person}`;
 <p>It took about ten seconds. I built the thing that made it.</p>
 <p>If anyone there still rebuilds CVs into your template by hand before they go to a client, that is the job it does. Whatever the candidate sent &mdash; two columns, tables, a scan &mdash; comes back looking like this.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
-<p>Reply and I will send the editable Word file, or run one of your own at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
+<p>Reply and I will send the editable Word file, or run one of your own at <a href="${site}">venditas.in</a> &mdash; ten free, no card.</p>
 <p>${SENDER.person}</p>
 </div>`;
 
@@ -113,7 +114,7 @@ function isNewAgency(p) {
  * mail merge. A new agency has no CV habits yet, so the pitch is to set the
  * habit rather than replace one.
  */
-function composeNew(p, greeting, agency, branded = true) {
+function composeNew(p, greeting, agency, branded = true, site = SENDER.site) {
   const month = new Date(Date.parse(p.incorporated)).toLocaleString('en-GB', { month: 'long', year: 'numeric' });
   const text = `${greeting}
 
@@ -132,7 +133,7 @@ around them. Venditas does it in about ten seconds from whatever the candidate s
 keeps the candidate's own wording, and refuses to hand over a document with a
 contact detail left in.
 
-Ten free at ${SENDER.site}, no card. After that it is £79 a month for the whole
+Ten free at ${site}, no card. After that it is £79 a month for the whole
 agency, and that founding price stays for as long as you do.
 
 ${SENDER.person}`;
@@ -145,7 +146,7 @@ ${SENDER.person}`;
     : `The image below is a sample candidate CV rebuilt for ${agency} &mdash; contact details stripped out, a reference code where the name was. Your logo and colours go on the same way.`}</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
 <p>Most agencies do that by hand before every submission, so a client cannot go around them. Venditas does it in about ten seconds from whatever the candidate sent, keeps the candidate&rsquo;s own wording, and refuses to hand over a document with a contact detail left in.</p>
-<p>Ten free at <a href="${SENDER.site}">venditas.in</a>, no card. After that it is &pound;79 a month for the whole agency, and that founding price stays for as long as you do.</p>
+<p>Ten free at <a href="${site}">venditas.in</a>, no card. After that it is &pound;79 a month for the whole agency, and that founding price stays for as long as you do.</p>
 <p>${SENDER.person}</p>
 </div>`;
 
@@ -170,7 +171,7 @@ function seenOn(p, tool) {
   return `on ${tool}'s customer page`;
 }
 
-function composeSwitch(p, greeting, agency, branded = true) {
+function composeSwitch(p, greeting, agency, branded = true, site = SENDER.site) {
   const tool = p.incumbent;
   const seen = seenOn(p, tool);
   const text = `${greeting}
@@ -188,7 +189,7 @@ candidate's own wording rather than rewriting it, and reads every document back,
 failing rather than hand you a file with a contact detail left in.
 
 If ${tool} comes up for renewal, it might be worth ten minutes. You can run
-your own CVs at ${SENDER.site} - ten free, no card.
+your own CVs at ${site} - ten free, no card.
 
 ${SENDER.person}`;
 
@@ -199,7 +200,7 @@ ${SENDER.person}`;
     ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by Venditas, the tool I built for the same job.`
     : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. It fills your own Word template, keeps the candidate&rsquo;s own wording rather than rewriting it, and reads every document back, failing rather than hand you a file with a contact detail left in.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
-<p>If ${tool} comes up for renewal, it might be worth ten minutes. You can run your own CVs at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
+<p>If ${tool} comes up for renewal, it might be worth ten minutes. You can run your own CVs at <a href="${site}">venditas.in</a> &mdash; ten free, no card.</p>
 <p>${SENDER.person}</p>
 </div>`;
 
@@ -336,6 +337,11 @@ Cannot read the mailbox: ${e.message}`);
   mkdirSync(outDir, { recursive: true });
 
   const manifest = [];
+  // Each email's link opens the tool already set up for that agency
+  // (lib/prefill.mjs). No secret, no personal link: the plain site, never a
+  // link the site would reject.
+  const linkSecret = loadSigningSecret();
+  let firstText = null;
   for (const p of batch) {
     const file = sampleFor(p.specialism, p.company);
     const data = samples[file];
@@ -359,7 +365,12 @@ Cannot read the mailbox: ${e.message}`);
       logoType: logo?.type,
     }, { reference });
 
-    const { subject, text, html } = compose(p, { branded: Boolean(logo || verified) });
+    const site = personalLink(
+      { agency: p.company, colour: verified, logo: logo ? p.logo_url : null },
+      { secret: linkSecret }
+    ) || SENDER.site;
+    const { subject, text, html } = compose(p, { branded: Boolean(logo || verified), site });
+    if (!firstText) firstText = text;
     const png = await preview(data, {
       name: p.company, colour, footer: p.company, logo: logo?.data, logoType: logo?.type,
     }, reference);
@@ -395,7 +406,8 @@ Cannot read the mailbox: ${e.message}`);
   }
 
   writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
-  const sampleText = compose(batch[0] || {}).text;
+  // The first email exactly as built, personal link included, for review.
+  const sampleText = firstText || compose(batch[0] || {}).text;
   writeFileSync(path.join(outDir, 'email.txt'), sampleText);
 
   console.log(`\n${manifest.length} built -> ${outDir}`);
