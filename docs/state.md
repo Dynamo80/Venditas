@@ -59,6 +59,12 @@ run. That day's dry run finished with no failures.
 2. A reply now arrives as a notification, with the answer already in Drafts
    (`ops/watch.mjs`). Read it, send it → recruiter runs their own CV → invoice
    via Skydo. `docs/runbooks/replies.md`, within the hour
+3. **Send the note waiting in Drafts** to the one stranger who ran a CV
+   (8 September, a gmail address). Nobody had written to them in six days
+4. **Follow-ups were silently skipped.** Until 14 September `followup.mjs`
+   found an address for 1 of the 50 agencies emailed on 2–3 September, so 49
+   never got the second message. Fixed; they go out 15 a day from the
+   14 September run, alongside the 15 agencies paying a competitor
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.

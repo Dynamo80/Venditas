@@ -24,6 +24,7 @@ import { domainOf, record, isSendableNow } from './contacted.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const LEDGER = path.join(ROOT, 'outreach', 'contacted.csv');
+const SENT_LOG = path.join(ROOT, 'outreach', 'sent.log');
 
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(`--${n}`);
@@ -50,6 +51,32 @@ function artifactsFor(domain) {
     if (entry) return entry;
   }
   return null;
+}
+
+/**
+ * The first cold email to each domain, from the log every sender appends to:
+ * the address it went to and the subject it carried.
+ *
+ * Batch manifests are not a complete record. On 14 September this found an
+ * address for only one of the 50 agencies emailed on 2 and 3 September, and
+ * the other 49 were skipped without a word, so the second message never went
+ * to any of them. sent.log
+ * holds every send, so it fills the gap. Its subject lets the follow-up thread
+ * under the email actually sent, now that the competitor and new-agency emails
+ * carry subjects of their own.
+ */
+function firstSends(ownDomain) {
+  const out = new Map();
+  if (!existsSync(SENT_LOG)) return out;
+  for (const line of readFileSync(SENT_LOG, 'utf8').split('\n')) {
+    const [at, to, subject = ''] = line.split('\t');
+    const email = (to || '').trim().toLowerCase();
+    const domain = domainOf(email);
+    if (!domain || domain === ownDomain) continue;
+    if (/^re:/i.test(subject) || /\btest\b/i.test(subject)) continue;
+    if (!out.has(domain)) out.set(domain, { email, subject, at });
+  }
+  return out;
 }
 
 function body(company) {
@@ -83,6 +110,7 @@ async function main() {
     if (d !== 0 && d !== 6) counted++;
   }
 
+  const sends = firstSends(domainOf(SENDER.site));
   const due = [];
   for (const r of rows) {
     if (r.channel !== 'email') continue;
@@ -90,9 +118,11 @@ async function main() {
     const t = Date.parse(r.at);
     if (!Number.isFinite(t) || t > cutoff) continue;
     const entry = artifactsFor(r.domain);
-    if (!entry?.email || skip.has(entry.email.toLowerCase())) continue;
+    const first = sends.get(r.domain);
+    const email = entry?.email || first?.email;
+    if (!email || skip.has(email.toLowerCase())) continue;
     if (!due.some((d) => d.domain === r.domain)) {
-      due.push({ domain: r.domain, at: r.at, ...entry });
+      due.push({ domain: r.domain, at: r.at, ...entry, email, subject: first?.subject });
     }
   }
 
@@ -125,7 +155,7 @@ async function main() {
       fromName: `${SENDER.person} at ${SENDER.company}`,
       // Same subject, so it threads under the original rather than arriving as
       // a fresh pitch they have to place.
-      subject: 'Re: your template, four seconds',
+      subject: `Re: ${p.subject || 'your template, four seconds'}`,
       text: body(p.company),
       allowRepeat: true,
     });
