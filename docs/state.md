@@ -68,6 +68,17 @@ run. That day's dry run finished with no failures.
 5. **Company page:** created 14 September from `outreach/company-page/`. Check
    the eight posts are scheduled through 9 October and that Abin's Venditas role
    links to the page
+6. **The REC partner email is ready and waiting on the founder.** The address was
+   checked on rec.uk.com on 14 September. Send it in UK working hours with
+   `node outreach/partner-send.mjs --only rec` (dry run), then add
+   `--send --confirm`. It sends once, files a copy in Sent, and never touches the
+   25-a-day cap. Scheduling it automatically was blocked by permissions, rightly:
+   it is mail to a third party in the founder's name
+7. **Hot list: 17 agencies** (was 15). Tempting Recruitment (Allsorter) and Collins
+   McNicholas (HireAra, Ireland) were added from public customer pages. Three more
+   confirmed competitor users have no address a script could verify: Major
+   Recruitment, Contract Scotland, Future Build Recruitment. Two minutes each in a
+   browser (`outreach/prospects-notes.md`, second pass)
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
