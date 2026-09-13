@@ -79,6 +79,15 @@ run. That day's dry run finished with no failures.
    confirmed competitor users have no address a script could verify: Major
    Recruitment, Contract Scotland, Future Build Recruitment. Two minutes each in a
    browser (`outreach/prospects-notes.md`, second pass)
+8. **Unsubscribe links were broken in every email sent before 14 September.** The
+   sending scripts signed them without the site's secret, and the site answered
+   400 "Invalid unsubscribe link", for the footer link and one-click alike.
+   Measured against production on 14 September, then fixed on both sides:
+   `send.mjs` loads the secret and refuses to send without it, and the site also
+   accepts the old tokens, so the 54 links already sent now work. Anyone who
+   tried before that saw "That link didn't work" and was told to email
+   founder@venditas.in; any such email must be honoured by hand
+   (`outreach/suppressed.txt`)
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.

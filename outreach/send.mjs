@@ -55,7 +55,22 @@ function loadEnv() {
       env[line.slice(0, i).trim()] = line.slice(i + 1).trim();
     }
   }
+  signWith(env);
   return env;
+}
+
+/**
+ * lib/unsub.mjs signs unsubscribe links from process.env, and a script run from a
+ * terminal or from Task Scheduler does not have .env.local in its environment.
+ * Until 14 September every link these scripts sent was signed with the
+ * development fallback, and the site rejected all of them with HTTP 400: 54
+ * emails whose unsubscribe did not work, one-click included. Hand the real
+ * secret over before anything is signed.
+ */
+function signWith(env) {
+  for (const k of ['UNSUB_SECRET', 'SUPABASE_SECRET', 'SUPABASE_SERVICE_KEY']) {
+    if (!process.env[k] && env[k]) process.env[k] = env[k];
+  }
 }
 
 // ------------------------------------------------------------- suppression
@@ -205,6 +220,13 @@ export async function send(msg, { env = loadEnv(), dry = false } = {}) {
   }
   if (!msg.allowRepeat && alreadySent(to)) {
     return { skipped: 'already-contacted', to };
+  }
+
+  // Never send a message whose way out does not work: without the site's own
+  // secret the link is signed with a key the site rejects.
+  signWith(env);
+  if (!process.env.UNSUB_SECRET && !process.env.SUPABASE_SECRET && !process.env.SUPABASE_SERVICE_KEY) {
+    throw new Error('no unsubscribe signing secret in .env.local, so the unsubscribe link would not work: refusing to send');
   }
 
   // Signed, so nobody can iterate addresses and quietly unsubscribe a list

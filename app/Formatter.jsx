@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { INVOICE_URL, MEETING_URL, PAY_URL, PRO } from '../lib/pricing.mjs';
 
 const ACCEPT = '.pdf,.docx,.txt';
 
@@ -217,6 +218,7 @@ export default function Formatter({ variant = 'full' }) {
     // Once the trial or the day's limit says no, every later file would get the
     // same answer. Stop asking, and say which ones were not sent.
     let stopped = null;
+    let stoppedReason = null;
 
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
@@ -245,8 +247,11 @@ export default function Formatter({ variant = 'full' }) {
         const res = await fetch('/api/format', { method: 'POST', body });
         if (!res.ok) {
           const { error, reason } = await res.json().catch(() => ({}));
-          out.push({ name: f.name, tone: 'err', text: error || 'Something went wrong. Nothing was saved.' });
-          if (res.status === 429 || reason === 'disposable') stopped = error || 'Limit reached.';
+          out.push({ name: f.name, tone: 'err', text: error || 'Something went wrong. Nothing was saved.', reason });
+          if (res.status === 429 || reason === 'disposable') {
+            stopped = error || 'Limit reached.';
+            stoppedReason = reason;
+          }
         } else {
           const blob = await res.blob();
           const ref = res.headers.get('X-Candidate-Ref') || 'candidate';
@@ -275,11 +280,11 @@ export default function Formatter({ variant = 'full' }) {
                 ? `Done — downloaded as ${only.ref}.docx. Name, email, phone and LinkedIn were removed, and the document was checked for them before it came back.`
                 : `Done — downloaded as ${only.ref}.docx. Open it and check the formatting.`,
             }
-          : { tone: 'err', text: only.text }
+          : { tone: 'err', text: only.text, buy: only.reason === 'trial-used' }
       );
       setResults([]);
     } else if (stopped) {
-      setMsg({ tone: 'err', text: `${ok.length} of ${files.length} formatted. ${stopped}` });
+      setMsg({ tone: 'err', text: `${ok.length} of ${files.length} formatted. ${stopped}`, buy: stoppedReason === 'trial-used' });
     } else {
       setMsg({
         tone: ok.length === files.length ? 'ok' : 'err',
@@ -464,7 +469,23 @@ export default function Formatter({ variant = 'full' }) {
         a CV you format.
       </p>
 
-      {msg && <div className={`msg ${msg.tone}`}>{msg.text}</div>}
+      {msg && (
+        <div className={`msg ${msg.tone}`}>
+          {msg.text}
+          {/* The ten are used up: the most qualified moment on the site, so the
+              next step is a button rather than an address to copy. Decision 014. */}
+          {msg.buy && (
+            <div className="row" style={{ marginTop: 12 }}>
+              <a className="go" href={PAY_URL || INVOICE_URL}>
+                Carry on: £{PRO.gbp}/month, unlimited
+              </a>
+              <a className="linkish" href={MEETING_URL} target="_blank" rel="noopener">
+                Or book 30 minutes
+              </a>
+            </div>
+          )}
+        </div>
+      )}
 
       {results.length > 1 && (
         <ul className="results">
