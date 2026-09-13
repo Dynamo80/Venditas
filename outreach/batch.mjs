@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 
 import path from 'node:path';
 import { render, makeReference } from '../lib/render.mjs';
 import { preview } from '../lib/preview.mjs';
+import { contrastOnWhite } from '../lib/colour.mjs';
 import { extract } from '../lib/extract.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
 import { recentlyContacted, record, COOLING_DAYS, isSendableNow } from './contacted.mjs';
@@ -62,13 +63,18 @@ function parseCsv(text) {
 }
 
 // ------------------------------------------------------- specialism matching
+// Stems, so no trailing \b: with one, `financ` never matched "finance" and
+// `health` never matched "healthcare", and every finance, healthcare,
+// engineering and construction agency was sent a backend engineer's CV.
+// Tested against specialism *and* company name — "Falcon Wealth Search" says
+// what it recruits for even when the specialism column says "general".
 const SAMPLE_FOR = [
-  [/\b(legal|law|solicitor|barrister|paralegal)\b/i, 'legal-commercial-solicitor.pdf'],
-  [/\b(health|nurs|clinical|medical|care|locum|nhs)\b/i, 'healthcare-theatre-nurse.pdf'],
-  [/\b(financ|account|audit|tax|banking|insurance|actuar)\b/i, 'finance-financial-controller.pdf'],
-  [/\b(engineer|manufactur|industrial|mechanical|process|construc|civil)\b/i, 'engineering-process-engineer.pdf'],
-  [/\b(sales|marketing|commercial|business development|bd)\b/i, 'sales-regional-manager.pdf'],
-  [/\b(tech|software|it|develop|data|digital|devops|cloud|cyber)\b/i, 'tech-backend-engineer.pdf'],
+  [/\b(legal|law\b|solicitor|barrister|paralegal|conveyanc)/i, 'legal-commercial-solicitor.pdf'],
+  [/\b(health|nurs|clinical|medical|care\b|carer|locum|nhs|dental|pharma)/i, 'healthcare-theatre-nurse.pdf'],
+  [/\b(financ|account|audit|tax\b|banking|insurance|actuar|wealth|invest|pension|payroll)/i, 'finance-financial-controller.pdf'],
+  [/\b(tech|software|it\b|develop|data\b|digital|devops|cloud|cyber|telecom)/i, 'tech-backend-engineer.pdf'],
+  [/\b(engineer|manufactur|industrial|mechanical|electrical|process\b|construc|civil)/i, 'engineering-process-engineer.pdf'],
+  [/\b(sales|marketing|commercial|business development|bd\b)/i, 'sales-regional-manager.pdf'],
 ];
 
 /**
@@ -95,19 +101,26 @@ function safeColour(raw) {
   const hex = String(raw || '').replace(/^#/, '').trim().toLowerCase();
   if (!/^[0-9a-f]{6}$/.test(hex)) return null;
   if (FRAMEWORK_DEFAULTS.has(hex)) return null;
+  // Near-white is a page background the scraper picked up, not a brand.
+  // Darkening it would invent a colour and call it theirs.
+  if (contrastOnWhite(hex) < 1.5) return null;
   return hex;
 }
 
-function sampleFor(specialism) {
+function sampleFor(specialism, company = '') {
+  const haystack = `${specialism || ''} ${company || ''}`;
   for (const [re, file] of SAMPLE_FOR) {
-    if (re.test(specialism || '')) {
+    if (re.test(haystack)) {
       if (existsSync(path.join(SAMPLES, file))) return file;
     }
   }
-  // Tech is the safest default: it is the largest specialism in the list, and
-  // the sample is the one most heavily tested.
-  const fallback = 'tech-backend-engineer.pdf';
-  return existsSync(path.join(SAMPLES, fallback)) ? fallback : null;
+  // Generalist agencies place office, sales and operations roles far more often
+  // than backend engineers, so a regional sales manager is the least surprising
+  // candidate to show them.
+  for (const fallback of ['sales-regional-manager.pdf', 'tech-backend-engineer.pdf']) {
+    if (existsSync(path.join(SAMPLES, fallback))) return fallback;
+  }
+  return null;
 }
 
 // ------------------------------------------------------------- sample cache
@@ -292,7 +305,7 @@ Cannot read the mailbox: ${e.message}`);
   console.log(`\n${all.length} prospects · ${eligible.length} eligible · taking ${batch.length}`);
   console.log(`mode: ${DO_SEND ? 'SEND' : 'dry run, nothing will be sent'}\n`);
 
-  const needed = [...new Set(batch.map((p) => sampleFor(p.specialism)).filter(Boolean))];
+  const needed = [...new Set(batch.map((p) => sampleFor(p.specialism, p.company)).filter(Boolean))];
   console.log(`samples needed: ${needed.length}`);
   const samples = await loadSamples(needed);
 
@@ -301,7 +314,7 @@ Cannot read the mailbox: ${e.message}`);
 
   const manifest = [];
   for (const p of batch) {
-    const file = sampleFor(p.specialism);
+    const file = sampleFor(p.specialism, p.company);
     const data = samples[file];
     if (!data) continue;
 
