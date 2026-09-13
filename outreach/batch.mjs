@@ -183,9 +183,9 @@ ${branded
 Venditas, the tool I built for the same job.`
     : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the
 tool I built for the same job; your logo and colours go on the same way.`} £79 a month for the whole
-agency, unlimited CVs, no contract. It keeps the candidate's own wording rather
-than rewriting it, every document is read back after it is built, and it fails
-rather than hand you a file with a contact detail left in.
+agency, unlimited CVs, no contract. It fills your own Word template, keeps the
+candidate's own wording rather than rewriting it, and reads every document back,
+failing rather than hand you a file with a contact detail left in.
 
 If ${tool} comes up for renewal, it might be worth ten minutes. You can run
 your own CVs at ${SENDER.site} - ten free, no card.
@@ -197,7 +197,7 @@ ${SENDER.person}`;
 <p>I saw <strong>${agency}</strong> ${seen}, so you already know the job: a candidate CV in, your branded document out, contact details gone.</p>
 <p>${branded
     ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by Venditas, the tool I built for the same job.`
-    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. It keeps the candidate&rsquo;s own wording rather than rewriting it, every document is read back after it is built, and it fails rather than hand you a file with a contact detail left in.</p>
+    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. It fills your own Word template, keeps the candidate&rsquo;s own wording rather than rewriting it, and reads every document back, failing rather than hand you a file with a contact detail left in.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
 <p>If ${tool} comes up for renewal, it might be worth ten minutes. You can run your own CVs at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
 <p>${SENDER.person}</p>
