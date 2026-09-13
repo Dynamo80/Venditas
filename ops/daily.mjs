@@ -52,6 +52,9 @@ const ROOT = path.resolve(
 const SENT_LOG = path.join(ROOT, 'outreach', 'sent.log');
 const RUN_LOG = path.join(ROOT, 'ops', 'daily.log');
 
+/** At most this many follow-ups a day, so new prospects always get a share. Decision 013. */
+const FOLLOWUP_MAX = 15;
+
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(`--${n}`);
 // Two flags, as everywhere else that mails strangers. One flag is too close to
@@ -163,9 +166,15 @@ async function main() {
 
   // 2. Follow-ups, then 3. new prospects, each taking what is left at the
   //    moment it runs rather than what was left when the run started.
+  //
+  //    Follow-ups are capped below the whole budget (decision 013). After a
+  //    gap in sending, overdue follow-ups can fill the day on their own, and
+  //    the agencies already paying a competitor for this job would wait behind
+  //    a cohort that has not replied in ten days.
   if (remaining() > 0) {
+    const n = String(Math.min(remaining(), FOLLOWUP_MAX));
     results.push(stage('follow-up — day 3 and day 8', 'outreach/followup.mjs',
-      LIVE ? ['--send', '--confirm', '--n', String(remaining())] : ['--n', String(remaining())]));
+      LIVE ? ['--send', '--confirm', '--n', n] : ['--n', n]));
   }
   if (remaining() > 0) {
     results.push(stage('batch — new prospects', 'outreach/batch.mjs',

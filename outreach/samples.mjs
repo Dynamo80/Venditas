@@ -28,7 +28,8 @@ export const SAMPLE_FOR = [
   [/\b(legal|law\b|solicitor|barrister|paralegal|conveyanc)/i, 'legal-commercial-solicitor.pdf'],
   [/\b(health|nurs|clinical|medical|care\b|carer|locum|nhs|dental|pharma)/i, 'healthcare-theatre-nurse.pdf'],
   [/\b(financ|account|audit|tax\b|banking|insurance|actuar|wealth|invest|pension|payroll)/i, 'finance-financial-controller.pdf'],
-  [/\b(tech|software|it\b|develop|data\b|digital|devops|cloud|cyber|telecom)/i, 'tech-backend-engineer.pdf'],
+  // `tech\b`, not `tech`: "Engineering & Technical" is not a software agency.
+  [/\b(tech\b|technolog|software|it\b|develop|data\b|digital|devops|cloud|cyber|telecom)/i, 'tech-backend-engineer.pdf'],
   [/\b(logistic|transport|driver|driving|hgv|lgv|haulage|warehous|fleet|mechanic\b|mechanics|freight)/i, 'logistics-ce-driver.pdf'],
   [/\b(engineer|manufactur|industrial|mechanical|electrical|process\b|construc|civil)/i, 'engineering-process-engineer.pdf'],
   [/\b(sales|marketing|commercial|business development|bd\b)/i, 'sales-regional-manager.pdf'],
@@ -104,9 +105,13 @@ export async function fetchLogo(url) {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null;
     const type = res.headers.get('content-type') || '';
-    if (!/image\/(png|jpe?g)/i.test(type)) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
+    if (!/image\/(png|jpe?g|svg\+xml|webp)/i.test(type)) return null;
+    let buf = Buffer.from(await res.arrayBuffer());
     if (buf.length > 1_500_000 || buf.length < 200) return null;
+    // Word and the preview take PNG or JPEG. Agency sites increasingly serve
+    // SVG or WebP, and skipping those left half the best prospects unbranded.
+    if (/svg/i.test(type)) buf = await sharp(buf, { density: 300 }).resize({ width: 600 }).png().toBuffer();
+    else if (/webp/i.test(type)) buf = await sharp(buf).png().toBuffer();
     if (await vanishesOnWhite(buf)) return null;
     return { data: buf, type: /jpe?g/i.test(type) ? 'jpg' : 'png' };
   } catch {

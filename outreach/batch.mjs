@@ -60,10 +60,20 @@ function parseCsv(text) {
 }
 
 // ------------------------------------------------------------------ message
-function compose(p) {
+/** "Opus Recruitment Solutions'", not "Solutions's". */
+const possessive = (name) => (/s$/i.test(name) ? `${name}'` : `${name}'s`);
+
+/**
+ * `branded` is false when neither a logo nor a verified colour was found. The
+ * document is then set in our neutral with the agency's name in type, and
+ * calling that "your branding" to someone who pays for a branding tool is a
+ * claim they can check in one glance.
+ */
+function compose(p, { branded = true } = {}) {
   const first = (p.contact_first || '').trim();
   const greeting = first ? `Hi ${first},` : 'Hi,';
   const agency = p.company || 'your agency';
+  if (p.incumbent) return composeSwitch(p, greeting, agency, branded);
 
   // The image is shown inline, not attached. A .docx from a stranger is a thing
   // security-aware people do not open, it raises spam scores, and some mail
@@ -72,8 +82,12 @@ function compose(p) {
   // trust. The real Word file goes out when they reply.
   const text = `${greeting}
 
-The image below is a candidate CV rebuilt in ${agency}'s branding - your
-colours, the contact details stripped out, a reference code where the name was.
+${branded
+    ? `The image below is a candidate CV rebuilt in ${possessive(agency)} branding - your
+colours, the contact details stripped out, a reference code where the name was.`
+    : `The image below is a candidate CV rebuilt for ${agency} - the contact details
+stripped out, a reference code where the name was. With your logo and colours
+it comes out the same way.`}
 
 It took four seconds. I built the thing that made it.
 
@@ -88,7 +102,9 @@ ${SENDER.person}`;
 
   const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
 <p>${greeting}</p>
-<p>The image below is a candidate CV rebuilt in <strong>${agency}</strong>'s branding &mdash; your colours, the contact details stripped out, a reference code where the name was.</p>
+<p>${branded
+    ? `The image below is a candidate CV rebuilt in <strong>${possessive(agency)}</strong> branding &mdash; your colours, the contact details stripped out, a reference code where the name was.`
+    : `The image below is a candidate CV rebuilt for <strong>${agency}</strong> &mdash; the contact details stripped out, a reference code where the name was. With your logo and colours it comes out the same way.`}</p>
 <p>It took four seconds. I built the thing that made it.</p>
 <p>If anyone there still rebuilds CVs into your template by hand before they go to a client, that is the job it does. Whatever the candidate sent &mdash; two columns, tables, a scan &mdash; comes back looking like this.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
@@ -97,6 +113,49 @@ ${SENDER.person}`;
 </div>`;
 
   return { subject: 'your template, four seconds', text, html };
+}
+
+/**
+ * For an agency a competitor names as a customer. It does not explain the job —
+ * they bought a tool for it — and it makes no claim about the competitor beyond
+ * the public page that lists them. Price and the redaction check are the pitch;
+ * a renewal date is the natural moment, so that is the ask.
+ */
+function composeSwitch(p, greeting, agency, branded = true) {
+  const tool = p.incumbent;
+  const text = `${greeting}
+
+I saw ${agency} on ${tool}'s customer page, so you already know the job:
+a candidate CV in, your branded document out, contact details gone.
+
+${branded
+    ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by
+Venditas, the tool I built for the same job.`
+    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the
+tool I built for the same job; your logo and colours go on the same way.`} £79 a month for the whole
+agency, unlimited CVs, no contract. Every document is read back after it is
+built, and it fails rather than hand you a file with a contact detail left in.
+
+If ${tool} comes up for renewal, it might be worth ten minutes. You can run
+your own CVs at ${SENDER.site} - ten free, no card.
+
+${SENDER.person}`;
+
+  const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
+<p>${greeting}</p>
+<p>I saw <strong>${agency}</strong> on ${tool}'s customer page, so you already know the job: a candidate CV in, your branded document out, contact details gone.</p>
+<p>${branded
+    ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by Venditas, the tool I built for the same job.`
+    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. Every document is read back after it is built, and it fails rather than hand you a file with a contact detail left in.</p>
+<p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
+<p>If ${tool} comes up for renewal, it might be worth ten minutes. You can run your own CVs at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
+<p>${SENDER.person}</p>
+</div>`;
+
+  const subject = branded
+    ? `${tool} alternative, in ${possessive(agency)} branding`
+    : `${tool} alternative for ${agency}`;
+  return { subject, text, html };
 }
 
 // --------------------------------------------------------------------- main
@@ -189,11 +248,16 @@ Cannot read the mailbox: ${e.message}`);
   // personalisation on its own; a wrong accent colour actively undermines an
   // email claiming to be in their branding. So lead with the ones we are sure
   // about.
+  //
+  // Before all of that: agencies already paying a competitor for this exact job
+  // (outreach/prospects-hot.csv, each with the public page that says so). They
+  // need no convincing that the problem exists, only that this is cheaper.
   const score = (p) => {
+    const hot = p.incumbent || p.evidence_url ? -10 : 0;
     const uk = /united kingdom|uk|england|scotland|wales/i.test(p.country || '') ? 0 : 4;
     const logo = /^https?:\/\//.test(p.logo_url || '') && !/\.ico(\?|$)/i.test(p.logo_url) ? 0 : 2;
     const colour = /^#?[0-9a-f]{6}$/i.test((p.brand_colour || '').trim()) ? 0 : 1;
-    return uk + logo + colour;
+    return hot + uk + logo + colour;
   };
   eligible.sort((a, b) => score(a) - score(b));
 
@@ -239,7 +303,7 @@ Cannot read the mailbox: ${e.message}`);
       logoType: logo?.type,
     }, { reference });
 
-    const { subject, text, html } = compose(p);
+    const { subject, text, html } = compose(p, { branded: Boolean(logo || verified) });
     const png = await preview(data, {
       name: p.company, colour, footer: p.company, logo: logo?.data, logoType: logo?.type,
     }, reference);

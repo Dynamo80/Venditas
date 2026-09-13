@@ -14,7 +14,7 @@ not a knock-on from broken extraction:
     07/2019 - 06/2021             01.09.2012 - 31.08.2015
     2015-17                       Jan '11 - Aug '12
     Summer 2010                   2019 (Aug) to 2021 (Jun)
-    from 3rd October 2011         Oct 2010 - Jun 2011
+    from 3rd October 2014         Oct 2010 - Jun 2011
 
 Two of the ranges deliberately overlap in real time but are written in
 different notations, so an extractor that normalises them will surface the
@@ -111,7 +111,7 @@ def build(path=OUT):
         ("Bewick Marine Fabrication", "Graduate Engineer, rotational",
          "01.09.2012 - 31.08.2015",
          ["Four six-month rotations: design office, production, QA and planning; "
-          "confirmed into the design office from 3rd October 2011."]),
+          "confirmed into the design office from 3rd October 2014."]),
         ("Thorne & Askwith Ltd", "Industrial placement engineer",
          "Jan '11 - Aug '12",
          ["Placement year extended to twenty months at the company's request."]),
