@@ -20,15 +20,12 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 
 import path from 'node:path';
 import { render, makeReference } from '../lib/render.mjs';
 import { preview } from '../lib/preview.mjs';
-import { contrastOnWhite } from '../lib/colour.mjs';
-import { extract } from '../lib/extract.mjs';
+import { sampleFor, safeColour, loadSamples, fetchLogo } from './samples.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
 import { recentlyContacted, record, COOLING_DAYS, isSendableNow } from './contacted.mjs';
 import { scanInbox } from './inbox.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
-const SAMPLES = path.join(ROOT, 'reference', 'samples');
-const CACHE = path.join(ROOT, 'outreach', 'sample-cache.json');
 
 const argv = process.argv.slice(2);
 const flag = (name) => argv.includes(`--${name}`);
@@ -60,100 +57,6 @@ function parseCsv(text) {
   if (field || row.length) { row.push(field); rows.push(row); }
   const [head, ...body] = rows.filter((r) => r.some((c) => c.trim()));
   return body.map((r) => Object.fromEntries(head.map((h, i) => [h.trim(), (r[i] ?? '').trim()])));
-}
-
-// ------------------------------------------------------- specialism matching
-// Stems, so no trailing \b: with one, `financ` never matched "finance" and
-// `health` never matched "healthcare", and every finance, healthcare,
-// engineering and construction agency was sent a backend engineer's CV.
-// Tested against specialism *and* company name — "Falcon Wealth Search" says
-// what it recruits for even when the specialism column says "general".
-const SAMPLE_FOR = [
-  [/\b(legal|law\b|solicitor|barrister|paralegal|conveyanc)/i, 'legal-commercial-solicitor.pdf'],
-  [/\b(health|nurs|clinical|medical|care\b|carer|locum|nhs|dental|pharma)/i, 'healthcare-theatre-nurse.pdf'],
-  [/\b(financ|account|audit|tax\b|banking|insurance|actuar|wealth|invest|pension|payroll)/i, 'finance-financial-controller.pdf'],
-  [/\b(tech|software|it\b|develop|data\b|digital|devops|cloud|cyber|telecom)/i, 'tech-backend-engineer.pdf'],
-  [/\b(engineer|manufactur|industrial|mechanical|electrical|process\b|construc|civil)/i, 'engineering-process-engineer.pdf'],
-  [/\b(sales|marketing|commercial|business development|bd\b)/i, 'sales-regional-manager.pdf'],
-];
-
-/**
- * Hex values that are a framework's default, not an agency's identity.
- *
- * The list-building agent warned that only 41 of 244 colours came from a
- * verified source, and #22d3ee — Tailwind's cyan-400 — reached this batch as
- * "Cloud Recruit UK's brand colour". Rendering a CV in a stranger's CSS default
- * and calling it their branding is worse than not personalising at all: it is
- * visibly, checkably wrong.
- *
- * When in doubt, fall back to our own neutral. An unbranded document still
- * demonstrates the product; a wrongly-branded one demonstrates carelessness.
- */
-const FRAMEWORK_DEFAULTS = new Set([
-  '007cba', '0073aa', '0693e3',                     // WordPress
-  '007bff', '0d6efd', '6c757d', '17a2b8', '28a745', // Bootstrap
-  '3b82f6', '1e40af', '22d3ee', '06b6d4', '2563eb', // Tailwind
-  '4285f4', '1a73e8',                               // Google
-  '000000', 'ffffff', 'cccccc', '333333', '666666', '999999',
-]);
-
-function safeColour(raw) {
-  const hex = String(raw || '').replace(/^#/, '').trim().toLowerCase();
-  if (!/^[0-9a-f]{6}$/.test(hex)) return null;
-  if (FRAMEWORK_DEFAULTS.has(hex)) return null;
-  // Near-white is a page background the scraper picked up, not a brand.
-  // Darkening it would invent a colour and call it theirs.
-  if (contrastOnWhite(hex) < 1.5) return null;
-  return hex;
-}
-
-function sampleFor(specialism, company = '') {
-  const haystack = `${specialism || ''} ${company || ''}`;
-  for (const [re, file] of SAMPLE_FOR) {
-    if (re.test(haystack)) {
-      if (existsSync(path.join(SAMPLES, file))) return file;
-    }
-  }
-  // Generalist agencies place office, sales and operations roles far more often
-  // than backend engineers, so a regional sales manager is the least surprising
-  // candidate to show them.
-  for (const fallback of ['sales-regional-manager.pdf', 'tech-backend-engineer.pdf']) {
-    if (existsSync(path.join(SAMPLES, fallback))) return fallback;
-  }
-  return null;
-}
-
-// ------------------------------------------------------------- sample cache
-async function loadSamples(needed) {
-  const cache = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, 'utf8')) : {};
-  let added = 0;
-  for (const file of needed) {
-    if (cache[file]) continue;
-    const buf = readFileSync(path.join(SAMPLES, file));
-    process.stdout.write(`  extracting ${file}… `);
-    cache[file] = await extract(buf, file);
-    added++;
-    console.log('done');
-  }
-  if (added) writeFileSync(CACHE, JSON.stringify(cache, null, 2));
-  return cache;
-}
-
-async function fetchLogo(url) {
-  if (!url || !/^https?:\/\//.test(url)) return null;
-  // .ico is a favicon, usually 32px and unusable at 150px wide in a document.
-  if (/\.ico(\?|$)/i.test(url)) return null;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null;
-    const type = res.headers.get('content-type') || '';
-    if (!/image\/(png|jpe?g)/i.test(type)) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.length > 1_500_000 || buf.length < 200) return null;
-    return { data: buf, type: /jpe?g/i.test(type) ? 'jpg' : 'png' };
-  } catch {
-    return null;
-  }
 }
 
 // ------------------------------------------------------------------ message

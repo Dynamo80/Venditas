@@ -22,3 +22,6 @@ outreach/suppressed.txt
 # Every prospect list, whatever the suffix, and the nurture log.
 outreach/prospects*.csv
 outreach/nurture.log
+
+# Samples rendered for named agencies in LinkedIn conversations.
+outreach/linkedin/

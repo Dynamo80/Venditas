@@ -30,6 +30,7 @@ a left sidebar); the six below follow its approach.
 | `make_engineering.py` | `engineering-process-engineer.pdf` | Engineering and manufacturing | Senior process engineer, CEng | **Nine inconsistent date formats** in one document (see below) | NOT TESTED — daily quota |
 | `make_legal.py` | `legal-commercial-solicitor.pdf` | Legal | Commercial solicitor, 5 yrs PQE | **Three pages**, flowing continuously so a job's bullets break across a page boundary; ten-item schedule of matters | PASS (with a serious content loss, see below) |
 | `make_sales.py` | `sales-regional-manager.pdf` | Sales and marketing | Regional sales manager | **No section headings at all** — no bold, no bullets, no rules, one font size; employers and dates buried mid-sentence | PASS |
+| `make_logistics.py` | `logistics-ce-driver.pdf` | Logistics and transport | International CE truck driver, ex-HGV mechanic | **Europass form** — right-aligned labels in a narrow left column interleave with the values, employer listed after the duties, a language self-assessment grid, day-first dates, and the candidate's name repeated in a "Page 1 / 2 - Curriculum vitae of ..." footer | Added 2026-09-13 for Cruisr (Dutch driver agency); extracted locally, not through the public endpoint |
 
 Every hazard on the brief is covered. Two CVs carry a second hazard: the tech CV
 adds the split email address to the two-column layout (they occur together in
