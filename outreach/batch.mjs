@@ -158,11 +158,24 @@ ${SENDER.person}`;
  * the public page that lists them. Price and the redaction check are the pitch;
  * a renewal date is the natural moment, so that is the ask.
  */
+/**
+ * Where we saw them, exactly as the evidence page is. An agency named in The
+ * Access Group's case study was not on HireAra's customer page, and a recruiter
+ * who checks will notice the difference.
+ */
+function seenOn(p, tool) {
+  const u = p.evidence_url || '';
+  if (/theaccessgroup\.com/i.test(u)) return `in The Access Group's case study on ${tool}`;
+  if (/case-stud/i.test(u)) return `in ${tool}'s case study`;
+  return `on ${tool}'s customer page`;
+}
+
 function composeSwitch(p, greeting, agency, branded = true) {
   const tool = p.incumbent;
+  const seen = seenOn(p, tool);
   const text = `${greeting}
 
-I saw ${agency} on ${tool}'s customer page, so you already know the job:
+I saw ${agency} ${seen}, so you already know the job:
 a candidate CV in, your branded document out, contact details gone.
 
 ${branded
@@ -181,7 +194,7 @@ ${SENDER.person}`;
 
   const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
 <p>${greeting}</p>
-<p>I saw <strong>${agency}</strong> on ${tool}'s customer page, so you already know the job: a candidate CV in, your branded document out, contact details gone.</p>
+<p>I saw <strong>${agency}</strong> ${seen}, so you already know the job: a candidate CV in, your branded document out, contact details gone.</p>
 <p>${branded
     ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by Venditas, the tool I built for the same job.`
     : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. It keeps the candidate&rsquo;s own wording rather than rewriting it, every document is read back after it is built, and it fails rather than hand you a file with a contact detail left in.</p>

@@ -319,7 +319,8 @@ export function cleanName(s) {
     .replace(/\s+/g, ' ');
 }
 
-async function investigate(co) {
+/** Exported for one-off lists built from other public sources, under the same rules. */
+export async function investigate(co) {
   for (const host of domainCandidates(co.name)) {
     if (!(await resolves(host))) continue;
     let page = await get(`https://${host}/`);
