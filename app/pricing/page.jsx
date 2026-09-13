@@ -5,6 +5,7 @@ export const metadata = {
   title: 'Pricing — Venditas',
   description:
     'Ten CVs free to try. £79/month for unlimited, everyone in your agency included, no per-seat charge.',
+  alternates: { canonical: 'https://www.venditas.in/pricing' },
 };
 
 const REGIONS = [

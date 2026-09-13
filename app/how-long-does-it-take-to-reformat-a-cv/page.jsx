@@ -4,7 +4,7 @@ export const metadata = {
   title: 'How long does it take to reformat a candidate CV? — Venditas',
   description:
     'Realistic time costs for reformatting a candidate CV into an agency template, by hand and with a tool. Where the time goes, what makes a CV take longer, and what to budget for a shortlist.',
-  alternates: { canonical: 'https://venditas.in/how-long-does-it-take-to-reformat-a-cv' },
+  alternates: { canonical: 'https://www.venditas.in/how-long-does-it-take-to-reformat-a-cv' },
 };
 
 /**

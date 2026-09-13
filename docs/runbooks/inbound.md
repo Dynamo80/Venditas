@@ -12,9 +12,11 @@ Quibench, the closest UK comparable, shut in August 2026. Its customers still
 have the job and are searching for its name, and no other vendor has claimed
 the term. `/quibench-alternative` is live and in the sitemap.
 
-Founder, ten minutes: submit `https://venditas.in/sitemap.xml` in Google
-Search Console and Bing Webmaster Tools so the pages are crawled this week
-rather than whenever.
+Founder, ten minutes: submit `https://www.venditas.in/sitemap.xml` in Google
+Search Console (the **www** property: the bare domain redirects there) so the
+pages are crawled this week rather than whenever. Bing is covered without an
+account: `ops/seo.mjs --submit` pushes changed pages to IndexNow every
+Saturday (decision 018).
 
 ## 2. Free directory listings — founder, one hour total
 

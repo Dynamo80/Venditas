@@ -4,7 +4,7 @@ export const metadata = {
   title: 'Bulk CV formatting for a shortlist — Venditas',
   description:
     'A workflow for formatting a whole shortlist of candidate CVs in one pass: what to prepare, how to keep them consistent, how to keep the redaction right on twelve at once, and the checks before you send to the client.',
-  alternates: { canonical: 'https://venditas.in/bulk-cv-formatting-shortlist' },
+  alternates: { canonical: 'https://www.venditas.in/bulk-cv-formatting-shortlist' },
 };
 
 /**
@@ -215,7 +215,11 @@ export default function BulkCvFormatting() {
             the workflow.
           </li>
           <li>
-            <Link href="/contact">Contact</Link> — to ask about bulk or batch
+            <Link href="/">Format a shortlist</Link> — drop up to twenty CVs in at
+            once, in your branding, with the contact details removed and checked.
+          </li>
+          <li>
+            <Link href="/contact">Contact</Link> — to ask about larger batch
             workflows for your team.
           </li>
         </ul>

@@ -4,6 +4,7 @@ export const dynamic = 'force-static';
 export const metadata = {
   title: 'Privacy — Venditas',
   description: 'What happens to a CV you upload, what we store, and what we never keep.',
+  alternates: { canonical: 'https://www.venditas.in/privacy' },
 };
 
 export default function Page() {

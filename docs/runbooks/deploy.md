@@ -31,6 +31,16 @@ curl -s -X POST https://www.venditas.in/api/format \
 A file starting with the bytes `PK` is a valid .docx. Anything else is JSON with
 an error in it.
 
+Then the search side:
+
+```bash
+node ops/seo.mjs --submit
+```
+
+Want: every page live, no problems, and IndexNow reporting the pages it
+submitted. The Saturday job does this anyway; running it straight after a
+deploy gets new pages to Bing four days sooner.
+
 ## Environment variables
 
 Vercel needs: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET`, `CRON_SECRET`.

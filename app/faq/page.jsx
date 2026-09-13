@@ -5,6 +5,7 @@ export const metadata = {
   title: 'FAQ — Venditas',
   description:
     'The questions recruitment agencies actually ask before paying: data handling, accuracy, formats, and what happens if it gets one wrong.',
+  alternates: { canonical: 'https://www.venditas.in/faq' },
 };
 
 /**

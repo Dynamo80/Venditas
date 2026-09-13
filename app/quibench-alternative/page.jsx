@@ -4,7 +4,8 @@ import { PRO, ANNUAL } from '../../lib/pricing.mjs';
 export const metadata = {
   title: 'Quibench alternative for CV formatting and redaction — Venditas',
   description:
-    'Quibench stopped operating in August 2026. If your agency used it to format and anonymise CVs, Venditas does the same job: your branded Word template, contact details stripped, from £79/month.',
+    'Quibench stopped operating in August 2026. If your agency used it to format and anonymise CVs, Venditas does the same job: a Word document in your branding, contact details stripped, from £79/month.',
+  alternates: { canonical: 'https://www.venditas.in/quibench-alternative' },
 };
 
 /**
@@ -25,7 +26,7 @@ export default function QuibenchAlternative() {
         <p className="standfirst">
           Quibench&apos;s site says it is no longer operating under that brand. The work it did for
           your agency — a candidate CV into your template, contact details removed — still needs
-          doing. Venditas does it in a few seconds, and you can run one right now without signing up.
+          doing. Venditas does it in about ten seconds, and you can run one right now without signing up.
         </p>
       </header>
 
@@ -33,7 +34,7 @@ export default function QuibenchAlternative() {
         <h2>What carries over</h2>
         <ul>
           <li>
-            <strong>Your own branded template.</strong> Logo, colours, footer. The output is a Word
+            <strong>Your branding.</strong> Logo, colours, footer. The output is a Word
             document your consultants can still edit.
           </li>
           <li>
@@ -68,7 +69,7 @@ export default function QuibenchAlternative() {
           </li>
           <li>
             <strong>Built and supported by one person.</strong> If the output gets something wrong
-            against your template, you email the person who can fix it, and it is fixed the same day.
+            against your branding, you email the person who can fix it, and it is fixed the same day.
           </li>
         </ul>
 
@@ -77,7 +78,8 @@ export default function QuibenchAlternative() {
           HireAra is the established UK product, now part of The Access Group, from £180 a month plus
           VAT with a cap on candidates per year. If your CRM is Loxo, Recruit CRM, Zoho Recruit or
           Vincere, it already formats CVs into a template natively and you may not need a separate tool
-          at all. If you are on Bullhorn, JobAdder or Mercury, you do.
+          at all. Bullhorn and Firefish have a basic built-in formatted CV. If you are on JobAdder or
+          Mercury, there is nothing built in.
         </p>
 
         <h2>Try it on a real CV</h2>

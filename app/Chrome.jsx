@@ -35,7 +35,7 @@ export function SiteFooter() {
         <div>
           <div className="foot-head">Venditas</div>
           <p>
-            CVs into your template, with the candidate's contact details stripped. Built for
+            CVs in your branding, with the candidate's contact details stripped. Built for
             recruitment agencies.
           </p>
         </div>
@@ -66,6 +66,9 @@ export function SiteFooter() {
           <Link href="/cv-formatting-house-style-consistency">House-style consistency</Link>
           <Link href="/bulk-cv-formatting-shortlist">Formatting a shortlist</Link>
           <Link href="/how-long-does-it-take-to-reformat-a-cv">How long reformatting takes</Link>
+          <Link href="/best-cv-formatting-software-uk">CV formatting software compared</Link>
+          <Link href="/hireara-alternative">HireAra alternative</Link>
+          <Link href="/anonymise-cv-tool">Anonymise a CV, free</Link>
         </div>
       </div>
       <div className="foot-legal">

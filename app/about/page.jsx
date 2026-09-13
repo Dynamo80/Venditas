@@ -3,6 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'About Venditas',
   description: 'Who builds this, why it exists, and how to reach a human.',
+  alternates: { canonical: 'https://www.venditas.in/about' },
 };
 
 /**
@@ -16,7 +17,7 @@ export default function About() {
       <header className="masthead">
         <h1>A small tool that does one job properly.</h1>
         <p className="standfirst">
-          Venditas reformats candidate CVs into your agency's template and strips the contact
+          Venditas reformats candidate CVs into your agency's branding and strips the contact
           details. That's the whole product. It isn't trying to become your CRM.
         </p>
       </header>

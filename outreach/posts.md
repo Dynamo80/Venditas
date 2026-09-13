@@ -1,206 +1,136 @@
 # LinkedIn posts
 
-Paste-ready. One a day, in this order — the first is the strongest and should
-not be third.
+Rewritten 2026-09-13. Every sentence in a post below can be traced to the code, a
+commit, or research with a source. There are no anecdotes, no "a recruiter told
+me", and no number that isn't on record. Venditas has no customers yet, and
+nothing here implies otherwise.
 
-**Why these exist.** 900 followers is not a buying audience, but it is reach that
-costs no send quota and no domain reputation. It also does something the cold
-email cannot: a recruiter who checks the profile before accepting a connection
-request sees recent, relevant activity instead of a dormant account. The posts
-and the requests compound.
+**The test before posting anything new:** can you point to the file or link
+that makes each sentence true? If not, cut the sentence.
 
-**The rule for all of them.** No "thoughts?", no "agree?", no engagement bait, no
-line-break-every-four-words formatting. This audience reads manufactured LinkedIn
-posts all day and recognising them is a professional skill. A post that is
-plainly one person saying one true thing outperforms the format everyone else
-uses, precisely because everyone else uses it.
+## Rules
 
----
-
-## Post 1 — the positioning nobody has claimed
-
-Lead with this. Every competitor in CV anonymisation frames it as diversity and
-bias reduction, sold to employers. Not one frames it as fee protection, which is
-the reason agencies actually do it. Saying the quiet part is inherently
-shareable.
-
-> Every tool that strips names off CVs sells it as bias reduction.
->
-> That is not why recruitment agencies do it.
->
-> Agencies redact a CV because if the client can read the candidate's email, the
-> client can hire them directly and the agency loses a fee worth thousands. The
-> diversity benefit is real, but it is not what is being protected. The fee is.
->
-> I find this odd, because the honest version is the stronger pitch. "Reduce
-> unconscious bias in your shortlist" is a nice-to-have that gets deprioritised
-> in a bad quarter. "Your client cannot go around you" is a line item with a
-> number attached.
->
-> I built a thing that reformats a CV into an agency's own template and removes
-> the candidate's contact details, and I nearly wrote the bias version of the
-> landing page because that is what everyone else's says.
->
-> Then I read what recruiters actually say about it in public, and none of them
-> mentioned bias once.
+- **Timing:** Tuesday and Thursday, 08:00–10:00 UK, which is 12:30–14:30 IST while the UK is on summer time (until 25 October).
+- **Links:** put venditas.in in the first comment, not in the post.
+- **No bait:** no "Agree?", no "comment INFO", no one-word lines for effect.
+- **Posting and connecting:** don't post and send connection requests in the same hour. Send the day's requests first, then post at least an hour later, or post first and send requests the next day.
+- **Comments:** reply to every one, in a sentence, the same day. Don't pitch in the thread. If someone asks what you're building, answer in one line and offer to send the link privately.
+- **The bias challenge:** if someone pushes back on the first post, reply: "Both reasons are real. I just think the fee is why the budget gets approved. Fair challenge though." Then stop.
 
 ---
 
-## Post 2 — the story that makes the problem concrete
+## Week one
 
-A real, public artefact: a candidate found his recruiter had stripped his
-contact details by hand and deleted his degree along with them. It documents
-both that the practice exists and how manual work fails.
+### Tuesday 15 September — why an agency takes the name off
 
-> A candidate posted that he had been asked in three interviews why his CV did
-> not show a degree.
+> Most of what gets written about anonymised CVs is about reducing bias.
 >
-> He has a degree. His recruiter had removed his contact details before sending
-> the CV to clients — standard practice, so the client cannot go direct — and
-> the header they deleted had the degree in it.
+> That is a real reason. It is not the everyday reason a recruitment agency
+> takes the candidate's name, email and phone off a CV before a client sees it.
 >
-> Nobody checked. It went out to every client that way.
+> An agency does it because a client who can read the candidate's number can
+> ring them directly, hire them, and never pay the fee.
 >
-> This is what manual redaction actually looks like. Not a policy failure, just
-> somebody deleting a text box at 6pm with fourteen more to do, and no way to
-> tell afterwards what went with it.
+> In an agency, then, redaction isn't a policy. It sits between a shortlist
+> and an invoice.
 >
-> The fix is not "be more careful". The fix is that the removal should be
-> checked by something that does not get tired, and the check should fail loudly
-> rather than silently produce a slightly wrong document.
+> That changes what "good enough" means. A redaction step that is right almost
+> every time isn't good enough. The CV that goes out with a phone number left in
+> the footer is the one that costs the fee.
 >
-> That is the part I care about in what I am building. The formatting is easy.
-> Proving nothing was lost is the actual work.
+> I build a tool that rebuilds CVs in an agency's branding and strips the contact
+> details. Because of all this, it reads every finished document back before
+> handing it over. If a contact detail survived, you get an error instead of a
+> file.
+>
+> If your agency redacts CVs mainly for a different reason, I'd genuinely like to
+> hear it.
+
+First comment: `venditas.in — ten CVs free, no card.`
+
+**Sources.** The bias framing in the anonymisation literature: `outreach/linkedin.md`
+§D.2 (research, 2 September). The fee reason: decision 001, `docs/reference/market.md`.
+The read-back check: `redactionLeaks()` in `lib/render.mjs`, enforced in
+`app/api/format/route.js`. The footer phone number is a hypothetical, written as
+one, not something that happened.
+
+### Thursday 17 September — what it's built not to do
+
+> Read the public reviews of CV formatting software and the complaints aren't
+> about price.
+>
+> They're about accuracy: content the candidate never wrote, and employment dates
+> put in the wrong order.
+>
+> For a recruiter that is worse than no tool at all. The document goes to a
+> client as the candidate's CV, and if it says something the candidate didn't,
+> you find out in the interview.
+>
+> So the tool I've built for agencies is designed around what it won't do.
+>
+> It won't rewrite the candidate. Their wording stays, and their roles and dates
+> stay in the order they listed them.
+>
+> It won't fill gaps. If the CV doesn't say something, the field stays empty
+> rather than getting a plausible guess.
+>
+> It won't hand over a leak. The finished document is read back, and if the
+> candidate's name, email, phone, links or home address survived, you get an
+> error and no file.
+>
+> The third is a hard check on every document. The first two are how it is built
+> to work, and I test them against deliberately awkward sample CVs rather than
+> tidy ones.
+>
+> It's new, it's one person, and I'm looking for the first agencies to use it.
+
+First comment: `venditas.in — run ten of your own CVs, no card, no sign-up.`
+
+**Sources.** The review complaints: `research/growth-2026-09.md` §2, which links
+Trustpilot and Capterra reviews. No competitor is named, on purpose. The rules
+against rewriting, filling gaps and reordering: rules 1, 2, 7 and 10 in
+`lib/extract.mjs`. The hard check: `lib/render.mjs` and `app/api/format/route.js`.
+Awkward sample CVs: `reference/samples/README.md` (fictional candidates).
 
 ---
 
-## Post 3 — the market read, given away
+## In reserve (true, and can be posted from week two)
 
-Costs nothing and builds more credibility than a product claim, because it
-includes findings against our own interest. Recruitment people share honest
-market analysis.
+### The Europass fault
 
-> I spent a day researching CV formatting tools for recruitment agencies before
-> building one. Some of what I found argues against building it, so here is all
-> of it.
+> Testing my CV tool against a Europass CV turned up a fault I'd rather have found
+> than not.
 >
-> Fourteen products already do this. Prices run from $0.25 a CV to £950 a month.
+> Europass is a form: labels in one column, answers in the other. The tool took
+> the street address as the candidate's "location" and carried it through. It
+> also missed the candidate's name, because the form puts the surname first,
+> after a label.
 >
-> Four of the seven major recruitment CRMs now ship branded CV formatting
-> natively. Loxo does it free. If you are on Loxo, Recruit CRM, Zoho Recruit or
-> Vincere, you already have this and should not buy anything.
+> A street address identifies someone as surely as a mobile number, and this
+> document is built to go to a client.
 >
-> A UK competitor doing exactly this — formatting plus redaction, aimed at
-> agencies — shut down last month.
+> Both are fixed. Labels are stripped before it looks for a name, and surname-first
+> names are recognised. Streets are removed, keeping only the town and postcode
+> district, which a client needs for the commute. The check that reads the finished
+> document back now looks for the home address too.
 >
-> And every "recruiters spend 15 to 45 minutes per CV" statistic traces back to
-> a vendor's own survey. There is no independent measurement. The trade press
-> coverage is entirely supplier-submitted.
->
-> What survived: UK job adverts genuinely list "formatting CVs" as a paid duty
-> at £26–35k, offshore firms sell it at $1.50–2.50 a CV, and the pain is real
-> for UK agencies submitting under a client template while largely absent for US
-> in-house teams.
->
-> So it is a real job, in a crowded market, worth less per unit than most
-> vendors imply. I am building it anyway, for the segment where the evidence
-> holds. But I would rather say that than quote a statistic I know is a vendor's
-> own marketing.
+> I found it because I test against the awkward CVs, not the tidy ones. If you run
+> an agency, the CV you'd be embarrassed to forward is the one I want to see.
+
+**Source:** commit `7a93eac`. Don't add "nothing else leaked" or "the name came off
+as it should". The commit says the name was *not* recognised on that CV.
 
 ---
 
-## Post 4 — the restart, which pre-empts the obvious question
+## Removed on 2026-09-13, and why
 
-Anyone who reads the profile sees Venditas was shut down once. Better to
-address it directly than let them find the contradiction.
-
-> I shut down my last company, Venditas, about a year in. Not because it failed
-> — because I worked out the problem was not real.
->
-> I have restarted it under the same name, aimed at a different problem.
->
-> The difference is what I did first. Last time I built and then went looking
-> for someone who needed it. This time I went looking for evidence before
-> writing anything: job adverts listing the task as a duty, people paying
-> offshore firms to do it by hand, recruiters describing the workflow in public
-> without being asked.
->
-> I also found the arguments against, and there are several — a crowded market,
-> CRMs absorbing the feature, a competitor that died doing this exact thing last
-> month.
->
-> Building anyway, with the reasons against written down where I have to keep
-> looking at them.
->
-> Reusing the name is deliberate. It would be easy to bury a company I closed.
-> Closing it was the right call, and pretending otherwise would be the actual
-> failure.
-
----
-
-## Post 5 — the bug I found in my own tool (added 2026-09-13)
-
-True, specific, and it proves the redaction is checked by someone who looks.
-This audience trusts a founder who reports his own failure more than one who
-claims there are none.
-
-> This week I ran a Europass CV through the tool I built for recruitment agencies,
-> the form most EU drivers and warehouse candidates send.
->
-> It kept the candidate's full home address, street and flat number included, as
-> their "location".
->
-> Nothing else leaked. The name and phone came off as they should. But a street
-> address identifies someone as surely as a mobile number, and it was sitting at
-> the top of a document built to go to a client.
->
-> The cause was dull: Europass puts "Address" in a label column beside the value,
-> and nothing was looking for streets at all. It now keeps the town and postcode
-> district, which a client genuinely needs for a commute, and drops the rest. The
-> check that reads the finished document back now looks for the address too.
->
-> I only found it because I test against the awful CVs, not the tidy ones. If you
-> run an agency, the CV you'd be embarrassed to forward is the one I want.
-
-## Post 6 — why it refuses to hand you a file (added 2026-09-13)
-
-> The feature I'm proudest of in my CV tool is the one that makes it look broken.
->
-> After it rebuilds a CV in an agency's template, it reads the finished document
-> back and looks for the candidate's name, email, phone, links and address. If any
-> of them survived, you don't get a file. You get an error.
->
-> From the outside that's a failure. From the agency's side it's the whole point.
-> A document that quietly still has the candidate's mobile in the footer is worse
-> than no document, because you only find out when the client has already rung
-> them.
->
-> The easy version would have been to trust the code that removes things. The
-> check exists because the code that removes things is written by me, and I've
-> been wrong before.
-
-## Before posting 3
-
-Post 3's numbers (fourteen products, four of seven CRMs, a competitor shutting
-down "last month") come from research dated 2 September. Re-check them before
-posting, or cut the paragraph. A wrong number in a post about not trusting vendor
-statistics would undo the post.
-
-## Cadence
-
-One post a day for four days, then one or two a week. Post between 8 and 10am
-UK, which is when this audience is at a desk. Suggested order: 1, 5, 2, 6, then 4
-and 3 the following week.
-
-Do not post and connect in the same hour. A connection request arriving minutes
-after a post looks like one automated sequence, which is the impression all of
-this is written to avoid.
-
-## What to do with comments
-
-Reply to every one, in a sentence, from your own account. A recruiter who
-comments is worth more than ten who scroll past, and the reply is visible to
-everyone who sees the post afterwards.
-
-Do not pitch in a comment thread. If someone asks what you are building, answer
-in one line and offer to send the link privately.
+| Post | Removed because |
+|---|---|
+| Old post 2, the candidate whose degree was deleted | The repo records the story (`docs/reference/market.md`) but not a link to it, and the post added a detail that isn't in the record ("asked in three interviews"). Find the original post and link it before writing about it again. |
+| Old post 3, "the market read" | Its numbers ("fourteen products", "four of seven CRMs", a competitor that "shut down last month") come from 2 September research and were already flagged as needing a re-check. "Last month" becomes false on 1 October. |
+| Old post 4, the restart | "About a year in" is not recorded anywhere, and the post framed Venditas as "my last company". The profile's About now covers the restart in two true sentences, and that is enough. |
+| Old post 5, the Europass bug | It said "Nothing else leaked. The name and phone came off as they should." The commit for that fix says the name was not recognised. Rewritten above as a reserve post. |
+| Old post 6, "why it refuses to hand you a file" | True. Folded into Thursday's post. |
+| Intro line "900 followers" | Not recorded anywhere in the repo. |
+| `outreach/linkedin.md` §D.3, "A recruiter told me last month that she reformats CVs between 9 and 11pm… fifteen years in, three billing awards" | **Invented.** No such conversation is on record, and Venditas has no customers. Removed from the playbook. |
+| `outreach/linkedin.md` §D.5, "Every recruiter I showed that to was unmoved… about a dozen conversations" | **Invented.** No such conversations are on record. Removed from the playbook. |

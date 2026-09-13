@@ -9,6 +9,7 @@ export default function robots() {
         disallow: ['/api/', '/unsubscribe'],
       },
     ],
-    sitemap: 'https://venditas.in/sitemap.xml',
+    // www: the bare domain redirects there (see app/sitemap.js).
+    sitemap: 'https://www.venditas.in/sitemap.xml',
   };
 }

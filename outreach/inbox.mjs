@@ -29,9 +29,10 @@ const env = Object.fromEntries(
     .map((l) => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; })
 );
 
-const BOUNCE_FROM = /mailer-daemon|postmaster|no-?reply@.*(mail|smtp)/i;
-const BOUNCE_SUBJECT = /undeliver|delivery (status|failure)|returned mail|failure notice|mail delivery/i;
-const AUTO_SUBJECT = /out of (the )?office|auto(matic)? reply|autoreply|vacation|away from/i;
+// Exported for ops/watch.mjs, which reads the same mailbox between daily runs.
+export const BOUNCE_FROM = /mailer-daemon|postmaster|no-?reply@.*(mail|smtp)/i;
+export const BOUNCE_SUBJECT = /undeliver|delivery (status|failure)|returned mail|failure notice|mail delivery/i;
+export const AUTO_SUBJECT = /out of (the )?office|auto(matic)? reply|autoreply|vacation|away from/i;
 
 /** Everyone we have emailed, so a sender can be recognised as a reply. */
 function contactedDomains() {
@@ -46,7 +47,7 @@ function suppress(email, reason) {
   appendFileSync(f, `${email.toLowerCase()}  # ${reason} ${new Date().toISOString()}\n`);
 }
 
-function decodeSubject(raw) {
+export function decodeSubject(raw) {
   // Enough MIME decoding to read a subject line; not a full implementation.
   return String(raw || '').replace(/=\?UTF-8\?Q\?([^?]*)\?=/gi, (_, t) =>
     t.replace(/_/g, ' ').replace(/=([0-9A-F]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))

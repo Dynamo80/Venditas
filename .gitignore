@@ -25,3 +25,6 @@ outreach/nurture.log
 
 # Samples rendered for named agencies in LinkedIn conversations.
 outreach/linkedin/
+
+# State of the scheduled jobs: message ids, addresses, the Companies House download.
+ops/.cache/

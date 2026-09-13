@@ -4,7 +4,7 @@ export const metadata = {
   title: 'Why recruitment agencies anonymise candidate CVs — fee protection — Venditas',
   description:
     'The commercial reason recruitment agencies anonymise candidate CVs before sending them to clients: fee protection, not diversity. How the practice works, what an anonymised CV looks like, and what changes when the client can identify the candidate directly.',
-  alternates: { canonical: 'https://venditas.in/candidate-cv-anonymisation-fee-protection' },
+  alternates: { canonical: 'https://www.venditas.in/candidate-cv-anonymisation-fee-protection' },
 };
 
 /**

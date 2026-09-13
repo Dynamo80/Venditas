@@ -111,12 +111,18 @@ export class Imap {
     return line[1].trim().split(/\s+/).map(Number).filter(Boolean);
   }
 
-  /** Headers only: enough to spot a bounce or a reply without pulling bodies. */
-  async headers(seq) {
-    const res = await this.send(`FETCH ${seq} (BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE)])`);
+  /**
+   * Headers only: enough to spot a bounce or a reply without pulling bodies.
+   * `fields` asks for more when a caller needs them: ops/watch.mjs threads its
+   * drafts on Message-ID and recognises a mailing list by its List-* headers.
+   */
+  async headers(seq, fields = ['FROM', 'SUBJECT', 'DATE']) {
+    const res = await this.send(`FETCH ${seq} (BODY.PEEK[HEADER.FIELDS (${fields.join(' ')})])`);
+    const wanted = new Set(fields.map((f) => f.toLowerCase()));
     const out = {};
-    for (const [, k, v] of res.matchAll(/^(From|Subject|Date):\s*([^\r\n]*)/gim)) {
-      out[k.toLowerCase()] = v.trim();
+    // A long header continues on lines that start with whitespace; join those first.
+    for (const [, k, v] of res.replace(/\r?\n[ \t]+/g, ' ').matchAll(/^([A-Za-z][A-Za-z0-9-]*):[ \t]*([^\r\n]*)/gm)) {
+      if (wanted.has(k.toLowerCase())) out[k.toLowerCase()] = v.trim();
     }
     return out;
   }

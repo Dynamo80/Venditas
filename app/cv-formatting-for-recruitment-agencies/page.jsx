@@ -5,6 +5,7 @@ export const metadata = {
   title: 'CV formatting software for recruitment agencies — Venditas',
   description:
     'Reformat candidate CVs into your agency’s branded Word template with contact details removed. Built for UK recruitment agencies that submit CVs to clients. Ten free, then £79/month for the whole agency.',
+  alternates: { canonical: 'https://www.venditas.in/cv-formatting-for-recruitment-agencies' },
 };
 
 /**

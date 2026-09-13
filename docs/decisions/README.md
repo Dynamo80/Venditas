@@ -24,3 +24,7 @@ exists: without it, the eighth conversation starts from scratch.
 | 012 | [Five CVs on a demo account, €80, and Gmail is a customer](012-five-cv-demo-and-euro.md) | 2026-09-08 |
 | 013 | [Agencies already paying a competitor go first; follow-ups get a ceiling](013-paying-competitor-customers-first.md) | 2026-09-13 |
 | 014 | [An agency can buy without a call](014-buy-without-a-call.md) | 2026-09-13 |
+| 015 | [The goal is £10,000 MRR; £1,000 is the first milestone](015-ten-thousand-mrr.md) | 2026-09-13 |
+| 016 | [Growth is paid for by growth; Hustlr is never used](016-growth-paid-by-growth.md) | 2026-09-13 |
+| 017 | [Markets, integrations, partnerships, and the order profits are spent](017-markets-integrations-partnerships.md) | 2026-09-13 |
+| 018 | [Most of the growth work runs by itself, on this laptop](018-growth-runs-itself.md) | 2026-09-14 |

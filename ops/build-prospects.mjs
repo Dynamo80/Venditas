@@ -14,6 +14,12 @@
  *   # 2. Find and verify websites and emails, appending to outreach/prospects-uk-2.csv:
  *   node ops/build-prospects.mjs discover --in ch-agencies.csv --limit 2000
  *
+ *   # New agencies only (decision 017): registered in the last 90 days, with a
+ *   # recruitment-shaped name, written to outreach/prospects-new.csv with the
+ *   # incorporation date, which is what outreach/batch.mjs keys its email on:
+ *   unzip -p ch.zip | node ops/build-prospects.mjs filter --since 90 --out ch-new.csv
+ *   node ops/build-prospects.mjs discover --in ch-new.csv --new --limit 2000
+ *
  * Rules, the same ones the first list honoured (outreach/prospects-notes.md):
  *
  *   - No email is ever guessed, inferred or pattern-generated. An address is
@@ -31,7 +37,7 @@
  * twice.
  */
 
-import { readFileSync, writeFileSync, existsSync, appendFileSync, createReadStream } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, appendFileSync, readdirSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { resolve as dnsResolve } from 'node:dns/promises';
 import { pathToFileURL } from 'node:url';
@@ -39,6 +45,7 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const OUT_CSV = path.join(ROOT, 'outreach', 'prospects-uk-2.csv');
+const NEW_CSV = path.join(ROOT, 'outreach', 'prospects-new.csv');
 const HEADER = 'company,website,email,city,country,size,specialism,brand_colour,logo_url,hook';
 const UA = 'VenditasListBuilder/1.0 (+https://venditas.in/about; founder@venditas.in)';
 
@@ -85,7 +92,14 @@ const NAMEY = /\b(RECRUIT|RESOURC|STAFFING|TALENT|SEARCH|SELECTION|PERSONNEL|APP
 const NOISE = /\b(UMBRELLA|PAYROLL|HOMECARE|HOME CARE|CARE SERVICES|DOMICILIARY|CLEANING|SECURITY|TAXI|MODEL|MODELS|ESCORT|DRIVING|DRIVERS|LOCUM|NANNY|NANNIES|AU PAIR|TUTOR|FOOTBALL|SPORTS|MUSIC|FILM|CASTING|ENTERTAINMENT|PROMOTIONS|MARITIME|CREW)\b/;
 
 async function filter() {
-  const out = opt('out', 'ch-agencies.csv');
+  // --since N keeps only companies registered in the last N days. The default
+  // run does the opposite and drops anything under two years old, because most
+  // young 78109 companies are one contractor's personal service company. A
+  // recruitment-shaped name (tier A) is what separates a new agency from those,
+  // so --since keeps tier A only.
+  const since = Number(opt('since', 0));
+  const fresh = since ? new Date(Date.now() - since * 86400_000) : null;
+  const out = opt('out', since ? 'ch-new.csv' : 'ch-agencies.csv');
   const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - 2);
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
   let head = null, kept = 0, seen = 0;
@@ -104,9 +118,12 @@ async function filter() {
     const acct = g('Accounts.AccountCategory');
     if (/DORMANT/.test(acct)) continue;
     const [d, m, y] = g('IncorporationDate').split('/').map(Number);
-    if (!y || new Date(y, m - 1, d) > cutoff) continue;
+    if (!y) continue;
+    const inc = new Date(y, m - 1, d);
+    if (fresh ? inc < fresh : inc > cutoff) continue;
     const name = g('CompanyName').trim();
     if (NOISE.test(name)) continue;
+    if (fresh && !NAMEY.test(name)) continue;
     if (!/LIMITED|LTD|LLP/.test(name)) continue; // sole traders are individual subscribers under PECR; skip
     rows.push({
       name, number: g('CompanyNumber'), town: g('RegAddress.PostTown'), postcode: g('RegAddress.PostCode'),
@@ -345,7 +362,8 @@ async function investigate(co) {
 function knownDomains() {
   const set = new Set();
   const dir = path.join(ROOT, 'outreach');
-  for (const f of ['prospects.csv', 'prospects-uk-2.csv', 'prospects-in-1.csv', 'prospects-uk-3.csv']) {
+  // Every list batch.mjs sends from, so a new list cannot re-add an agency an old one has.
+  for (const f of readdirSync(dir).filter((n) => /^prospects.*\.csv$/i.test(n))) {
     for (const r of readCsvFile(path.join(dir, f))) {
       try { set.add(new URL(r.website).hostname.replace(/^www\./, '')); } catch {}
       if (r.email && r.email.includes('@')) set.add(r.email.split('@')[1].toLowerCase());
@@ -360,6 +378,11 @@ async function discover() {
   const conc = Number(opt('concurrency', 6));
   const tierOnly = opt('tier', 'A');
   const doneFile = opt('done', path.join(path.dirname(path.resolve(inFile)), 'discover-done.txt'));
+  // --new: the list of recently registered agencies, which carries the
+  // incorporation date so the first email can say what it is based on.
+  const isNew = args.includes('--new');
+  const outCsv = isNew ? NEW_CSV : OUT_CSV;
+  const header = isNew ? `${HEADER},incorporated` : HEADER;
 
   const done = new Set(existsSync(doneFile) ? readFileSync(doneFile, 'utf8').split('\n').filter(Boolean) : []);
   const known = knownDomains();
@@ -374,7 +397,7 @@ async function discover() {
     .filter((c) => (tierOnly === 'all' || c.tier === tierOnly) && small(c) && !done.has(c.number))
     .sort((a, b) => hash(a.number) - hash(b.number))
     .slice(0, limit);
-  if (!existsSync(OUT_CSV)) writeFileSync(OUT_CSV, HEADER + '\n');
+  if (!existsSync(outCsv)) writeFileSync(outCsv, header + '\n');
 
   const stats = { tried: 0, found: 0, withEmail: 0, crm: 0, robots: 0, nosite: 0, dup: 0 };
   let i = 0;
@@ -388,7 +411,8 @@ async function discover() {
         if (known.has(r.domain)) { stats.dup++; }
         else {
           known.add(r.domain);
-          appendFileSync(OUT_CSV, Object.values(r.row).map(csvCell).join(',') + '\n');
+          const row = isNew ? { ...r.row, incorporated: co.incorporated } : r.row;
+          appendFileSync(outCsv, Object.values(row).map(csvCell).join(',') + '\n');
           stats.found++; if (r.row.email) stats.withEmail++;
           console.log(`  + ${r.row.company.padEnd(40)} ${r.row.website.padEnd(38)} ${r.row.email || '(no address published)'}`);
         }
@@ -400,7 +424,7 @@ async function discover() {
     }
   };
   await Promise.all(Array.from({ length: conc }, worker));
-  console.log(`\ndone: ${stats.tried} tried · ${stats.found} added · ${stats.withEmail} with a published email · ${stats.dup} already listed · ${stats.crm} skipped (CRM) · ${stats.robots} skipped (robots.txt) · ${stats.nosite} no verifiable site\n-> ${OUT_CSV}`);
+  console.log(`\ndone: ${stats.tried} tried · ${stats.found} added · ${stats.withEmail} with a published email · ${stats.dup} already listed · ${stats.crm} skipped (CRM) · ${stats.robots} skipped (robots.txt) · ${stats.nosite} no verifiable site\n-> ${outCsv}`);
 }
 
 // Only act as a CLI when run directly; cleanName is importable on its own.
@@ -408,5 +432,5 @@ const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve
 if (isMain) {
   if (cmd === 'filter') filter();
   else if (cmd === 'discover') discover();
-  else { console.error('usage: build-prospects.mjs filter --out F  |  discover --in F [--limit N] [--tier A|B|all] [--concurrency N]'); process.exit(1); }
+  else { console.error('usage: build-prospects.mjs filter [--since DAYS] --out F  |  discover --in F [--new] [--limit N] [--tier A|B|all] [--concurrency N]'); process.exit(1); }
 }

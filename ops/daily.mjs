@@ -44,6 +44,7 @@ import { readFileSync, existsSync, appendFileSync } from 'node:fs';
 import path from 'node:path';
 import { DAILY_CAP } from '../outreach/send.mjs';
 import { isSendableNow } from '../outreach/contacted.mjs';
+import { notify } from './automation.mjs';
 
 const ROOT = path.resolve(
   path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'),
@@ -142,6 +143,12 @@ async function main() {
   if (pre.status === 1) {
     console.log(' Nothing was attempted. Fix the mail path, then run this again.\n');
     log('BLOCKED — mail host unreachable, nothing attempted');
+    if (LIVE) {
+      await notify({
+        title: 'Outreach blocked today',
+        body: 'The mail host is unreachable, so nothing went out and no reply was read. Run node ops/preflight.mjs.',
+      });
+    }
     process.exitCode = 1;
     return;
   }
@@ -157,7 +164,7 @@ async function main() {
   if (remaining() === 0) {
     console.log('\n cap already spent today. Inbox read; nothing sent.');
     log(`inbox only — cap already spent (${startedWith} sent)`);
-    return summary(results, startedWith);
+    return await summary(results, startedWith);
   }
 
   // 1. Trial users. Tiny volume, highest intent: someone who has run five CVs
@@ -183,10 +190,10 @@ async function main() {
     console.log('\n── batch — new prospects ───────────────────────────────\n   no budget left after follow-ups; skipped');
   }
 
-  summary(results, startedWith);
+  await summary(results, startedWith);
 }
 
-function summary(results, startedWith) {
+async function summary(results, startedWith) {
   const sent = sentToday() - startedWith;
   const failed = results.filter((r) => !r.ok);
 
@@ -204,8 +211,17 @@ function summary(results, startedWith) {
 
   // A scheduled task that always exits 0 is a scheduled task nobody notices has
   // broken. Non-zero when a stage failed, so Task Scheduler shows a last-result
-  // that is worth looking at.
-  if (failed.length) process.exitCode = 1;
+  // that is worth looking at, and a notification, because nobody looks at Task
+  // Scheduler either.
+  if (failed.length) {
+    process.exitCode = 1;
+    if (LIVE) {
+      await notify({
+        title: 'Daily outreach: a stage failed',
+        body: `${failed.map((f) => `${f.name} (${f.why})`).join('; ')}. Sent ${sent} this run. Details in ops/daily.log; rerun with node ops/daily.mjs --send --confirm.`,
+      });
+    }
+  }
 }
 
 function log(line) {
@@ -216,8 +232,9 @@ function log(line) {
   }
 }
 
-main().catch((e) => {
+main().catch(async (e) => {
   console.error('daily routine failed:', e?.message || e);
   log(`ERROR ${e?.message || e}`);
+  if (LIVE) await notify({ title: 'Daily outreach crashed', body: String(e?.message || e) }).catch(() => {});
   process.exit(1);
 });

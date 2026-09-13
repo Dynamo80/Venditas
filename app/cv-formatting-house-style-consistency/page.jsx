@@ -4,7 +4,7 @@ export const metadata = {
   title: 'CV formatting and house-style consistency across a recruitment team — Venditas',
   description:
     'Why shortlists look inconsistent, what good house-style consistency looks like for a UK recruitment agency, and how a single template plus a single workflow keeps every CV in a shortlist looking like it came from the same team.',
-  alternates: { canonical: 'https://venditas.in/cv-formatting-house-style-consistency' },
+  alternates: { canonical: 'https://www.venditas.in/cv-formatting-house-style-consistency' },
 };
 
 /**

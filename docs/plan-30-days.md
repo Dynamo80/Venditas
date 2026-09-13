@@ -7,6 +7,10 @@ of measured results. Deadline **2026-10-02**. Target: **13 paying agencies at
 Live count: `node ops/status.mjs`. Nothing in this file is a number you should
 trust over that script.
 
+**2026-09-13:** the goal is now £10,000 MRR
+([decision 015](decisions/015-ten-thousand-mrr.md)). This page is the plan for
+the first £1,000, and none of it changes.
+
 ## What is actually blocking money, 2026-09-08
 
 Run `node ops/preflight.mjs` before reading further. On the day this was

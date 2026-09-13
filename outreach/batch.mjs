@@ -53,6 +53,7 @@ function compose(p, { branded = true } = {}) {
   const greeting = first ? `Hi ${first},` : 'Hi,';
   const agency = p.company || 'your agency';
   if (p.incumbent) return composeSwitch(p, greeting, agency, branded);
+  if (isNewAgency(p)) return composeNew(p, greeting, agency, branded);
 
   // The image is shown inline, not attached. A .docx from a stranger is a thing
   // security-aware people do not open, it raises spam scores, and some mail
@@ -68,7 +69,7 @@ colours, the contact details stripped out, a reference code where the name was.`
 stripped out, a reference code where the name was. With your logo and colours
 it comes out the same way.`}
 
-It took four seconds. I built the thing that made it.
+It took about ten seconds. I built the thing that made it.
 
 If anyone there still rebuilds CVs into your template by hand before they go to
 a client, that is the job it does. Whatever the candidate sent - two columns,
@@ -84,14 +85,71 @@ ${SENDER.person}`;
 <p>${branded
     ? `The image below is a candidate CV rebuilt in <strong>${possessive(agency)}</strong> branding &mdash; your colours, the contact details stripped out, a reference code where the name was.`
     : `The image below is a candidate CV rebuilt for <strong>${agency}</strong> &mdash; the contact details stripped out, a reference code where the name was. With your logo and colours it comes out the same way.`}</p>
-<p>It took four seconds. I built the thing that made it.</p>
+<p>It took about ten seconds. I built the thing that made it.</p>
 <p>If anyone there still rebuilds CVs into your template by hand before they go to a client, that is the job it does. Whatever the candidate sent &mdash; two columns, tables, a scan &mdash; comes back looking like this.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
 <p>Reply and I will send the editable Word file, or run one of your own at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
 <p>${SENDER.person}</p>
 </div>`;
 
-  return { subject: 'your template, four seconds', text, html };
+  return { subject: 'a candidate CV in your branding', text, html };
+}
+
+/**
+ * Registered at Companies House in the last four months (outreach/prospects-new.csv,
+ * built by `ops/build-prospects.mjs discover --new`). Decision 017.
+ */
+const NEW_AGENCY_DAYS = 120;
+function isNewAgency(p) {
+  const inc = Date.parse(p.incorporated || '');
+  return Number.isFinite(inc) && Date.now() - inc < NEW_AGENCY_DAYS * 86400_000;
+}
+
+/**
+ * For an agency that has only just been registered. The only thing it claims
+ * to know about them is the registration date, which is public and which they
+ * know we can see. It does not congratulate them on a launch: a new company
+ * number can be an old agency restructuring, and guessing wrong reads as a
+ * mail merge. A new agency has no CV habits yet, so the pitch is to set the
+ * habit rather than replace one.
+ */
+function composeNew(p, greeting, agency, branded = true) {
+  const month = new Date(Date.parse(p.incorporated)).toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+  const text = `${greeting}
+
+${agency} was registered at Companies House in ${month}, so you may still be
+setting up how candidates go out to clients.
+
+${branded
+    ? `The image below is a sample candidate CV already rebuilt in ${possessive(agency)}
+branding - contact details stripped out, a reference code where the name was.`
+    : `The image below is a sample candidate CV rebuilt for ${agency} - contact details
+stripped out, a reference code where the name was. Your logo and colours go on
+the same way.`}
+
+Most agencies do that by hand before every submission, so a client cannot go
+around them. Venditas does it in about ten seconds from whatever the candidate sent,
+keeps the candidate's own wording, and refuses to hand over a document with a
+contact detail left in.
+
+Ten free at ${SENDER.site}, no card. After that it is £79 a month for the whole
+agency, and that founding price stays for as long as you do.
+
+${SENDER.person}`;
+
+  const html = `<div style="font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#14181d;max-width:640px">
+<p>${greeting}</p>
+<p><strong>${agency}</strong> was registered at Companies House in ${month}, so you may still be setting up how candidates go out to clients.</p>
+<p>${branded
+    ? `The image below is a sample candidate CV already rebuilt in ${possessive(agency)} branding &mdash; contact details stripped out, a reference code where the name was.`
+    : `The image below is a sample candidate CV rebuilt for ${agency} &mdash; contact details stripped out, a reference code where the name was. Your logo and colours go on the same way.`}</p>
+<p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
+<p>Most agencies do that by hand before every submission, so a client cannot go around them. Venditas does it in about ten seconds from whatever the candidate sent, keeps the candidate&rsquo;s own wording, and refuses to hand over a document with a contact detail left in.</p>
+<p>Ten free at <a href="${SENDER.site}">venditas.in</a>, no card. After that it is &pound;79 a month for the whole agency, and that founding price stays for as long as you do.</p>
+<p>${SENDER.person}</p>
+</div>`;
+
+  return { subject: `a branded CV for ${agency}`, text, html };
 }
 
 /**
@@ -112,8 +170,9 @@ ${branded
 Venditas, the tool I built for the same job.`
     : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the
 tool I built for the same job; your logo and colours go on the same way.`} £79 a month for the whole
-agency, unlimited CVs, no contract. Every document is read back after it is
-built, and it fails rather than hand you a file with a contact detail left in.
+agency, unlimited CVs, no contract. It keeps the candidate's own wording rather
+than rewriting it, every document is read back after it is built, and it fails
+rather than hand you a file with a contact detail left in.
 
 If ${tool} comes up for renewal, it might be worth ten minutes. You can run
 your own CVs at ${SENDER.site} - ten free, no card.
@@ -125,7 +184,7 @@ ${SENDER.person}`;
 <p>I saw <strong>${agency}</strong> on ${tool}'s customer page, so you already know the job: a candidate CV in, your branded document out, contact details gone.</p>
 <p>${branded
     ? `The image below is a sample candidate rebuilt in ${possessive(agency)} branding by Venditas, the tool I built for the same job.`
-    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. Every document is read back after it is built, and it fails rather than hand you a file with a contact detail left in.</p>
+    : `The image below is a sample candidate rebuilt for ${agency} by Venditas, the tool I built for the same job; your logo and colours go on the same way.`} &pound;79 a month for the whole agency, unlimited CVs, no contract. It keeps the candidate&rsquo;s own wording rather than rewriting it, every document is read back after it is built, and it fails rather than hand you a file with a contact detail left in.</p>
 <p><img src="cid:cvpreview" alt="Candidate CV in ${agency} branding" style="width:100%;max-width:600px;border:1px solid #dfe3e9;border-radius:4px"></p>
 <p>If ${tool} comes up for renewal, it might be worth ten minutes. You can run your own CVs at <a href="${SENDER.site}">venditas.in</a> &mdash; ten free, no card.</p>
 <p>${SENDER.person}</p>
@@ -231,12 +290,17 @@ Cannot read the mailbox: ${e.message}`);
   // Before all of that: agencies already paying a competitor for this exact job
   // (outreach/prospects-hot.csv, each with the public page that says so). They
   // need no convincing that the problem exists, only that this is cheaper.
+  //
+  // Next: agencies registered in the last four months. They are choosing how
+  // CVs go to clients right now, and have no template habit to replace.
+  // Ireland counts with the UK (decision 017).
   const score = (p) => {
     const hot = p.incumbent || p.evidence_url ? -10 : 0;
-    const uk = /united kingdom|uk|england|scotland|wales/i.test(p.country || '') ? 0 : 4;
+    const fresh = !hot && isNewAgency(p) ? -6 : 0;
+    const uk = /united kingdom|uk|england|scotland|wales|ireland/i.test(p.country || '') ? 0 : 4;
     const logo = /^https?:\/\//.test(p.logo_url || '') && !/\.ico(\?|$)/i.test(p.logo_url) ? 0 : 2;
     const colour = /^#?[0-9a-f]{6}$/i.test((p.brand_colour || '').trim()) ? 0 : 1;
-    return hot + uk + logo + colour;
+    return hot + fresh + uk + logo + colour;
   };
   eligible.sort((a, b) => score(a) - score(b));
 

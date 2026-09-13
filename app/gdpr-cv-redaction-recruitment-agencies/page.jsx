@@ -4,7 +4,7 @@ export const metadata = {
   title: 'GDPR-compliant CV handling for recruitment agencies — Venditas',
   description:
     'How UK and EU recruitment agencies handle candidate CVs under UK GDPR and the Data Protection Act 2018: lawful basis, minimisation, anonymisation, sub-processors and what an ICO complaint looks like in practice.',
-  alternates: { canonical: 'https://venditas.in/gdpr-cv-redaction-recruitment-agencies' },
+  alternates: { canonical: 'https://www.venditas.in/gdpr-cv-redaction-recruitment-agencies' },
 };
 
 /**

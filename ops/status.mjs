@@ -16,8 +16,11 @@
  */
 
 import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
+import { PRO } from '../lib/pricing.mjs';
+import { lastRun } from './automation.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const SITE = 'https://www.venditas.in';
@@ -117,6 +120,19 @@ function countCsv(file) {
     else if (c === '\n' && !quoted) rows++;
   }
   return Math.max(0, rows - 1);
+}
+
+/**
+ * A Windows scheduled task: its next run, or null if it is not registered.
+ * Undefined where there is no Task Scheduler to ask.
+ */
+function scheduledTask(name) {
+  if (process.platform !== 'win32') return undefined;
+  const res = spawnSync('schtasks', ['/query', '/tn', name, '/fo', 'csv', '/nh', '/v'], { encoding: 'utf8', windowsHide: true });
+  if (res.status !== 0) return null;
+  // Verbose CSV: HostName, TaskName, Next Run Time, Status, Logon Mode, Last Run Time, Last Result, ...
+  const cells = [...((res.stdout || '').trim().split('\n')[0] || '').matchAll(/"((?:[^"]|"")*)"/g)].map((m) => m[1]);
+  return { next: cells[2] || '?', lastResult: cells[6] || '?' };
 }
 
 async function main() {
@@ -238,14 +254,56 @@ async function main() {
     : 0;
   console.log(`  suppressed       ${suppN}`);
 
+  // ---- automation -------------------------------------------------------
+  // A job that runs by itself is a job nobody looks at (decision 010), so the
+  // morning glance says whether each one is scheduled, when it last ran, and
+  // what it found. Decision 018.
+  console.log('\nAUTOMATION');
+  {
+    const when = (iso) => (iso ? `${String(iso).slice(0, 16).replace('T', ' ')} UTC` : '');
+    const dailyRun = (() => {
+      const f = path.join(ROOT, 'ops', 'daily.log');
+      if (!existsSync(f)) return null;
+      const last = readFileSync(f, 'utf8').split('\n').filter((l) => l.trim()).pop();
+      if (!last) return null;
+      const [at, summary = ''] = last.split('\t');
+      return { at, summary, ok: !/FAILED|BLOCKED|ERROR/.test(summary) };
+    })();
+    const jobs = [
+      ['daily outreach', 'Venditas daily outreach', dailyRun],
+      ['reply watch', 'Venditas reply watch', lastRun('watch')],
+      ['weekly', 'Venditas weekly', lastRun('weekly')],
+    ];
+    for (const [label, task, run] of jobs) {
+      const t = scheduledTask(task);
+      const scheduled = t === undefined ? '' : t ? `scheduled, next ${t.next}` : 'NOT SCHEDULED - powershell -File ops\\install-schedule.ps1';
+      console.log(`  ${pad(label, 15)} ${scheduled}`);
+      console.log(`  ${pad('', 15)} last ${run ? `${when(run.at)}  ${run.ok === false ? 'FAILED  ' : ''}${run.summary}` : 'never run'}`);
+    }
+    const seo = lastRun('seo');
+    if (seo) console.log(`  ${pad('seo', 15)} ${when(seo.at)}  ${seo.summary}`);
+    const refresh = lastRun('refresh');
+    if (refresh) console.log(`  ${pad('new agencies', 15)} ${when(refresh.at)}  ${refresh.summary}`);
+    console.log(`  ${pad('alerts reach', 15)} ${env.ALERT_EMAIL ? 'this laptop, and ALERT_EMAIL' : 'this laptop only (set ALERT_EMAIL in .env.local to reach a phone)'}`);
+  }
+
   // ---- funnel -----------------------------------------------------------
   // The arithmetic in docs/plan-30-days.md, recomputed rather than copied.
   // Sending is capped at 25/day, so the question every morning is not "did we
   // send" but "how many days of list are left, and how far from the goal".
   console.log('\nFUNNEL');
   {
-    const GOAL_GBP = 1000, PRICE_GBP = 79, CAP = 25, DEADLINE = '2026-10-02';
-    const need = Math.ceil(GOAL_GBP / PRICE_GBP);
+    // Decision 015: GBP 10,000 is the goal, GBP 1,000 by the deadline the first
+    // milestone. The first foundingSeats agencies pay the founding price and
+    // everyone after pays standard (decision 004).
+    const GOAL_GBP = 10000, MILESTONE_GBP = 1000, CAP = 25, DEADLINE = '2026-10-02';
+    const agenciesFor = (gbp) => {
+      const founding = PRO.foundingSeats * PRO.gbp;
+      return gbp <= founding
+        ? Math.ceil(gbp / PRO.gbp)
+        : PRO.foundingSeats + Math.ceil((gbp - founding) / PRO.standardGbp);
+    };
+    const need = agenciesFor(GOAL_GBP), milestone = agenciesFor(MILESTONE_GBP);
     const sentAddrs = new Set(
       existsSync(sentLog)
         ? readFileSync(sentLog, 'utf8').split('\n').map((l) => l.split('\t')[1]).filter(Boolean).map((e) => e.toLowerCase())
@@ -263,8 +321,10 @@ async function main() {
       }
     }
     const daysLeft = Math.max(0, Math.round((Date.parse(DEADLINE) - Date.now()) / 86400_000));
-    console.log(`  goal             ${need} agencies at GBP ${PRICE_GBP} = GBP ${need * PRICE_GBP}/mo, by ${DEADLINE} (${daysLeft} days left)`);
+    console.log(`  goal             GBP ${GOAL_GBP}/mo = ${need} agencies (${Math.min(need, PRO.foundingSeats)} at GBP ${PRO.gbp}, ${Math.max(0, need - PRO.foundingSeats)} at GBP ${PRO.standardGbp}), no date set`);
+    console.log(`  milestone        GBP ${MILESTONE_GBP}/mo = ${milestone} agencies at GBP ${PRO.gbp}, by ${DEADLINE} (${daysLeft} days left)`);
     console.log(`  UK prospects     ${ukLeft} uncontacted of ${ukTotal}  ->  ${(ukLeft / CAP).toFixed(1)} days of sending at ${CAP}/day`);
+    console.log(`  goal vs list     ${need} of ${ukTotal} UK prospects would have to pay: 1 in ${Math.round(ukTotal / need)}`);
     console.log(`  US prospects     ${usLeft} uncontacted  (last in the queue; see decision 005)`);
     if (ukLeft < CAP * 5) console.log(`  LIST RUNS OUT    in under a week — build prospects-uk-2.csv (docs/plan-30-days.md, item 3)`);
   }

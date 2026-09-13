@@ -4,6 +4,7 @@ export const dynamic = 'force-static';
 export const metadata = {
   title: 'Data processing agreement — Venditas',
   description: 'The data processing agreement for agencies using Venditas, with sub-processors and transfer terms.',
+  alternates: { canonical: 'https://www.venditas.in/dpa' },
 };
 
 export default function Page() {

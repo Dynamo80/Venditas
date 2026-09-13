@@ -6,8 +6,12 @@ Researched 2026-09-02. Prices read first-hand from vendor pages unless marked.
 
 **HireAra** — £180 / £450 / £950 per month + VAT, unlimited users, capped by
 candidates per year (1,500 / 5,000 / 12,000). UK, agency-focused, acquired by
-The Access Group in October 2024. Notably makes **no mention of redaction**,
-which is either an opportunity or a signal that it does not sell.
+The Access Group in October 2024.
+
+**Corrected 2026-09-13:** HireAra *does* sell redaction. The Access Group's
+product page says "Anonymise CVs for compliant submissions". Its public
+complaints are about invented content, not price. Its Trustpilot rating is
+suspended for a guidelines breach. See `research/growth-2026-09.md` §2.
 
 ## The floor — the anchoring problem
 
@@ -51,3 +55,13 @@ exactly what cannot be sent to a client.
 See `docs/decisions/005-target-market.md`. Short version: Loxo (free), Recruit
 CRM, Zoho Recruit and Vincere have it. Bullhorn, JobAdder and Mercury do not —
 those are the prospects.
+
+**Corrected 2026-09-13, and 005 is out of date on this point:**
+- **Bullhorn** has a basic built-in blind CV: plain CV text with the agency's
+  header, set up by Bullhorn Support.
+- **Firefish** has had formatted CVs (Word/PDF) built in since 2021.
+- **JobAdder, Mercury, Tracker and Itris** still have nothing built in.
+- **The pitch to Bullhorn and Firefish agencies is quality:** the candidate's own
+  CV rebuilt as an editable Word document in the agency's branding, compared with a text dump.
+
+`research/growth-2026-09.md` §1 has the sources.

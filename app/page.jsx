@@ -1,74 +1,42 @@
-'use client';
+import Formatter from './Formatter';
+import { PRO } from '../lib/pricing.mjs';
 
-import { useRef, useState } from 'react';
+export const metadata = {
+  alternates: { canonical: 'https://www.venditas.in/' },
+};
 
-const ACCEPT = '.pdf,.docx,.txt';
+/**
+ * What a search engine or an AI answer reads to know this is a product with a
+ * price rather than an article. Nothing the page does not already say, and no
+ * rating, because there are no reviews yet.
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Venditas',
+  url: 'https://www.venditas.in/',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description:
+    "Reformats candidate CVs into a recruitment agency's branded Word document, with the candidate's name, email, phone and LinkedIn removed.",
+  offers: [
+    { '@type': 'Offer', price: '0', priceCurrency: 'GBP', description: 'Ten CVs free, no card' },
+    { '@type': 'Offer', price: String(PRO.gbp), priceCurrency: 'GBP', description: 'Agency plan: unlimited CVs, whole agency, per month' },
+  ],
+};
 
 export default function Page() {
-  const [file, setFile] = useState(null);
-  const [email, setEmail] = useState('');
-  const [over, setOver] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState(null);
-  const inputRef = useRef(null);
-
-  function choose(f) {
-    if (!f) return;
-    setFile(f);
-    setMsg(null);
-  }
-
-  function onDrop(e) {
-    e.preventDefault();
-    setOver(false);
-    choose(e.dataTransfer.files?.[0]);
-  }
-
-  async function submit(e) {
-    e.preventDefault();
-    if (!file || busy) return;
-
-    setBusy(true);
-    setMsg({ tone: 'work', text: 'Reading the CV… this takes about ten seconds.' });
-
-    const body = new FormData(e.currentTarget);
-    body.set('cv', file);
-
-    try {
-      const res = await fetch('/api/format', { method: 'POST', body });
-
-      if (!res.ok) {
-        const { error } = await res.json().catch(() => ({}));
-        setMsg({ tone: 'err', text: error || 'Something went wrong. Nothing was saved.' });
-        return;
-      }
-
-      const blob = await res.blob();
-      const ref = res.headers.get('X-Candidate-Ref') || 'candidate';
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${ref}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-
-      setMsg({ tone: 'ok', text: `Done — downloaded as ${ref}.docx. Open it and check the formatting.` });
-    } catch {
-      setMsg({ tone: 'err', text: 'The upload failed. Check your connection and try again.' });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <div className="wrap">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <header className="masthead">
         <div className="brand">
           Venditas <span>for recruitment agencies</span>
         </div>
-        <h1>Candidate CVs in your template, with the contact details stripped.</h1>
+        <h1>Candidate CVs in your branding, with the contact details stripped.</h1>
         <p className="standfirst">
           Drop in whatever mess the candidate sent. Get back a clean Word document in your
           branding, ready to send to a client — with the candidate's name, email, phone and
@@ -76,83 +44,7 @@ export default function Page() {
         </p>
       </header>
 
-      <form className="panel" onSubmit={submit}>
-        <h2>Try it on a real CV</h2>
-        <p className="hint">
-          Ten CVs free. No card, no account to set up — just your work email so we know
-          who you are. The CV itself is processed and discarded, never stored.
-        </p>
-
-        <div className="grid">
-          <label>
-            <span className="lbl">Work email</span>
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="you@youragency.com"
-              maxLength={254}
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-          <label>
-            <span className="lbl">Agency name</span>
-            <input type="text" name="agency" placeholder="Meridian Talent Partners" maxLength={80} />
-          </label>
-          <label>
-            <span className="lbl">Contact line for the footer</span>
-            <input type="text" name="contact" placeholder="hello@youragency.com" maxLength={80} />
-          </label>
-          <label>
-            <span className="lbl">Brand colour</span>
-            <input type="color" name="colour" defaultValue="#33418f" />
-          </label>
-          <label>
-            <span className="lbl">Logo (PNG or JPG, optional)</span>
-            <input type="file" name="logo" accept="image/png,image/jpeg" />
-          </label>
-        </div>
-
-        <div
-          className={`drop${over ? ' over' : ''}${file ? ' has-file' : ''}`}
-          onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-          onDragLeave={() => setOver(false)}
-          onDrop={onDrop}
-          onClick={() => inputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }}
-        >
-          <strong>{file ? file.name : 'Drop a CV here, or click to choose'}</strong>
-          <span>{file ? `${(file.size / 1024).toFixed(0)} KB — click to swap` : 'PDF or Word, up to 10MB'}</span>
-          <input
-            ref={inputRef}
-            type="file"
-            accept={ACCEPT}
-            hidden
-            onChange={(e) => choose(e.target.files?.[0])}
-          />
-        </div>
-
-        <div className="row">
-          <button className="go" type="submit" disabled={!file || !email.trim() || busy}>
-            {busy ? 'Working…' : 'Format this CV'}
-          </button>
-          <label className="check">
-            <input type="checkbox" name="redact" value="off" defaultChecked={false} />
-            <span>Keep the candidate's contact details (off by default)</span>
-          </label>
-        </div>
-
-        <p className="consent">
-          We'll email you about Venditas. One click unsubscribes you, and we won't pass your
-          address to anyone.
-        </p>
-
-        {msg && <div className={`msg ${msg.tone}`}>{msg.text}</div>}
-      </form>
+      <Formatter />
 
       <section className="why">
         <div>

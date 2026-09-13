@@ -289,6 +289,29 @@ footer {
 .legal tbody td { padding: 9px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .legal tbody tr:last-child td { border-bottom: none; }
 
+/* ================================================= formatter: batch and saved branding */
+.brand-fields { margin-top: 16px; }
+details.brand-fields summary {
+  cursor: pointer; font-size: 14.5px; color: var(--ink-2); margin-bottom: 14px;
+}
+.row.remember { margin-top: 12px; }
+.saved {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 13px; color: var(--ink-2); margin: 6px 0 0;
+}
+button.linkish {
+  font: inherit; font-size: 13px; color: var(--accent-ink); background: none;
+  border: 0; padding: 0; cursor: pointer; text-decoration: underline;
+}
+.results { list-style: none; margin: 14px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.results li {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+}
+.results .fname { color: var(--ink); overflow-wrap: anywhere; }
+.results .err { color: var(--crit); }
+.results .skip { color: var(--ink-3); }
+
 .plan .founding {
   font-size: 12.5px; color: var(--accent-ink); background: var(--accent-soft);
   border-radius: 7px; padding: 9px 11px; margin: 12px 0 0; line-height: 1.45;

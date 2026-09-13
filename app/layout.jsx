@@ -24,16 +24,18 @@ const publicSans = Public_Sans({
 });
 
 export const metadata = {
-  title: 'Venditas — branded CVs in four seconds',
+  title: 'Venditas — branded CVs, contact details stripped',
   description:
-    "Drop in a candidate CV, get it back in your agency template with the contact details stripped. Built for recruitment agencies.",
-  metadataBase: new URL('https://venditas.in'),
+    "Drop in a candidate CV, get it back in your agency's branding with the contact details stripped. Built for recruitment agencies.",
+  // www: the bare domain redirects there, so relative canonicals resolve to
+  // the address that is actually served (app/sitemap.js).
+  metadataBase: new URL('https://www.venditas.in'),
   openGraph: {
-    title: 'Venditas — branded CVs in four seconds',
+    title: 'Venditas — branded CVs, contact details stripped',
     description:
-      "Candidate CVs in your template, with the contact details stripped. Ten CVs free, then £79/month for the whole agency.",
+      "Candidate CVs in your branding, with the contact details stripped. Ten CVs free, then £79/month for the whole agency.",
     type: 'website',
-    url: 'https://venditas.in',
+    url: 'https://www.venditas.in',
   },
 };
 

@@ -4,6 +4,7 @@ export const dynamic = 'force-static';
 export const metadata = {
   title: 'Terms — Venditas',
   description: 'Terms of service for Venditas, including the limits of machine-generated output.',
+  alternates: { canonical: 'https://www.venditas.in/terms' },
 };
 
 export default function Page() {

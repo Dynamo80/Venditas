@@ -10,15 +10,16 @@
  * to answer one of them is the entire batch. So: everything needed to respond
  * is one command away, including the file we promised in the original message.
  *
+ * ops/watch.mjs usually gets there first and leaves the right draft in the
+ * Drafts folder. This is for answering from the terminal instead.
+ *
  * Nothing here sends without --send. Reading is free; mailing a customer is not.
  */
 
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import path from 'node:path';
+import { readFileSync, existsSync } from 'node:fs';
 import { send, closeTransport, SENDER } from './send.mjs';
 import { domainOf, record } from './contacted.mjs';
-
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
+import { DRAFTS, findArtifacts } from './drafts.mjs';
 
 const argv = process.argv.slice(2);
 const who = argv[0];
@@ -32,73 +33,8 @@ if (!who) {
 
 const domain = domainOf(who);
 
-/** Find the document we generated for this agency, in the most recent batch. */
-function findArtifacts() {
-  const dir = path.join(ROOT, 'outreach', 'batches');
-  if (!existsSync(dir)) return null;
-  for (const day of readdirSync(dir).sort().reverse()) {
-    const manifestPath = path.join(dir, day, 'manifest.json');
-    if (!existsSync(manifestPath)) continue;
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    const entry = manifest.find((m) => domainOf(m.email) === domain || domainOf(m.company) === domain);
-    if (!entry) continue;
-    const safe = (entry.company || '').replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40);
-    return {
-      day,
-      entry,
-      docx: path.join(dir, day, `${safe}.docx`),
-      png: path.join(dir, day, `${safe}.png`),
-    };
-  }
-  return null;
-}
-
-/**
- * Replies cluster into a handful of shapes. Each of these is written to be sent
- * as-is, because a draft that needs editing is a draft that waits until evening.
- */
-const DRAFTS = {
-  interested: (c) => `Thanks — the Word file is attached, so you can see it is properly editable rather than a picture of a document.
-
-If you want to try it on your own candidates: ${SENDER.site}, ten free, no card, no account to set up. Put your logo and colour in and it comes back in your template.
-
-Anything it handles badly, tell me and I will fix it — that is more useful to me than a compliment.
-
-${SENDER.person}`,
-
-  price: (c) => `£79 a month, everyone at ${c.company || 'your agency'} included — no per-seat charge. Unlimited CVs. Monthly, cancel whenever.
-
-That is a founding rate for the first twenty agencies and it stays at £79 for as long as you keep it; it goes to £149 after.
-
-Ten free first at ${SENDER.site} — I would rather you decided on your own CVs than on my sample.
-
-${SENDER.person}`,
-
-  data: (c) => `Fair question, and the honest answer is short: we do not keep candidate CVs. The file is read in memory, turned into a document, returned, and gone when the request ends. No bucket, no backup, no candidate database.
-
-What we do store is your email, your agency name and a count of CVs run.
-
-The detail is at ${SENDER.site}/security, and there is a data processing agreement at ${SENDER.site}/dpa if your client needs one signed. If your legal team wants changes to it, send them over — it is a draft, not a hostage situation.
-
-${SENDER.person}`,
-
-  crm: (c) => `If your CRM already does branded CV formatting, honestly, use it. Loxo, Recruit CRM, Zoho Recruit and Vincere all ship it, and a second tool is not worth the money.
-
-Where this tends to earn its place is Bullhorn, JobAdder, or no CRM at all — and where the CVs arriving are a mess, because that is the part it was actually built for.
-
-Which are you on? If the answer is one of the first four I will say so and leave you alone.
-
-${SENDER.person}`,
-
-  no: (c) => `Understood, thanks for replying — most people do not, and it is genuinely useful to know.
-
-You are off the list. I will not contact you again.
-
-${SENDER.person}`,
-};
-
 async function main() {
-  const found = findArtifacts();
+  const found = findArtifacts(domain);
 
   console.log(`\n${domain}`);
   if (!found) {

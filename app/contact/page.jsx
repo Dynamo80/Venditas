@@ -5,7 +5,7 @@ export const metadata = {
   title: 'Contact Venditas — support, security and billing',
   description:
     'How to reach Venditas for support, security disclosures, billing questions, DPA review and data requests. Book a 30-minute call, or email a named person who replies within a working day.',
-  alternates: { canonical: 'https://venditas.in/contact' },
+  alternates: { canonical: 'https://www.venditas.in/contact' },
 };
 
 /**

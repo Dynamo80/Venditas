@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'nodejs';
-export const alt = 'Venditas — candidate CVs in your template, with the contact details stripped';
+export const alt = 'Venditas — candidate CVs in your branding, with the contact details stripped';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -70,7 +70,7 @@ export default function Image() {
               maxWidth: 940,
             }}
           >
-            Candidate CVs in your template, with the contact details stripped.
+            Candidate CVs in your branding, with the contact details stripped.
           </div>
           <div
             style={{
@@ -80,7 +80,7 @@ export default function Image() {
               fontFamily: 'system-ui, sans-serif',
             }}
           >
-            Four seconds. Ten free, no card.
+            About ten seconds. Ten free, no card.
           </div>
         </div>
 

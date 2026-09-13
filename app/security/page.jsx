@@ -4,6 +4,7 @@ export const metadata = {
   title: 'Security & data — Venditas',
   description:
     'What happens to a CV you upload, what we store, who else touches it, and what we do not keep.',
+  alternates: { canonical: 'https://www.venditas.in/security' },
 };
 
 /**

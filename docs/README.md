@@ -9,7 +9,9 @@ present for the conversation that built it.
    anything this can tell you.
 2. **`state.md`** — what is blocked and what happens next. Short by design.
    **`plan-30-days.md`** — the funnel arithmetic and the four things that have
-   to be true to reach £1,000 MRR by 2026-10-02.
+   to be true to reach £1,000 MRR by 2026-10-02, the first milestone on the way
+   to £10,000 (decision 015). **`strategy-10k.md`** — the channels and the
+   decisions that get from there to 77 agencies.
 3. **`decisions/`** — why things are the way they are. Read before proposing a
    change of direction.
 4. **`runbooks/`** — how to actually perform a task. `closing.md` when someone says yes; `replies.md` first if

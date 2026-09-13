@@ -6,6 +6,13 @@ executed by hand. UK recruitment agencies, 5–30 people.
 Researched and written 2 September 2026. Platform limits change without notice — re-check
 the ones flagged in [§0.5](#05-what-im-not-certain-about) before scaling volume.
 
+**Corrected 2026-09-13.**
+- The daily work now starts at [`linkedin/START-HERE.md`](linkedin/START-HERE.md).
+- Profile text lives only in [`profile.md`](profile.md), and posts only in [`posts.md`](posts.md).
+- Messages and reply handlers (§C) were checked against the code and current pricing.
+- Two posts built on invented anecdotes were removed (§D).
+- The claims that were removed, and why, are listed where they used to be.
+
 ---
 
 ## 0. Research findings that shape everything below
@@ -73,9 +80,9 @@ window rather than a calendar week, identical across Free, Premium and Sales Nav
 paying does not raise it. New or low-trust accounts are throttled lower, ~50–80/week.
 Withdrawing pending invites does **not** return quota; the count is of requests sent.
 
-**New vs. established.** Abin's account is old and has ~500 real connections, which is
-established. But it has never sent outreach, so its behavioural baseline is "occasional
-browsing." Jumping from that to 20 invites a day is itself an anomaly. Ramp:
+**New vs. established.** Abin's account is established, but it has never sent
+outreach, so its behavioural baseline is "occasional browsing." Jumping from that to 20
+invites a day is itself an anomaly. Ramp:
 
 | | Invites/day | Invites/week |
 |---|---|---|
@@ -87,6 +94,9 @@ browsing." Jumping from that to 20 invites a day is itself an anomaly. Ramp:
 Steady state stays at **60/week against an observed ~100 ceiling**. The headroom is
 deliberate: the cap is dynamic and reacts to acceptance rate, and we would rather spend
 the margin on safety than on 40 more requests a week that would not change the outcome.
+
+**Abin's hard limits** are 15 a day and 100 in any 7 days. `node outreach/linkedin/today.mjs`
+counts requests from its log and warns at either. The ramp above stays well inside them.
 
 **The acceptance rate is the real limit, not the number.** LinkedIn weights ignored and
 pending invites heavily. Recruiters accept at unusually high rates, which is the entire
@@ -121,6 +131,7 @@ Two practical notes for this specific case:
 2. **Spreadsheets, keyboard shortcuts and pre-written text are not automation.** Preparing all
    twenty messages in a text file and pasting them one at a time is manual sending. The line is
    crossed when software touches the LinkedIn session, not when you prepare in advance.
+   `today.mjs` reads and writes local files only.
 
 **One limit that will bite before any of the above:** the free-account
 **Commercial Use Limit**, which throttles search after roughly 250–350 profile searches a
@@ -156,108 +167,33 @@ than a fake "we", because recruiters spend all day reading company blurb and can
 one-man band pretending to be twelve. The move is to state it plainly and then make it
 irrelevant with specifics only someone who actually built the thing would know.
 
-### A.1 Headline
+**The paste-ready headline, About, experience entry, banner and settings are in
+[`profile.md`](profile.md), and only there.** Two copies drift apart, and the prospect always
+reads the stale one.
 
-Paste-ready. LinkedIn allows 220 characters.
+What the profile has to carry, in order of weight:
 
-**Primary (169 chars):**
+1. **What it does and why agencies pay.** A CV in the agency's branding with the contact
+   details removed, so the client can't go around the agency.
+2. **Accuracy.** The candidate's own words are kept, roles and dates stay in the order they
+   wrote them, and a document with a surviving contact detail is refused. Public complaints
+   about competing tools are about invented content and scrambled dates, not price
+   (`docs/strategy-10k.md` §1). Competitors are not named on the profile.
+3. **Honesty about the founder.** One person, in Navi Mumbai, not a recruiter. It is a relaunch
+   of a name he previously closed, and it has no customers to show yet.
+4. **A zero-risk action.** Ten CVs free, no card, no sign-up. £79/month for the whole agency,
+   the founding price for the first 20.
 
-```
-I build Venditas — candidate CVs into your agency's branded template in four seconds, contact details swapped for a reference code. Solo founder. Ten free at venditas.in
-```
+**Removed from this section on 2026-09-13:**
+- The old About opened "I built Venditas because recruiters kept telling me the same thing".
+  No such conversations are on record.
+- It also said "four seconds". Nothing measures that, and the site's upload screen says "about
+  ten seconds".
+- The old experience entry dated Venditas "Feb 2026". No record supports that date.
+- The custom-URL example read `linkedin.com/in/arseny-...`, which is the wrong name. It is now
+  `abinjohnson` or `abin-venditas`.
 
-**Alternative, leads on the commercial reason (191 chars):**
-
-```
-Solo founder, Venditas. Your client can't go around you if they can't see the candidate's name. CV reformatted into your agency's template, contact details redacted, four seconds. venditas.in
-```
-
-**Alternative, plainest (139 chars):**
-
-```
-I built a tool that puts a candidate CV into your recruitment agency's own Word template with the contact details stripped out. venditas.in
-```
-
-Use the primary. Switch to the second only after the fee-protection content in Section D has
-been running for a month and the phrase is doing recognisable work.
-
-No "Helping X to Y." No rocket emoji. No "| Entrepreneur | Visionary |".
-
-### A.2 About
-
-Paste-ready. First two lines are what shows before "see more" — they carry the weight.
-
-```
-I built Venditas because recruiters kept telling me the same thing: the CV reformatting job
-is twenty minutes, it happens at 9pm, and it is the least skilled part of the week.
-
-Drop in whatever the candidate sent — the two-column one, the one that's a scan, the one with
-a table nobody can edit — and it comes back as a Word document in your agency's template.
-Candidate's name, email, phone and LinkedIn removed and replaced with a reference code.
-Four seconds.
-
-The redaction is the part that actually matters, so it's the part I over-built. Every document
-is checked after it's generated, and if anything would have leaked you get an error instead of
-a file. It fails loudly rather than quietly, because the quiet failure is the one that costs
-you a placement fee.
-
-Honest about what this is: I'm one person. I'm not a recruiter and I'm not in the UK — I'm in
-Navi Mumbai. I don't have a list of agency logos to show you, because this is new.
-
-What I have instead is this: you can run ten CVs through it right now without an account,
-without a card, and without talking to me. If it doesn't handle your messiest CV, you'll know
-in four seconds and you've lost nothing. And when you message me, it's me who answers, not a
-support queue — which is the one genuine advantage of buying from one person.
-
-£79/month when you're past the ten, everyone in your agency included. No per-seat pricing,
-because charging you extra for adding a consultant is a strange way to run a business.
-
-venditas.in — or just message me here, I'll run one for you.
-```
-
-Why this works, briefly: it opens with the recruiter's experience rather than the product;
-the "two-column one, the one that's a scan" line is the credibility proof, because only
-someone who has actually processed real CVs knows those are the hard cases; the weakness is
-stated before the reader can find it, which removes its power; and the close is a zero-risk
-action rather than a call booking.
-
-### A.3 Experience entry
-
-```
-Founder — Venditas
-Self-employed · Feb 2026 – Present · Navi Mumbai, Maharashtra, India · Remote
-
-Venditas reformats a candidate CV into a recruitment agency's own branded Word template and
-redacts the candidate's contact details, replacing name, email, phone and LinkedIn with a
-reference code. Input is whatever the candidate actually sent — PDF or Word, up to 10MB,
-including two-column layouts, sidebars, tables, inconsistent date formats and scans. Output
-is an editable Word document in about four seconds.
-
-The tool preserves the candidate's own wording. It does not rewrite, embellish or "improve"
-their experience, because a CV that says something the candidate didn't say is a problem you
-find out about in the interview.
-
-Redaction is verified after generation rather than assumed: if a contact detail survived into
-the output, the job errors instead of returning a file.
-
-CVs are processed in memory and discarded. No candidate data is stored.
-
-Built and run solo. Ten CVs free, then £79/month with the whole agency included.
-```
-
-### A.4 The rest of the profile
-
-- **Photo.** A real, recent, well-lit photo of his face. Non-negotiable — a default avatar
-  loses more acceptances than any wording gains.
-- **Banner.** A screenshot of an actual before/after: messy CV on the left, branded output on
-  the right. This does more work than any other pixel on the page. If that's not feasible,
-  plain colour with `venditas.in` and "CVs into your template, four seconds."
-- **Featured section.** One item: the link to venditas.in with the "ten free, no card" line.
-- **Location.** Set to Navi Mumbai, honestly. Faking a London location is discoverable and is
-  exactly the kind of thing that ends a conversation with someone whose job is verifying people.
-- **Custom URL.** `linkedin.com/in/arseny-...` — set it, the default string looks abandoned.
-- **Open to work: off.** Obviously, but check — it reframes the whole profile as job-seeking.
-- **Do this before sending a single request.** The profile is the campaign.
+**Do the profile before sending a single request. The profile is the campaign.**
 
 ---
 
@@ -363,9 +299,11 @@ Skip anyone who fails:
 - [ ] **Agency, not in-house.** Their headline says the agency's name, not "TA at [SaaS company]".
 - [ ] **Roughly 3–40 people.** Check the company page.
 - [ ] **They submit CVs to clients.** Job posts, candidate-spec posts, "my client is looking for…"
-- [ ] **The agency has a real website with a logo.** Hard requirement — no logo, no branded
-      render, and the render is the entire sequence. No logo, no target.
+- [ ] **The agency has a real website with a logo.** No usable logo means a render with the
+      agency name in type, which gets message one B (§C.3). A *wrong* logo means no render and
+      no message.
 - [ ] **Active in the last ~60 days.** A dormant profile never sees the follow-up.
+- [ ] **Not emailed in the last 14 days.** `today.mjs` checks `sent.log` and the contact ledger.
 
 ---
 
@@ -393,9 +331,8 @@ you as a seller.
 
 The rule is "never open with a pitch." A pitch is an *ask* — for time, a call, a reply, a trial.
 The render is not an ask. It is a finished object, with their own logo on it, produced before
-they requested it and handed over with nothing attached. It cannot be mass-produced
-convincingly, which is exactly why it does not read as a sequence: the recruiter's
-pattern-matcher is tuned for cheap and generic, and this is visibly neither.
+they requested it and handed over with nothing attached. It is visibly specific to them, which
+is why it does not read like the generic opening of a sequence.
 
 The discipline that keeps it from becoming a pitch is that **message one contains no ask at
 all.** Not a question, not a link, not "worth a chat?". The moment it contains an ask, it
@@ -412,15 +349,14 @@ The profile does the work. This is why Section A comes first.
 real, specific, checkable reason — the person posted this week about the exact problem, or
 you have a genuine mutual connection. Never on an ordinary prospect.
 
-**Note template for those rare cases** (194 chars — the 200 limit leaves almost no slack, so
-re-count after swapping the name and agency in):
+**Note template for those rare cases** (under 200 characters; re-count after filling it in):
 
 ```
-Hi James — saw your post about rebuilding CVs into the template at 11pm. I built a tool that does exactly that bit. Not pitching; happy to just send you one in Hartley's branding if it's useful.
+Hi [name], saw your post about [the actual thing they posted]. I built a tool for exactly that part of the job. Not pitching; happy to send you a sample set up for [agency] if it's useful.
 ```
 
-Replace the first clause with the actual observed thing. If there is no actual observed thing,
-send it without a note.
+The bracketed observation must be real. If there is no actual observed thing, send the request
+without a note.
 
 ### C.3 Touch 2 — first message, 1 to 3 days after acceptance
 
@@ -430,113 +366,173 @@ stranger. One to three days reads as a person who got round to it.
 
 Attach **a PNG of page one of the render, inline**, not the .docx. Reasons: it renders in the
 message without a download, and a stranger's Word attachment is a thing security-aware people
-do not open. Offer the editable file only if they ask.
+do not open. Offer the editable file only if they ask. The week's renders are in
+`outreach/linkedin/renders/`, one per agency, each checked by eye.
 
-**Paste-ready** (swap the bracketed values):
+**A: the render carries their logo or site icon**
 
 ```
-Thanks for connecting, [James].
+Thanks for connecting, [first name].
 
-No ask attached to this one. I ran a sample CV into [Hartley Grey]'s template to see whether
-it would hold up — page one below.
+No ask attached to this one. I ran one of my sample CVs through Venditas with [Agency]'s logo on it, to see how it would come out. Page one is below. The candidate is fictional.
 
-Name, email, phone and LinkedIn stripped out, reference code in their place. Four seconds,
-from whatever the candidate happened to send.
+The name, email, phone, links and street address come off, and a reference code goes where the name was. The candidate's own wording stays as they wrote it.
 
-I built it, so I was mostly curious whether your template would survive it. It did.
-
-Ignore freely — genuinely no reply needed.
+Ignore freely, no reply needed.
 ```
 
-Sixty words. No link, no question mark, no ask. "Ignore freely" is not a technique, it is the
-literal instruction, and it is the line that stops the message reading as an opening move.
+**B: no usable logo, so the agency name is set in type**
 
-**If the render genuinely failed** — bad logo, colours off, template didn't survive — do not
+```
+Thanks for connecting, [first name].
+
+No ask attached to this one. I ran one of my sample CVs through Venditas set up for [Agency], to see how it would come out. Page one is below. The candidate is fictional, and with your logo uploaded it goes where the agency name is.
+
+The name, email, phone, links and street address come off, and a reference code goes where the name was. The candidate's own wording stays as they wrote it.
+
+Ignore freely, no reply needed.
+```
+
+No link, no question mark, no ask. "Ignore freely" is not a technique. It is the literal
+instruction, and it is the line that stops the message reading as an opening move.
+
+**Corrected 2026-09-13:**
+- The old text said the sample was "into [agency]'s template", and closed "I was mostly
+  curious whether your template would survive it. It did." The tool applies logo, colours and
+  footer to its own layout (`lib/render.mjs`). It has never seen their template, so that
+  claim was untrue.
+- "Four seconds" is unmeasured.
+- The removed identifiers listed only name, email, phone and LinkedIn. The street address and
+  every link are removed too (commit `7a93eac`).
+- "The candidate is fictional" is added so nobody thinks a real candidate's data was used.
+
+**If the render genuinely failed** — wrong logo, colours off, layout broken — do not
 send it. Send nothing and move that prospect to the second-touch-only track. A bad render
 argues against the product more effectively than anything a competitor could say.
 
 ### C.4 Touch 3 — second touch, 5 to 7 days later, only if no reply
 
-This one carries the fee-protection angle, which is the argument no competitor is making.
+This one carries the fee-protection argument and the accuracy point.
 
 **Paste-ready:**
 
 ```
-Last one from me, [James].
+Last one from me, [first name].
 
-Every other tool that strips names off a CV sells it as bias reduction. That's not why
-agencies do it. You do it because a client holding a candidate's mobile number doesn't need
-you for the second conversation.
+Agencies take the contact details off a CV because a client holding the candidate's mobile doesn't need the agency for the second conversation. That's the part I built for. Every finished document is read back, and if a contact detail survived you get an error instead of a file. It also keeps the candidate's own words, and their roles and dates in the order they wrote them.
 
-So that's the part I built for. The redaction gets verified after the document is generated —
-if a phone number survived into the output, you get an error instead of a file. It fails
-loudly, because the quiet failure is the one that costs you a fee.
-
-venditas.in — ten free, no card, no account. £79/month after that, whole agency included.
+venditas.in: ten CVs free, no card, no sign-up. After that it's £79 a month for the whole agency, the founding price for the first 20 agencies, and you can buy by email with no call.
 
 If it's not for you, no reply needed. I won't chase.
 ```
 
-"I won't chase" is true and it is kept. It also, reliably, raises reply rate among the people
-who were on the fence — because it removes the cost of engaging.
+"I won't chase" is true, and it has to stay true. It also takes away the cost of replying.
+
+**Corrected 2026-09-13:** the old text opened "Every other tool that strips names off a CV sells
+it as bias reduction." That is false. At least one competitor sells anonymisation "for
+compliant submissions" (`docs/reference/competitors.md`). The price line now says it is the
+founding price (decision 004) and that buying needs no call (decision 014).
 
 **Then stop.** No third follow-up, no "just bumping this", no re-add in three months. The
 connection persists; the content in Section D keeps reaching them; that is the long game.
 
 ### C.5 Replies — paste-ready handlers
 
+Each one checked against the code, `lib/pricing.mjs` and the decisions on 2026-09-13.
+If something changes (Gemini billing enabled, saved branding built), update the handler
+the same day.
+
 **"How much?"**
 
 ```
-£79/month, everyone in the agency included — no per-seat charge. Ten CVs free first, no card.
-If it can't handle your worst CV you'll know inside a minute.
+£79 a month for the whole agency, no per-seat charge, or £790 for a year. That's the founding price for the first 20 agencies, and it stays at that rate for them; the standard price is £149. Ten CVs free first, no card, at venditas.in. If it can't handle your worst CV, you'll know in a minute.
 ```
 
 **"Our ATS already does this" / "Bullhorn does this"**
 
 ```
-Fair — and if the output is good, you genuinely don't need me. The two things I hear are that
-the formatter needs the CV parsed into the system cleanly first, and that it struggles with
-the CVs that weren't built in a normal template. If yours handles a two-column PDF and a scan,
-you're covered. If it doesn't, that's the gap I'm in.
+Fair. If what it gives you is something you'd send a client, you don't need me. The test I'd run is your awkward CVs, the two-column PDFs and scans: does it come out in your branding rather than plain text under a header, and does anything the candidate wrote go missing? If yours passes that, you're covered. If it doesn't, that's the gap I'm in.
 ```
 
 Never disparage the ATS. Half of them are happy with it and arguing loses the other half too.
+(Corrected: the old handler began "The two things I hear are…", which referred to
+conversations that are not on record.)
 
 **"Where does the candidate data go?" / "GDPR?"**
 
 ```
-Processed in memory and discarded — nothing about a candidate is stored, so there's no
-database of CVs to breach. Happy to send the data protection page, or answer anything
-specific your DPO wants to ask.
+Nothing about a candidate is stored: the file is handled in memory and discarded when the request ends. The name, email, phone, links and street address are removed on our server before the rest of the text goes to Google's Gemini API to be put into sections. I'm on Gemini's free tier, whose terms let Google use what's sent to improve its products, which is why the identifiers come off first. A scanned CV has no text to strip, so its page images go as they are. It's all set out at venditas.in/security, and there's a data processing agreement at venditas.in/dpa. Happy to answer anything your DPO asks.
 ```
+
+(Corrected: the old handler said only "processed in memory and discarded". That is true but
+leaves out Google, which `/security` and DPA clause 3.4 both disclose. A DPO will find it,
+so they should hear it from us first.)
+
+**"Does it make things up?" / "Is it AI?"**
+
+```
+It uses an AI model to read the CV into sections. It's instructed to copy the candidate's wording, keep their roles and dates in order, and leave a field empty rather than guess. The part that isn't left to instructions is the contact details: every finished document is checked, and it fails rather than hand over a leak. Honestly, the best check is yours: run your messiest CV through the free ten and compare it line by line.
+```
+
+**"Can it use our own Word template?"**
+
+```
+Not your actual Word file, no. It puts your logo, colours and footer on a clean layout of its own. If your clients expect a particular layout, send me the template and I'll tell you honestly how close it gets.
+```
+
+**"Can we save our branding?" / "Can I upload a whole shortlist?"**
+
+**Check venditas.in yourself before you answer.** On 13 September both were being built
+(`lib/pricing.mjs` now says "Branding remembered on your computer — set it once" and
+"Drop in a whole shortlist at once") but were not yet live. Use whichever reply matches
+what the live site does today.
+
+If both work on the live site:
+
+```
+Yes. It remembers your logo and colours in your browser on that computer, so you set them once, and you can drop in a whole shortlist in one go. Each CV takes about ten seconds.
+```
+
+If they don't yet:
+
+```
+Not yet, honestly. Right now it's one CV at a time, with your logo and colours added each time. Both are being built now, and hearing that you'd use them helps.
+```
+
+Never give the first reply until you've seen it work on venditas.in.
 
 **"Not interested"**
 
 ```
-No problem — thanks for saying so, that's more useful than silence. I won't follow up.
+No problem, thanks for saying so. That's more useful than silence. I won't follow up.
 ```
 
-Then actually don't. Log it and never contact them again on any channel.
+Then actually don't. Log it `closed` and never contact them again on any channel.
 
 **"Can you do X?" (a feature it doesn't have)**
 
 ```
-Not today, no. [Honest one-line answer.] I'm one person so I build what people actually ask
-for twice — if you want it, that's one.
+Not today, no. [Honest one-line answer.] I'm one person, so what gets built next is whatever agencies actually ask for. That counts as one.
 ```
 
 ### C.6 Cross-channel collision
 
-There is a cold-email sequence in `outreach/sequence.md` against a 285-agency list in
-`outreach/prospects.csv`, 145 of them UK. **Never run the email sequence and this one at the
-same person inside the same fortnight.** A LinkedIn request and a cold email landing the same
-week is the clearest possible signal of a machine working a list, and it converts a warm
-channel into a burnt one. Keep one shared "contacted" column across both.
+**Never run the email sequence and this one at the same agency inside the same fortnight.**
+A LinkedIn request and a cold email landing the same week is the clearest possible signal of a
+machine working a list, and it converts a warm channel into a burnt one.
 
-**Also reconcile the price.** `sequence.md` still says "£X/month" with £149 as a working
-number; this playbook and the brief say **£79**. Two prices in two channels is a credibility
-problem the moment anyone compares. Pick one before either sequence runs at volume.
+How that is enforced now:
+- **Every agency in a LinkedIn pack is written to the shared contact ledger**
+  (`outreach/contacted.mjs`), so the email batch skips it for 21 days. So is every request
+  logged with `today.mjs log … requested`.
+- **`today.mjs` checks the other direction.** Any agency emailed in the last 14 days (by
+  address or domain, from `sent.log` and the ledger) shows as "emailed <date>, skip until
+  <date>" and is never listed as due.
+- **Agencies already paying a competitor** (`prospects-hot.csv`, decision 013) are the email
+  batch's first job, so they are left out of LinkedIn packs.
+
+**Price: reconciled.** `sequence.md`, this playbook and the site all say £79 (founding, first
+20 agencies), £149 standard. `lib/pricing.mjs` is the source of truth.
 
 ---
 
@@ -553,103 +549,29 @@ nobody. It is sequence support, not audience building.
 Two posts a week. Not daily — daily posting from a nobody looks like a content tool.
 Link in the first comment, not the body.
 
-### D.2 Post 1 — the reframe (the unclaimed angle)
+### D.2 The posts
 
-This is the flagship. Every competitor in the space — MeVitae, Sapia, Pinpoint, GapJumpers,
-plus the whole blind-recruitment literature from techUK and BITC — frames CV anonymisation as
-bias reduction, sold to employers for their internal hiring. Not one of them frames it as fee
-protection, which is the reason recruitment agencies actually do it.
+**Paste-ready posts are in [`posts.md`](posts.md), and only there**, each with the file or
+link that makes it true. Week one:
+- **Tuesday:** why an agency takes the name off. Fee protection rather than bias.
+- **Thursday:** what the tool is built not to do. Accuracy and the leak check.
 
-```
-Every piece of software that strips the name off a CV sells it as bias reduction.
+**Removed from this playbook on 2026-09-13:**
 
-That is not why recruitment agencies do it.
+- **Old post 2 ("the observed detail") was invented.** It began "A recruiter told me last month
+  that she reformats CVs into the agency template between 9 and 11pm", with "fifteen years in,
+  three billing awards". No such conversation is on record, and Venditas has no customers.
+- **Old post 4 ("the honest outsider") was invented.** "Every recruiter I showed that to was
+  unmoved… about a dozen conversations". No such conversations are on record.
+- **Old post 1 was rewritten.** It claimed "Every piece of software that strips the name off a
+  CV sells it as bias reduction" and "Not one of them frames it as fee protection". Both are
+  too absolute, and one competitor sells anonymisation for compliance. "Nobody has ever lost
+  twelve thousand pounds to unconscious bias" used an unsourced fee figure; decision 004 puts
+  a typical fee nearer £7,800.
+- **Old post 3 was folded into posts.md's reserve post.** Its list of failure cases was fair,
+  but it said "in order of how often I've had to fix them", and there is no such count.
 
-Agencies redact candidate details because a client who has the candidate's mobile number does
-not need the agency for the second conversation. The redaction is not an equality initiative.
-It is the thing standing between you and a client who "just wanted to check one detail" and
-somehow ended up making an offer.
-
-I find it strange that an entire product category has decided to sell the noble version of the
-reason, when the commercial one is stronger, more honest, and the one that actually gets
-budget signed off.
-
-Nobody has ever lost twelve thousand pounds to unconscious bias.
-
-Am I wrong? Genuinely asking — if your agency anonymises CVs primarily for diversity reasons
-rather than fee protection, I'd like to hear it, because it would mean I've built the wrong
-messaging.
-```
-
-The closing question is real, not engagement bait, and it invites the disagreement that drives
-comments. Expect pushback from DEI-focused recruiters — see [§F](#f-what-not-to-do) on how to handle it.
-
-### D.3 Post 2 — the observed detail
-
-No product mention at all. This is the one most likely to get shared.
-
-```
-A recruiter told me last month that she reformats CVs into the agency template between 9 and
-11pm, because it's the only part of the day nobody interrupts.
-
-Twenty minutes a CV. Six or seven CVs on a bad week.
-
-The part that stuck with me: she didn't describe it as a problem. She described it as the job.
-Fifteen years in, three billing awards, and a couple of hours a week spent fighting a
-two-column layout that won't paste cleanly into Word.
-
-I don't think there's an insight here. I just haven't stopped thinking about it.
-```
-
-No hook trick, no "here's what I learned", no numbered lessons. It works because it is
-specific and it doesn't sell — which is why the people it describes will reply to it.
-
-### D.4 Post 3 — technical competence
-
-Proves the founder understands the actual job, which is the substitute for a track record.
-
-```
-Things that break a CV reformatting tool, in order of how often I've had to fix them:
-
-1. Two-column layouts. Text reads left-to-right across both columns, so the job title lands
-   in the middle of the previous role's responsibilities.
-2. Tables with merged cells. Employment history in a 3x8 table where two cells were merged in
-   2019 and nothing has been right since.
-3. Scans. Someone photographed a printed CV. It is a picture. There is no text.
-4. Dates. "2019-2021", "Mar 19 – present", "3 yrs 2 mos", and my favourite, "2018 - 2018".
-5. Contact details in the header. Not the document body — the actual Word header, where a
-   naive find-and-replace never looks. This is the one that leaks a phone number to a client.
-
-Number 5 is why the redaction gets checked after the document is built rather than during. If
-a contact detail survived into the output, the job errors instead of handing you the file.
-
-A tool that quietly leaks a candidate's mobile is worse than no tool, because you don't find
-out until the client has already called them.
-```
-
-### D.5 Post 4 — the honest outsider
-
-Deploy after the first three. Turns the credibility gap into the content.
-
-```
-I'm not a recruiter. I built a tool for recruiters. Here's what I got wrong.
-
-I assumed the value was time. Twenty minutes a CV, several CVs a week, multiply it out, show
-the hours saved. Every recruiter I showed that to was unmoved.
-
-What they actually cared about was the redaction being right. Not fast — right. One of them
-described the failure mode precisely: you don't discover the leak, the client does, and the
-first you hear about it is the placement not happening.
-
-So the speed is the headline and the checking is the product. It took about a dozen
-conversations with people who had every reason to ignore a stranger from Navi Mumbai to work
-that out.
-
-If you're building for an industry you've never worked in: the thing the industry optimises
-for is almost never the thing an outsider assumes it optimises for. Ask more, assume less.
-```
-
-### D.6 Format rules
+### D.3 Format rules
 
 - First two lines carry it — roughly 140 characters show before "see more" on mobile.
 - One idea per line, blank line between. Walls of text die.
@@ -666,34 +588,34 @@ for is almost never the thing an outsider assumes it optimises for. Ask more, as
 ## E. The 20-minute daily routine
 
 Runs Monday to Friday. UK business hours from IST: **12:30–14:30 IST** hits the UK
-morning. Pick one slot and keep it.
+morning. Pick one slot and keep it. **The step-by-step version, with the commands, is
+[`linkedin/START-HERE.md`](linkedin/START-HERE.md).**
 
 Steady state is **12 connection requests + 5 first messages + 3 second touches = 20 touches.**
 Week 1 runs 8 requests, week 2 runs 10 (see the ramp in §0.3).
 
-1. **[1 min] Open the sheet and the saved prospect list.** No searching during the daily
-   window — the list was built in Sunday's block. Searching mid-window burns Commercial Use
-   Limit and blows the time budget.
+1. **[1 min] `node outreach/linkedin/today.mjs --due`.** It shows the counters and exactly who
+   is due. No searching for new prospects during the daily window — the list was built in
+   Sunday's block. Searching mid-window burns Commercial Use Limit and blows the time budget.
 
-2. **[6 min] Send 12 connection requests.** Work down the list. Ten seconds a profile against
-   the B.6 checklist, then Connect → **Send without a note**. If the "Add a note" prompt
-   appears, dismiss it. Skip anyone who fails the check rather than lowering the bar to hit
-   the number — 9 good requests beat 12 loose ones, because acceptance rate is the metric
-   LinkedIn is actually watching.
+2. **[6 min] Send the day's connection requests.** Work down the day's pack. Ten seconds a
+   profile against the B.6 checklist, then Connect → **Send without a note**. If the "Add a
+   note" prompt appears, dismiss it. Skip anyone who fails the check rather than lowering the
+   bar to hit the number — acceptance rate is the metric LinkedIn is actually watching.
 
-3. **[7 min] Send 5 first messages.** Filter to acceptances from **2–3 days ago**, not today.
-   For each: paste the pre-written message from the batch file, swap name and agency, drop in
-   the pre-built render PNG, send. If a render wasn't prepared for that person, skip them —
-   they go into Sunday's batch and get messaged next week.
+3. **[7 min] Send first messages** to the people `--due` lists (accepted 1–3 days ago). Paste
+   message A or B, attach the render PNG, send. If no good render exists for that agency,
+   skip them.
 
-4. **[3 min] Send 3 second touches.** People who accepted 5–7 days ago, got message one, and
-   didn't reply. Paste the C.4 text. Mark them closed in the sheet — no third message, ever.
+4. **[3 min] Send second touches** to the people `--due` lists (5–7 days after message one, no
+   reply). Paste the C.4 text. No third message, ever.
 
 5. **[2 min] Handle replies.** Anything needing more than the C.5 handlers gets flagged and
    answered properly later in the day. Never rush a real conversation to protect the timer.
 
-6. **[1 min] Log it.** One row per touch: name, agency, date, stage, outcome. This is also the
-   shared "contacted" record that stops the email sequence colliding.
+6. **[1 min] Log each action as you go**: `node outreach/linkedin/today.mjs log "<agency>"
+   <stage> ["name"]`. The counters, the due list and the email cooling-off all come from
+   this log.
 
 **Overflow, if the timer allows:** one substantive comment on a UK recruiter's post. Not
 "great post" — an actual sentence. This is the cheapest possible way to become a recognised
@@ -704,22 +626,28 @@ name before the request lands.
 The 20-minute daily window only works because the expensive work happens once a week. Without
 this, the daily routine is 50 minutes and gets abandoned by Thursday.
 
-1. **[20 min] Build next week's renders.** For everyone who accepted this week: pull the
-   agency logo and brand colour from their site, run the sample CV, screenshot page one, save
-   as `agency-name.png`. Match the sample CV to their specialism — a tech CV to a tech agency.
-   The render is four seconds; fetching the branding is the actual work.
-2. **[15 min] Refresh the prospect list to 60+ names** using the B.3 searches and the B.4
-   company-page route.
-3. **[10 min] Write the week's two posts** and schedule or draft them.
+1. **[20 min] Build next week's list and renders.**
+   `node --env-file=.env.local outreach/linkedin-pack.mjs --days 5 --per-day 10` picks UK
+   agencies nobody has emailed, renders a sample in each one's branding, and reserves them in
+   the contact ledger. Then **look at every render**. Drop any with a wrong logo (a client's
+   logo, an accreditation badge or a stock icon) or a site that isn't the agency's. For a
+   single agency, `outreach/render-one.mjs --company … --logo <url>` re-renders with a logo
+   taken from its own site. Add the keepers to `tracker.csv` with `site` and `render` notes.
+   The pack's own `index.html` messages use older wording, so use §C.3 and §C.4.
+2. **[15 min] Refresh the prospect list** using the B.3 searches and the B.4
+   company-page route, for agencies not already on a list.
+3. **[10 min] Check next week's two posts** in `posts.md` against the rule at its top.
 
 ### E.2 Numbers to expect
 
-Honest arithmetic, so week three doesn't feel like failure:
+Estimates, not measurements, so week three doesn't feel like failure:
 
-- 60 requests/week → **~20 acceptances** (recruiters accept well; below 25% means fix targeting)
-- 20 acceptances → **~2–4 replies**
-- Per month: ~240 requests, ~80 acceptances, ~10 conversations, **maybe 3–6 free-tier trials,
-  1–2 conversions**
+- 60 requests/week → **~16–20 acceptances** (research benchmark: 27% of invitations accepted,
+  `research/growth-2026-09.md`; below 25% means fix targeting)
+- 20 acceptances → **~2–5 replies** (same source: 28% of those accepted reply, but most
+  replies are not interest)
+- Per month: ~240 requests, ~65–80 acceptances, ~10 conversations, **maybe 3–6 free-tier
+  trials, 1–2 conversions**
 
 **That is roughly £79–£158 of new MRR a month from this channel alone.** It is slow. It is also
 20 minutes a day, it compounds — 80 new recruiter connections a month means the posts in
@@ -738,15 +666,15 @@ have converted to a trial, stop and change the targeting or the message. Do not 
 1. **Don't install automation.** Dux-Soup, Expandi, PhantomBuster, Waalaxy, HeyReach and the
    rest are User Agreement violations however gently configured, and 2026 reporting describes
    detection flagging sessions within ~48 hours. A restricted account cannot be replaced —
-   the 500 connections and the profile history are the asset.
-2. **Don't exceed ~20 requests a day or ~100 a week**, and don't go near either. The plan sits
-   at 12/day and 60/week for a reason: the cap is unpublished, dynamic, and reacts to
+   the connections and the profile history are the asset.
+2. **Don't exceed 15 requests a day or 100 in 7 days**, and don't go near either. The plan sits
+   at 12/day and 60/week for a reason: LinkedIn's cap is unpublished, dynamic, and reacts to
    acceptance rate.
 3. **Don't send in one machine-gun burst.** Twelve requests over six minutes is fine. Twelve
    in ninety seconds at exactly 13:00 every day is a rhythm.
 4. **Don't let pending invitations pile up.** LinkedIn explicitly restricts accounts with
    "excessive pending" invites, and the wait can be *up to one month*. Once a month, withdraw
-   invites older than four weeks — in small batches.
+   invites older than four weeks — in small batches. `today.mjs` flags them.
 5. **But don't withdraw to free up quota.** It doesn't work — the count is of requests sent —
    and LinkedIn blocks re-inviting that person for **up to three weeks**.
 6. **Don't use a UK VPN.** A stable Navi Mumbai IP is safer than a location that moves.
@@ -763,9 +691,10 @@ have converted to a trial, stop and change the targeting or the message. Do not 
 10. **Don't fake the opener.** No "how's the perm market treating you?", no "loved your recent
     post" when there was no recent post, no invented mutual ground. Recruiters spot manufactured
     rapport professionally, daily. Getting caught is strictly worse than never sending.
-11. **Don't invent social proof.** No "trusted by UK agencies", no logo wall, no "we". He is
-    one person with a new product, and saying so is the credibility play — a claim a recruiter
-    can disprove in one search ends the conversation permanently.
+11. **Don't invent social proof.** No "trusted by UK agencies", no logo wall, no "we", no "a
+    recruiter told me". He is one person with a new product and no customers yet, and saying so
+    is the credibility play — a claim a recruiter can disprove in one search ends the
+    conversation permanently.
 12. **Don't send a third follow-up.** Two touches then silence. "Just bumping this to the top
     of your inbox" is the most-recognised move in outbound and it converts a neutral
     non-response into an actively negative impression.
@@ -775,28 +704,32 @@ have converted to a trial, stop and change the targeting or the message. Do not 
     thing a sales sequence retroactively, including the parts that weren't.
 15. **Don't target in-house TA.** They accept, they never convert, and they degrade the
     acceptance-to-reply signal that this whole channel depends on.
-16. **Don't argue about diversity in the comments.** Post 1 will attract pushback from
+16. **Don't argue about diversity in the comments.** The Tuesday post will attract pushback from
     recruiters invested in the bias framing. The correct response is
     `"Both reasons are real — I just think one of them is why the budget gets approved.
     Fair challenge though."` Then stop. Winning that argument publicly costs more than losing
     it quietly.
 17. **Don't connect with candidates.** Only agency-side people. Candidates in the network make
     the profile read as a recruiter's, which confuses every prospect who checks it.
-18. **Don't run email and LinkedIn at the same person the same fortnight.** See C.6.
+18. **Don't run email and LinkedIn at the same agency the same fortnight.** See C.6.
 19. **Don't automate the posts through a scheduling tool that posts on his behalf via API
     login.** Native scheduling inside LinkedIn is fine.
+20. **Don't claim what the product doesn't do.** Not "your template" (it applies your
+    branding), not "four seconds" (unmeasured; the site says about ten), and not remembered
+    branding or shortlist upload until you have seen them work on the live site (§C.5).
 
 ---
 
 ## Appendix — the one-page version
 
 - Profile first. It is the entire connection request.
-- 12 requests/day, **no note**, ramped from 8. 60/week, never 100.
+- Start each day with `node outreach/linkedin/today.mjs --due`; log every action.
+- 12 requests/day, **no note**, ramped from 8. 60/week; hard limits 15/day and 100/7 days.
 - Never search during the daily window. Build lists Sunday.
-- Message 2–3 days after acceptance, never instantly, always with the branded render, **never
+- Message 2–3 days after acceptance, never instantly, always with the render, **never
   with an ask**.
-- Second touch at day 5–7 carries the fee-protection line. Then stop.
-- Two posts a week. Fee protection, not diversity.
+- Second touch at day 5–7 carries the fee-protection line and the accuracy point. Then stop.
+- Two posts a week. Fee protection, not diversity. Nothing invented.
 - If LinkedIn contradicts this document, LinkedIn is right.
 
 ---

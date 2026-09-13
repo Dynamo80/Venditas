@@ -3,37 +3,62 @@
 **Only things that cannot be measured belong here.** For anything else run
 `node ops/status.mjs`, which fetches it live.
 
-Last reviewed: 2026-09-08 (outreach blocked; daily routine scheduled)
+Last reviewed: 2026-09-14 (growth jobs automated, decision 018; canonical host fixed in code)
 
 ## Goal
 
-£1,000 MRR. At £79 that is **13 paying agencies**. Currently 0.
+**£10,000 MRR**, no date set yet: 77 agencies (20 at the £79 founding price,
+57 at £149). First milestone: £1,000 by 2026-10-02, which is 13 agencies at £79.
+Currently 0. [Decision 015](decisions/015-ten-thousand-mrr.md) has the
+arithmetic, and the constraints, all set with £1,000 in mind, that now cap the
+business below £10,000. Each one is the founder's to keep or drop.
+
+**Decided 2026-09-13:**
+- The budget stays at $0, and revenue pays for growth.
+- Paddle comes after the first one or two paying agencies.
+- venditas.in is the only sending domain.
+- Hustlr is never used ([016](decisions/016-growth-paid-by-growth.md)).
+- Markets are the UK and Ireland. JobAdder is the first integration, because Firefish's API can't download a candidate's CV (`reference/integrations.md`). It waits on Abin registering a JobAdder developer account. Only free partnerships for now. The order profits are spent in is set ([017](decisions/017-markets-integrations-partnerships.md)).
+
+**Built 2026-09-13, not deployed until the founder says so:**
+- Batch upload of up to 20 CVs at once, and branding remembered in the browser
+  (`app/Formatter.jsx`). The pricing page now describes what exists.
+- `/anonymise-cv-tool`, `/hireara-alternative` and `/best-cv-formatting-software-uk`.
+- The new-agency feed (`ops/build-prospects.mjs filter --since 90`, then
+  `discover --new`).
+- An accuracy line in the email to agencies already paying a competitor.
+
+**Automated 2026-09-14** ([018](decisions/018-growth-runs-itself.md);
+`runbooks/automation.md`). Running on this laptop now:
+- `ops/watch.mjs`, every 20 minutes: replies marked, the matching answer filed
+  in Drafts, and a notification for replies, invoice requests, enquiries and
+  trial signups. Nothing is sent.
+- `ops/weekly.mjs`, Saturdays: the live-site SEO check with IndexNow, and the
+  monthly Companies House refresh.
+- `ops/daily.mjs` now sends a notification when it is blocked or a stage fails.
+
+**Built 2026-09-14, not live until deployed.** The SEO check found every
+canonical and sitemap URL naming `venditas.in`, which redirects to
+`www.venditas.in`, plus ten pages with no canonical. Fixed in code: www
+everywhere, a canonical on every page, structured data on the home page, and
+the DPA's annexes no longer render as extra `<h1>`s. The IndexNow key file
+(`public/`) also needs the deploy before Bing can be told anything.
 
 ## The critical path
 
-**Outreach is stopped. Nothing else matters until it is not.**
+**The first paying agency.** It is the next step on either goal.
 
-`node ops/preflight.mjs` says BLOCKED: every port on `smtpout.secureserver.net`
-and `imap.secureserver.net` times out from this machine, port 80 included, while
-`smtp.gmail.com:587` answers and `godaddy.com:443` loads. DNS resolves fine. That
-is a blocked route to GoDaddy's mail IPs (`92.204.80.21`, `148.72.44.1`), not an
-ISP closing mail ports.
+Mail is unblocked: `node ops/preflight.mjs` said READY on 13 September, after the
+GoDaddy route had been dead since the 3rd. The scheduled task `Venditas daily
+outreach` is registered **live** (`--send --confirm`), weekdays at 14:00 IST, and
+catches up a day missed while the laptop slept. On 13 September it had never
+run. That day's dry run finished with no failures.
 
-Batches went out on 2 and 3 September. Nothing since — five working days, 125
-sends, gone. Try in this order:
-
-1. **Phone hotspot**, two minutes. Settles whether the block follows the network
-   or the machine.
-2. **GoDaddy support** with both IPs, the symptom, and the start date. A block
-   placed after a burst of outbound mail from a residential address is ordinary
-   and they can lift it.
-3. **Any free-tier SMTP relay**, same domain, same SPF/DKIM/DMARC. It is one
-   environment variable; `send.mjs` does not care who relays.
-
-Then, and only then:
-
-4. Watch for replies → recruiter runs their own CV → invoice via Skydo
-5. The daily routine, scheduled: `ops\install-schedule.ps1`. Decision 010
+1. **Confirm the first live run sent.** `ops/daily.log` should say `sent N`,
+   not `dry` or `BLOCKED`, and `status.mjs` should show more than 54 sent
+2. A reply now arrives as a notification, with the answer already in Drafts
+   (`ops/watch.mjs`). Read it, send it → recruiter runs their own CV → invoice
+   via Skydo. `docs/runbooks/replies.md`, within the hour
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
@@ -55,12 +80,12 @@ directly each blocks money.
 
 | # | Item | Why it matters | Effort |
 |---|---|---|---|
-| 1 | Run `sql/003_customers.sql` | There is nowhere to record that someone paid | 5 min |
+| 1 | ~~Run `sql/003_customers.sql`~~ — done; preflight confirms | | |
 | 2 | Skydo GBP/USD account details and an INR account or UPI ID ready to put on an invoice | Money is collected by invoice (decision 007). The pricing page already asks for what the invoice needs; `docs/runbooks/invoice.md` is the ten-minute routine | 15 min |
 | 3 | Enable billing on the Gemini project | DPA clause 3.4 ("we do not train on your data") is untrue on the free tier. First compliance question every UK agency asks. Cost ~£0.0001 per CV | 10 min |
 | 4 | ~~One founder identity~~ — done 2026-09-03: emails, DPA, Article 30 record and the LinkedIn playbook all say Abin Johnson | | |
 | 5 | Fix the LinkedIn About that says Venditas was shut down | Every cold email that gets looked up finds the founder disowning the product. Rewrite in `outreach/profile.md` | 10 min |
-| 5a | Submit the sitemap to Google Search Console and Bing; list on the free directories | The Quibench page only works if it is crawled. `docs/runbooks/inbound.md` | 1 hour |
+| 5a | Submit `https://www.venditas.in/sitemap.xml` to Google Search Console (the www property); list on the free directories. Bing needs nothing: IndexNow is pushed every Saturday once deployed | The Quibench page only works if it is crawled. `docs/runbooks/inbound.md` | 1 hour |
 | 6 | Supabase region | One line from the dashboard; DPA Annex 3 and the Article 30 record have placeholders without it | 2 min |
 | 7 | Solicitor review of privacy, terms, DPA; settle liability and governing law | A UK agency will not sign an unreviewed DPA from an overseas sole trader | 1–3 hours of fees |
 | 8 | Article 27 UK representative, or a written opinion that none is needed; ICO fee question | A line on every supplier questionnaire | £100–500/yr |
@@ -96,8 +121,10 @@ Register it once and stop thinking about it:
 powershell -ExecutionPolicy Bypass -File ops\install-schedule.ps1
 ```
 
-Installs a dry run at 14:00 IST on weekdays; add `-Live` to arm it. Catches up a
-day missed to a sleeping laptop. Decision 010, and the reason it exists is that
+Installs the daily run at 14:00 IST on weekdays (a dry run unless `-Live`), plus
+the reply watch and the weekly job from decision 018; `-Task watch,weekly`
+leaves the daily task alone. Every job catches up a run missed while the laptop
+slept. Decision 010, and the reason it exists is that
 the hand-run version stopped on 3 September and nobody noticed for five days.
 
 When FUNNEL says the UK list is under a week from empty:
@@ -137,18 +164,15 @@ reasoning plus when to revisit it is in
 
 ## Not blocked, worth doing
 
-- Batch upload (whole shortlist at once) — asked for on the pricing page, does
-  not exist yet
-- Saved branding per account — same
+- **Load the agency's own Word template (.docx).** Today the output is the
+  agency's logo, colour and footer on Venditas's own layout (`lib/render.mjs`
+  builds a new document every time). Until 2026-09-13 the site said "your
+  template", which overstated it. Agencies that already have a template will
+  ask for it, and HireAra sells templates. This is the product gap most worth
+  closing
+- Saved branding that follows a paying agency to another computer. It is
+  per-browser today, by design (see `app/Formatter.jsx`)
 - `.doc` support — currently refused with a clear message
-
-## Waiting on one paste into Supabase
-
-`sql/005_trial_limits.sql` has not been run. Until it is, the daily cap holds
-but the ten-CV trial resets every 90 days when the retention job clears the
-counters it was summed from. `node ops/status.mjs` prints `trial limits NOT RUN`
-while that is true. Paste the file into the Supabase SQL editor and Run; it is
-safe to re-run, and it replaces `purge_old_data` from `sql/002_retention.sql`.
 
 ## Known and accepted
 
@@ -172,13 +196,10 @@ The plan assumed no audience and no domain expertise, and both were wrong.
 
 | Asset | Why it matters |
 |---|---|
-| **Hustlr** — live product, 50 users in 14 days, **agencies and SDRs** | A warm B2B audience adjacent to recruitment agencies. The single most valuable asset here, and cold email was chosen because it was believed not to exist |
-| **Labs60** — his agency, AI receptionists and video for SaaS teams | An existing commercial relationship base, and a second route to market |
 | Six years building, IIT Bombay special mention, national hackathon top three | Changes what he can credibly claim in outreach |
 
-**Action not yet taken:** work out whether Hustlr's 50 users can be told about
-Venditas. Warm beats cold by an order of magnitude, and this was never in the
-plan because the plan did not know it existed.
+**Hustlr and Labs60 are never used for Venditas** (decision 016): not as a
+channel, a list, credibility or a mention.
 
 ## Conflict to resolve before LinkedIn outreach
 
