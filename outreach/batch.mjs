@@ -21,6 +21,7 @@ import path from 'node:path';
 import { render, makeReference } from '../lib/render.mjs';
 import { preview } from '../lib/preview.mjs';
 import { sampleFor, safeColour, loadSamples, fetchLogo } from './samples.mjs';
+import { parseCsv } from './prospects.mjs';
 import { send, closeTransport, suppressed, SENDER, DAILY_CAP } from './send.mjs';
 import { recentlyContacted, record, COOLING_DAYS, isSendableNow } from './contacted.mjs';
 import { scanInbox } from './inbox.mjs';
@@ -36,28 +37,6 @@ const opt = (name, fallback) => {
 
 const WANT = Number(opt('n', DAILY_CAP));
 const DO_SEND = flag('send') && flag('confirm');
-
-// ------------------------------------------------------------------- csv
-/** Quoted fields contain commas and newlines, so a split(',') will not do. */
-function parseCsv(text) {
-  const rows = [];
-  let row = [], field = '', quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else quoted = false;
-      } else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-    else if (c !== '\r') field += c;
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  const [head, ...body] = rows.filter((r) => r.some((c) => c.trim()));
-  return body.map((r) => Object.fromEntries(head.map((h, i) => [h.trim(), (r[i] ?? '').trim()])));
-}
 
 // ------------------------------------------------------------------ message
 /** "Opus Recruitment Solutions'", not "Solutions's". */

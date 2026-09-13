@@ -138,10 +138,59 @@ address it directly than let them find the contradiction.
 
 ---
 
+## Post 5 — the bug I found in my own tool (added 2026-09-13)
+
+True, specific, and it proves the redaction is checked by someone who looks.
+This audience trusts a founder who reports his own failure more than one who
+claims there are none.
+
+> This week I ran a Europass CV through the tool I built for recruitment agencies,
+> the form most EU drivers and warehouse candidates send.
+>
+> It kept the candidate's full home address, street and flat number included, as
+> their "location".
+>
+> Nothing else leaked. The name and phone came off as they should. But a street
+> address identifies someone as surely as a mobile number, and it was sitting at
+> the top of a document built to go to a client.
+>
+> The cause was dull: Europass puts "Address" in a label column beside the value,
+> and nothing was looking for streets at all. It now keeps the town and postcode
+> district, which a client genuinely needs for a commute, and drops the rest. The
+> check that reads the finished document back now looks for the address too.
+>
+> I only found it because I test against the awful CVs, not the tidy ones. If you
+> run an agency, the CV you'd be embarrassed to forward is the one I want.
+
+## Post 6 — why it refuses to hand you a file (added 2026-09-13)
+
+> The feature I'm proudest of in my CV tool is the one that makes it look broken.
+>
+> After it rebuilds a CV in an agency's template, it reads the finished document
+> back and looks for the candidate's name, email, phone, links and address. If any
+> of them survived, you don't get a file. You get an error.
+>
+> From the outside that's a failure. From the agency's side it's the whole point.
+> A document that quietly still has the candidate's mobile in the footer is worse
+> than no document, because you only find out when the client has already rung
+> them.
+>
+> The easy version would have been to trust the code that removes things. The
+> check exists because the code that removes things is written by me, and I've
+> been wrong before.
+
+## Before posting 3
+
+Post 3's numbers (fourteen products, four of seven CRMs, a competitor shutting
+down "last month") come from research dated 2 September. Re-check them before
+posting, or cut the paragraph. A wrong number in a post about not trusting vendor
+statistics would undo the post.
+
 ## Cadence
 
 One post a day for four days, then one or two a week. Post between 8 and 10am
-UK, which is when this audience is at a desk.
+UK, which is when this audience is at a desk. Suggested order: 1, 5, 2, 6, then 4
+and 3 the following week.
 
 Do not post and connect in the same hour. A connection request arriving minutes
 after a post looks like one automated sequence, which is the impression all of

@@ -110,13 +110,54 @@ export async function fetchLogo(url) {
     if (buf.length > 1_500_000 || buf.length < 200) return null;
     // Word and the preview take PNG or JPEG. Agency sites increasingly serve
     // SVG or WebP, and skipping those left half the best prospects unbranded.
+    // The bytes decide, not the header: image CDNs send WebP labelled
+    // image/png, and Word shows a broken image for it.
+    const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8;
     if (/svg/i.test(type)) buf = await sharp(buf, { density: 300 }).resize({ width: 600 }).png().toBuffer();
-    else if (/webp/i.test(type)) buf = await sharp(buf).png().toBuffer();
+    else if (!isPng && !isJpeg) buf = await sharp(buf).png().toBuffer();
     if (await vanishesOnWhite(buf)) return null;
-    return { data: buf, type: /jpe?g/i.test(type) ? 'jpg' : 'png' };
+    if (await looksLikePhoto(buf)) return null;
+    return { data: buf, type: isJpeg && !/svg/i.test(type) ? 'jpg' : 'png' };
   } catch {
     return null;
   }
+}
+
+/**
+ * A "logo" that is really a photograph: the scraper's `logo_url` sometimes
+ * points at a hero banner or a social share image. RED Rhino Resourcing's
+ * rendered as a postage stamp of a website screenshot, which is worse than no
+ * logo at all.
+ *
+ * Logos are flat artwork: a few colours cover most of the image. On a small,
+ * coarsely quantised copy, the three commonest colours covered 0.44 to 0.96 of
+ * 26 real agency logos and 0.34 of the screenshot, which also had the most
+ * distinct colours (183, against a highest real logo of 155). Both tests have to
+ * agree, because a multicolour logo can pass either one alone.
+ *
+ * Also rejected: anything under 100px on its longest side. Those are favicons,
+ * and a 57px icon stretched across a CV header is visibly blurred.
+ */
+async function looksLikePhoto(buf) {
+  const meta = await sharp(buf).metadata();
+  if (Math.max(meta.width || 0, meta.height || 0) < 100) return true;
+
+  const { data, info } = await sharp(buf)
+    .flatten({ background: '#ffffff' })
+    .resize(64, 64, { fit: 'inside' })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const counts = new Map();
+  let pixels = 0;
+  for (let i = 0; i < data.length; i += info.channels) {
+    const key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4);
+    counts.set(key, (counts.get(key) || 0) + 1);
+    pixels++;
+  }
+  const top = [...counts.values()].sort((a, b) => b - a);
+  const flat = ((top[0] || 0) + (top[1] || 0) + (top[2] || 0)) / pixels;
+  return flat < 0.4 && counts.size > 150;
 }
 
 /**
