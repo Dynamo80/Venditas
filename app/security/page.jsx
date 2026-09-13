@@ -75,9 +75,10 @@ export default function Security() {
 
         <h2>Redaction, and why we verify it</h2>
         <p>
-          Contact details are removed by default: name, email, phone and personal links, replaced
-          with a reference code. Location survives, because it's useful to a client and doesn't
-          identify anyone.
+          Contact details are removed by default: name, email, phone, personal links and street
+          address, replaced with a reference code. The town and postcode district survive, because
+          a client needs to know where the candidate is; the street, house number and full postcode
+          do not.
         </p>
         <p>
           The part worth knowing: after the document is built, it is{' '}
