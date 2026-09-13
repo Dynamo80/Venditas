@@ -140,8 +140,9 @@ change.
 
 - **Your content.** You keep all rights in the CVs you upload and in the
   documents Venditas returns to you. We claim no ownership of either, and we do
-  not use your content to train models. (We send CV content to Google's Gemini
-  API for processing — see the Privacy Policy and the DPA for what that means.)
+  not use your content to train models. (We send CV content, with direct
+  identifiers removed, to Google's Gemini API on its free tier, whose terms let
+  Google use it to improve its products — see the Privacy Policy and the DPA.)
 - **Your branding.** You keep all rights in the logo, colours and text you supply.
   You give us permission to use them only to build your document, for the
   duration of the request.

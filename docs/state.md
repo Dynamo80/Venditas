@@ -123,13 +123,12 @@ writes it down. See `docs/runbooks/closing.md`.
 Switching it on later is one Vercel environment variable,
 `NEXT_PUBLIC_PAY_URL`, and a redeploy. The pricing page picks it up itself.
 
-## How someone buys, as of 2026-09-09
+## How someone buys, as of 2026-09-13
 
-Book a call → talk → payment settled on the call (bank transfer, PayPal,
-whatever suits) → they get unlimited CVs. The pricing page button is the
-Calendly link; no rail is named on the site, because naming one commits us to it
-before the first ten customers. `docs/runbooks/invoice.md` is still the routine
-once they say yes.
+Pricing button → a pre-filled email asking for the agency's legal name, billing
+address and monthly or annual → Abin replies with a Skydo invoice
+(`docs/runbooks/invoice.md`) → paid → unlimited CVs. No call needed; "Book 30
+minutes" stays underneath for anyone who wants one. Decision 014.
 
 Demo accounts get five CVs and an email confirmation link. The public form still
 gives ten with no signup, which is more than the demo gets — deliberate, and the

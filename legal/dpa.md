@@ -85,7 +85,12 @@ infringes Data Protection Law.
 
 3.4 **Venditas shall not** sell Personal Data, use it for its own purposes, use it
 to train or fine-tune any machine learning model, or disclose it to any third
-party other than a Sub-processor listed in Annex 3.
+party other than a Sub-processor listed in Annex 3. The Customer acknowledges
+that Google LLC, listed in Annex 3, receives CV text from which direct
+identifiers have been removed (or, for a scanned CV, page images) under the
+Gemini API terms for unpaid services, which permit Google to use submitted
+content to provide, improve and develop its products and machine learning
+technologies, including by human review.
 
 3.5 The Customer warrants that it has a lawful basis for the processing, that it
 has given data subjects the information required by Articles 13 and 14 UK GDPR,
@@ -402,6 +407,13 @@ answer is worth more than a discovered omission:
 ---
 
 # Annex 3 — Authorised Sub-processors
+
+> **Google LLC (Gemini API) is used on its unpaid tier.** Google's terms for that
+> tier allow it to use submitted content to improve its products and machine
+> learning technologies, including by human review. Venditas removes the
+> candidate's name, email address, phone number, links and street address
+> before any text is sent. Scanned CVs are sent as page images and cannot be
+> de-identified this way.
 
 As at the effective date.
 

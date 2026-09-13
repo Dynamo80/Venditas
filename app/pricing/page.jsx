@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, CONTACT_URL, MEETING_URL } from '../../lib/pricing.mjs';
+import { FREE, PRO, priceFor, GUARANTEE, PAY_URL, INVOICE_URL, MEETING_URL } from '../../lib/pricing.mjs';
 
 export const metadata = {
   title: 'Pricing — Venditas',
@@ -84,21 +84,24 @@ export default async function Pricing({ searchParams }) {
             </>
           ) : (
             <>
-              <a href={MEETING_URL} className="act primary" target="_blank" rel="noopener noreferrer">
-                Book 30 minutes with Abin
+              <a href={INVOICE_URL} className="act primary">
+                Get an invoice — {price.symbol}{price.amount}/month
               </a>
-              {/* Kept inside this branch: it says there is no checkout, and the
-                  other branch is a checkout. */}
+              {/* Kept inside this branch: it describes paying without a checkout,
+                  and the other branch is a checkout. */}
               <p className="per" style={{ marginTop: 10 }}>
-                No checkout, deliberately. We are early enough that every conversation
-                teaches us something, so buying starts with half an hour: bring a CV your
-                team actually struggles with, and if it holds up we sort out payment on the
-                call. Unlimited CVs from that point.
+                No call needed. The button opens an email: add your agency&apos;s name and billing
+                address, and the invoice usually comes back within a working day. Bank transfer
+                in your currency, unlimited CVs from the day it is paid.
               </p>
             </>
           )}
           <p className="per" style={{ marginTop: 10 }}>
-            Rather write first? <a href={CONTACT_URL}>Email Abin</a>.
+            Rather see it on your own CVs first?{' '}
+            <a href={MEETING_URL} target="_blank" rel="noopener noreferrer">
+              Book 30 minutes with Abin
+            </a>
+            .
           </p>
         </div>
       </div>

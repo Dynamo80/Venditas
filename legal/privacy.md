@@ -152,7 +152,7 @@ These are the third parties that process data as part of running Venditas.
 
 | Provider | What they get | Where |
 | --- | --- | --- |
-| **Google LLC** (Gemini API) | CV text, or images of CV pages for scanned PDFs, sent for the duration of the call | United States and other Google locations |
+| **Google LLC** (Gemini API, free tier) | CV text with the candidate's name, email, phone, links and street address removed, or images of CV pages for scanned PDFs. Google's free-tier terms let it use this content to improve its products, including by human review | United States and other Google locations |
 | **Supabase** (Postgres, hosted on Amazon Web Services) | Your email address, agency name, timestamps, counters, hashed IP counters | See `legal/dpa.md` for the current region |
 | Application hosting provider | Processes the upload in memory while your request runs; no candidate data is stored | See `legal/dpa.md` |
 | Email provider (SMTP) | Your email address, so we can send you email | See `legal/dpa.md` |

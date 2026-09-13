@@ -23,3 +23,4 @@ exists: without it, the eighth conversation starts from scratch.
 | 011 | [A demo account is a confirmed work address, nothing more](011-demo-accounts.md) | 2026-09-08 |
 | 012 | [Five CVs on a demo account, €80, and Gmail is a customer](012-five-cv-demo-and-euro.md) | 2026-09-08 |
 | 013 | [Agencies already paying a competitor go first; follow-ups get a ceiling](013-paying-competitor-customers-first.md) | 2026-09-13 |
+| 014 | [An agency can buy without a call](014-buy-without-a-call.md) | 2026-09-13 |

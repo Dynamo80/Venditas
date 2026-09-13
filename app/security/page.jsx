@@ -43,9 +43,11 @@ export default function Security() {
             document itself.
           </li>
           <li>
-            That text is sent to <strong>Google's Gemini API</strong> to be turned into structured
-            fields. This is the one point where a third party sees the content, and it is named
-            here rather than buried in a sub-processor list.
+            The candidate's name, email, phone, links and street address are removed on our server,
+            and what is left is sent to <strong>Google's Gemini API</strong> to be turned into
+            structured fields. This is the one point where a third party sees the content, and it
+            is named here rather than buried in a sub-processor list. A scanned CV has no text to
+            remove anything from, so its page images are sent as they are.
           </li>
           <li>A Word document is built from those fields and returned to your browser.</li>
           <li>Everything from steps 1 to 4 is discarded when the request finishes.</li>
@@ -101,10 +103,17 @@ export default function Security() {
 
         <h2>What we don't do</h2>
         <ul>
-          <li>No training on your data. Nothing you upload is used to improve any model.</li>
+          <li>No training on your data by us. We build no models from anything you upload.</li>
           <li>No selling or sharing of your details with anyone.</li>
           <li>No candidate database being quietly accumulated behind the product.</li>
         </ul>
+        <p>
+          One qualification, because it matters: we use Gemini on Google's free tier, and Google's
+          terms for that tier let Google use what is sent to it to improve its products, including
+          human review. That is exactly why the identifiers come off before anything is sent. What
+          reaches Google is a work history with the person taken out, which can still count as
+          personal data, so we say so rather than promise more than we can keep.
+        </p>
 
         <h2>Honest limitations</h2>
         <p>
