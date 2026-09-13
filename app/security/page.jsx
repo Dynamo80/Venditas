@@ -50,8 +50,12 @@ export default function Security() {
             is named here rather than buried in a sub-processor list. A scanned CV has no text to
             remove anything from, so its page images are sent as they are.
           </li>
-          <li>A Word document is built from those fields and returned to your browser.</li>
-          <li>Everything from steps 1 to 4 is discarded when the request finishes.</li>
+          <li>
+            A Word document is built from those fields, inside your own Word template if you
+            uploaded one, and returned to your browser. The template never goes to Google: it is
+            only opened on our server to put the CV into it.
+          </li>
+          <li>Everything from steps 1 to 4, your template included, is discarded when the request finishes.</li>
         </ol>
 
         <h2>What we do keep</h2>

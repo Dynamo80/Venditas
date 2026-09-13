@@ -121,13 +121,18 @@ Venditas puts every CV into your agency's branding: your logo, your colour and y
 
 You set it up once. It's saved in your own browser, on your own computer, so nothing about your agency's branding is kept on a server.
 
-One honest limit: it's your branding on Venditas's layout. It doesn't load your agency's own Word template yet. If your agency has a template it won't give up, message this page, because that's the next thing worth building.
+If your agency already has a Word template, upload that instead. Its header, footer, fonts and margins stay exactly as they are, and the CV goes wherever you type {{CV}}.
 
 www.venditas.in
 ```
 
-**Sources.** `localStorage` in `app/Formatter.jsx`; `lib/render.mjs` builds its
-own layout; the template gap is in `docs/state.md`, "Not blocked, worth doing".
+**Sources.** `localStorage` in `app/Formatter.jsx`; templates in `lib/template.mjs`
+(decision 019).
+
+**Changed on 14 September, after the posts were scheduled.** The earlier text said
+Venditas "doesn't load your agency's own Word template yet", which stopped being
+true that day. If post 4 is already scheduled in LinkedIn, open the page's
+scheduled posts and replace its text with the version above before 25 September.
 
 ## 5 · Wednesday 30 September, 08:30 UK: a whole shortlist
 

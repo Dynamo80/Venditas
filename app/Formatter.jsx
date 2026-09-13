@@ -19,6 +19,9 @@ const MAX_FILES = 20;
 const STORE = 'venditas.branding.v1';
 /** localStorage holds about 5MB per site; a base64 logo is a third larger than the file. */
 const MAX_SAVED_LOGO_BYTES = 1024 * 1024;
+/** The server's limit (lib/template.mjs), and the largest template worth keeping in the browser. */
+const MAX_TEMPLATE_BYTES = 2 * 1024 * 1024;
+const MAX_SAVED_TEMPLATE_BYTES = 1.5 * 1024 * 1024;
 
 function loadBranding() {
   try {
@@ -80,6 +83,8 @@ export default function Formatter({ variant = 'full' }) {
   const [colour, setColour] = useState('#33418f');
   const [logoFile, setLogoFile] = useState(null);
   const [savedLogo, setSavedLogo] = useState(null);
+  const [templateFile, setTemplateFile] = useState(null);
+  const [savedTemplate, setSavedTemplate] = useState(null);
   const [remember, setRemember] = useState(true);
   const [keepContacts, setKeepContacts] = useState(false);
   const [over, setOver] = useState(false);
@@ -89,6 +94,7 @@ export default function Formatter({ variant = 'full' }) {
   const [restored, setRestored] = useState(false);
   const inputRef = useRef(null);
   const logoRef = useRef(null);
+  const templateRef = useRef(null);
   const urlsRef = useRef([]);
 
   useEffect(() => {
@@ -99,6 +105,7 @@ export default function Formatter({ variant = 'full' }) {
       if (saved.contact) setContact(saved.contact);
       if (saved.colour) setColour(saved.colour);
       if (saved.logo?.dataUrl) setSavedLogo(saved.logo);
+      if (saved.template?.dataUrl) setSavedTemplate(saved.template);
       setRestored(true);
     }
     return () => urlsRef.current.forEach((u) => URL.revokeObjectURL(u));
@@ -131,6 +138,19 @@ export default function Formatter({ variant = 'full' }) {
     setColour('#33418f');
     if (logoRef.current) logoRef.current.value = '';
     setLogoFile(null);
+    setSavedTemplate(null);
+    if (templateRef.current) templateRef.current.value = '';
+    setTemplateFile(null);
+  }
+
+  function chooseTemplate(file) {
+    if (file && file.size > MAX_TEMPLATE_BYTES) {
+      setMsg({ tone: 'err', text: `That template is ${(file.size / 1048576).toFixed(1)}MB. The limit is 2MB.` });
+      if (templateRef.current) templateRef.current.value = '';
+      setTemplateFile(null);
+      return;
+    }
+    setTemplateFile(file || null);
   }
 
   async function remembered() {
@@ -145,8 +165,21 @@ export default function Formatter({ variant = 'full' }) {
         : null;
       if (!logo?.dataUrl) logo = null;
     }
-    if (saveBranding({ email, agency, contact, colour, logo })) {
+    let template = savedTemplate;
+    if (templateFile) {
+      template = templateFile.size <= MAX_SAVED_TEMPLATE_BYTES
+        ? { name: templateFile.name, dataUrl: await readAsDataUrl(templateFile).catch(() => null) }
+        : null;
+      if (!template?.dataUrl) template = null;
+    }
+    // The browser may refuse a large template. Branding without it is still worth keeping.
+    if (saveBranding({ email, agency, contact, colour, logo, template })) {
       setSavedLogo(logo);
+      setSavedTemplate(template);
+      setRestored(true);
+    } else if (saveBranding({ email, agency, contact, colour, logo })) {
+      setSavedLogo(logo);
+      setSavedTemplate(null);
       setRestored(true);
     }
   }
@@ -168,6 +201,16 @@ export default function Formatter({ variant = 'full' }) {
     } else if (savedLogo?.dataUrl) {
       logoBlob = await fetch(savedLogo.dataUrl).then((r) => r.blob()).catch(() => null);
       logoName = savedLogo.name;
+    }
+
+    let templateBlob = null;
+    let templateName = null;
+    if (templateFile) {
+      templateBlob = templateFile;
+      templateName = templateFile.name;
+    } else if (savedTemplate?.dataUrl) {
+      templateBlob = await fetch(savedTemplate.dataUrl).then((r) => r.blob()).catch(() => null);
+      templateName = savedTemplate.name;
     }
 
     const out = [];
@@ -195,6 +238,7 @@ export default function Formatter({ variant = 'full' }) {
       body.set('contact', contact);
       body.set('colour', colour);
       if (logoBlob) body.set('logo', logoBlob, logoName || 'logo.png');
+      if (templateBlob) body.set('template', templateBlob, templateName || 'template.docx');
       if (!anonymise && keepContacts) body.set('redact', 'off');
 
       try {
@@ -288,6 +332,30 @@ export default function Formatter({ variant = 'full' }) {
           <p className="saved">
             Using your saved logo, {savedLogo.name}.
             <button type="button" className="linkish" onClick={() => setSavedLogo(null)}>
+              Don&apos;t use it
+            </button>
+          </p>
+        )}
+      </div>
+      <div>
+        <label>
+          <span className="lbl">Your own Word template (.docx, optional)</span>
+          <input
+            ref={templateRef}
+            type="file"
+            name="template"
+            accept=".docx,.dotx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={(e) => chooseTemplate(e.target.files?.[0] || null)}
+          />
+        </label>
+        <p className="saved">
+          Its header, footer, fonts and margins are kept, and they replace the logo and footer
+          line above. Type {'{{CV}}'} where the CV should go, or it fills the page.
+        </p>
+        {savedTemplate && !templateFile && (
+          <p className="saved">
+            Using your saved template, {savedTemplate.name}.
+            <button type="button" className="linkish" onClick={() => setSavedTemplate(null)}>
               Don&apos;t use it
             </button>
           </p>

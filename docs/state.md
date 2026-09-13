@@ -184,12 +184,12 @@ reasoning plus when to revisit it is in
 
 ## Not blocked, worth doing
 
-- **Load the agency's own Word template (.docx).** Today the output is the
-  agency's logo, colour and footer on Venditas's own layout (`lib/render.mjs`
-  builds a new document every time). Until 2026-09-13 the site said "your
-  template", which overstated it. Agencies that already have a template will
-  ask for it, and HireAra sells templates. This is the product gap most worth
-  closing
+- ~~**Load the agency's own Word template (.docx).**~~ Built 14 September
+  ([019](decisions/019-the-agencys-own-template.md)): upload a .docx or .dotx
+  with the CV; its header, footer, fonts and margins are kept, and the CV goes
+  where it says {{CV}}. Tested against templates made in Word and opened in
+  Word. **Scheduled company page post 4 (25 September) still says it doesn't
+  exist: edit it in LinkedIn** (`outreach/company-page/posts.md`)
 - Saved branding that follows a paying agency to another computer. It is
   per-browser today, by design (see `app/Formatter.jsx`)
 - `.doc` support — currently refused with a clear message

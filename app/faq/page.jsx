@@ -69,6 +69,18 @@ const QUESTIONS = [
     ),
   },
   {
+    q: 'Can it use our own Word template?',
+    a: (
+      <>
+        Yes. Upload your template (.docx) alongside the CV. Its header, footer, fonts and margins
+        stay as they are, and the CV goes wherever you type {'{{CV}}'} in it, or fills the page if
+        there&apos;s no marker. Without a template, your logo, colour and footer line go on our own
+        layout. The template is used for that CV and not kept on our side; tick
+        &ldquo;remember&rdquo; and it stays in your browser instead.
+      </>
+    ),
+  },
+  {
     q: 'What about two-column CVs, tables, and the truly awful ones?',
     a: (
       <>

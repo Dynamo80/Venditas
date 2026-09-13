@@ -41,7 +41,7 @@ export function findArtifacts(domain) {
 export const DRAFTS = {
   interested: (c) => `Thanks — the Word file is attached, so you can see it is properly editable rather than a picture of a document.
 
-If you want to try it on your own candidates: ${SENDER.site}, ten free, no card, no account to set up. Put your logo and colour in and it comes back in your template.
+If you want to try it on your own candidates: ${SENDER.site}, ten free, no card, no account to set up. Put your logo and colour in, or upload your own Word template, and it comes back in your branding.
 
 Anything it handles badly, tell me and I will fix it — that is more useful to me than a compliment.
 

@@ -3,6 +3,7 @@ import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
 import { check, guard, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
 import { readSession, SESSION_COOKIE } from '../../../lib/demo-account.mjs';
 import { coverage, COVERAGE_FLOOR } from '../../../lib/coverage.mjs';
+import { checkTemplate, intoTemplate, MAX_TEMPLATE_BYTES } from '../../../lib/template.mjs';
 import mammoth from 'mammoth';
 
 // Extraction takes ten seconds or so, most of it waiting on the model.
@@ -54,6 +55,22 @@ export async function POST(request) {
   if (!email) return bad('Enter your work email to run a CV.', 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
     return bad("That email doesn't look right — mind checking it?", 400);
+  }
+
+  // The agency's own Word template, if one came with the CV (lib/template.mjs).
+  // Checked before the meter, so a template we cannot use never costs a trial CV.
+  let template = null;
+  const templateFile = form.get('template');
+  if (templateFile && typeof templateFile !== 'string' && templateFile.size > 0) {
+    if (templateFile.size > MAX_TEMPLATE_BYTES) {
+      return bad(`That template is ${(templateFile.size / 1048576).toFixed(1)}MB. The limit is 2MB.`);
+    }
+    template = Buffer.from(await templateFile.arrayBuffer());
+    try {
+      await checkTemplate(template);
+    } catch (e) {
+      return bad(e?.userFacing ? e.message : "That template couldn't be read. Save it as .docx and try again.", 422);
+    }
   }
 
   // A verified demo account, if this browser has one. The cookie is signed and
@@ -127,8 +144,11 @@ export async function POST(request) {
 
   let docx;
   try {
-    docx = await render(data, brand, { reference });
+    docx = await render(data, brand, { reference, template: Boolean(template) });
+    // The redaction check below reads this final document, template text included.
+    if (template) docx = await intoTemplate(docx, template);
   } catch (e) {
+    if (e?.userFacing) return bad(e.message, 422);
     console.error('render failed:', e?.message || 'unknown');
     return bad('Formatting failed after the CV was read. Nothing was saved.', 500);
   }

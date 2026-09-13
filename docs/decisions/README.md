@@ -28,3 +28,4 @@ exists: without it, the eighth conversation starts from scratch.
 | 016 | [Growth is paid for by growth; Hustlr is never used](016-growth-paid-by-growth.md) | 2026-09-13 |
 | 017 | [Markets, integrations, partnerships, and the order profits are spent](017-markets-integrations-partnerships.md) | 2026-09-13 |
 | 018 | [Most of the growth work runs by itself, on this laptop](018-growth-runs-itself.md) | 2026-09-14 |
+| 019 | [The CV goes into the agency's own Word template](019-the-agencys-own-template.md) | 2026-09-14 |
