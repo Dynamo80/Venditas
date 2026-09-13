@@ -215,6 +215,18 @@ async function main() {
     const rows = leads.rows || [];
     console.log(`  leads captured  ${rows.length}`);
     console.log(`  opted out       ${rows.filter((r) => r.may_contact === false).length}`);
+    // Which trials came from outreach. Nothing tracks clicks (lib/prefill.mjs);
+    // a trial needs a work email, and its domain says whether we emailed them.
+    {
+      const sentFile = path.join(ROOT, 'outreach', 'sent.log');
+      const domainOf = (e) => String(e || '').trim().toLowerCase().split('@')[1] || '';
+      const emailed = new Set(existsSync(sentFile)
+        ? readFileSync(sentFile, 'utf8').split('\n').map((l) => domainOf(l.split('\t')[1])).filter(Boolean)
+        : []);
+      emailed.delete('venditas.in');
+      const fromOutreach = rows.filter((r) => emailed.has(domainOf(r.email)));
+      console.log(`  from outreach   ${fromOutreach.length}${fromOutreach.length ? `  (${fromOutreach.map((r) => domainOf(r.email)).join(', ')})` : '  (no trial yet from an agency we emailed)'}`);
+    }
     for (const r of rows.slice(0, 5)) {
       console.log(`    ${pad(r.email, 34)} ${pad(r.agency || '-', 22)} ${r.first_seen?.slice(0, 10)}`);
     }

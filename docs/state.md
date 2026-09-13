@@ -88,6 +88,13 @@ run. That day's dry run finished with no failures.
    tried before that saw "That link didn't work" and was told to email
    founder@venditas.in; any such email must be honoured by hand
    (`outreach/suppressed.txt`)
+9. **The funnel, tightened on 14 September.** Each cold email's link opens the
+   tool already set up with that agency's name, colour and logo
+   (`lib/prefill.mjs`). Agencies can use their own Word template (019). The
+   follow-up sequence is now two messages: day 3, then a last note five working
+   days later. When the ten free CVs run out, the form offers the invoice and a
+   call as buttons. Trials from emailed agencies show up as leads whose email
+   domain matches a prospect; nothing tracks clicks
 
 Payment integration is **not** on the critical path. A Skydo invoice or a
 Razorpay link collects £79 by hand perfectly well for the first customers.
