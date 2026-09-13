@@ -23,7 +23,7 @@ powershell -ExecutionPolicy Bypass -File ops\install-schedule.ps1 -Task watch -R
 | **Sale: X wants to buy** | Open Drafts: the reply is there. Raise the Skydo invoice and record it before anything else (`invoice.md`) |
 | **Reply from X** | Open Drafts, read the draft, then send it or rewrite it. They are already marked replied, so no follow-up will reach them. If the draft is the wrong shape: `node outreach/reply.mjs <domain> --draft <kind>` |
 | **New email from X** | Someone we never wrote to. There is a draft only if they asked about price, data or buying. Answer today |
-| **Trial signup: X** | Someone has just run a CV. A personal line from Abin today beats the automatic email at five CVs |
+| **Trial signup: X** | Someone has just run a CV, and a personal note to them is already in Drafts (`drafts.mjs`, "trial"). Read it, send it today. It beats the automatic email at five CVs |
 | **Replies are not being read** | The mailbox has been unreachable for three hours. `node ops/preflight.mjs` |
 | **Outreach blocked today** / **a stage failed** | `node ops/preflight.mjs`, then `node ops/daily.mjs --send --confirm` inside UK working hours |
 | **Weekly check: needs a look** | Pages written but not live means deploy (`deploy.md`). SEO problems: `node ops/seo.mjs` lists them by page |

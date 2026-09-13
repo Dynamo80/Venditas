@@ -156,18 +156,53 @@ const withoutTrailer = (res) => res.replace(/\)\s*\r?\nA\d{4} (?:OK|NO|BAD)[^\r\
 
 // ------------------------------------------------------------------ drafts
 
-async function fileDraft(im, folder, { env, to, subject, headers, text, attachments }) {
+async function fileDraft(im, folder, { env, to, subject, headers, text, attachments, reply = true }) {
   const composer = nodemailer.createTransport({ streamTransport: true, buffer: true });
   const built = await composer.sendMail({
     from: `"${SENDER.person} at ${SENDER.company}" <${env.SMTP_USER}>`,
     to,
-    subject: /^re:/i.test(subject) ? subject : `Re: ${subject}`,
+    subject: !reply || /^re:/i.test(subject) ? subject : `Re: ${subject}`,
     inReplyTo: headers['message-id'] || undefined,
     references: [headers.references, headers['message-id']].filter(Boolean).join(' ') || undefined,
     text,
     attachments,
   });
   await im.append(folder, built.message.toString(), '\\Draft');
+}
+
+/**
+ * A personal note for each new trial user, in Drafts, so answering a signup is
+ * reading and pressing send. The note says nothing it cannot know: that they ran
+ * a CV, and what the product does (drafts.mjs, "trial").
+ * @returns {Promise<number>} how many were filed
+ */
+async function draftTrialNotes(env, leads) {
+  const host = (env.IMAP_HOST || env.SMTP_HOST || '').replace(/^(?:smtpout|smtp)\./, 'imap.');
+  const im = new Imap({ host, port: Number(env.IMAP_PORT || 993), user: env.SMTP_USER, pass: env.SMTP_PASS });
+  let filed = 0;
+  try {
+    await im.connect();
+    await im.login();
+    const folder = pickFolder(await im.listFolders(), ['Drafts', 'INBOX.Drafts', 'Draft']);
+    if (!folder) return 0;
+    for (const lead of leads) {
+      await fileDraft(im, folder, {
+        env,
+        to: lead.email,
+        subject: 'the CV you ran through Venditas',
+        headers: {},
+        text: DRAFTS.trial({ agency: lead.agency }),
+        attachments: [],
+        reply: false,
+      });
+      filed++;
+    }
+  } catch (e) {
+    console.log(`  could not file trial notes: ${e.message}`);
+  } finally {
+    await im.logout();
+  }
+  return filed;
 }
 
 // ------------------------------------------------------------------ handle
@@ -306,7 +341,7 @@ async function newLeads(env, state) {
   if (!since) return [];
   try {
     const res = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/leads?select=email,agency,first_seen&first_seen=gt.${encodeURIComponent(since)}&order=first_seen.asc`,
+      `${env.SUPABASE_URL}/rest/v1/leads?select=email,agency,first_seen,may_contact&first_seen=gt.${encodeURIComponent(since)}&order=first_seen.asc`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(20000) }
     );
     if (!res.ok) return [];
@@ -319,6 +354,7 @@ async function newLeads(env, state) {
         title: `Trial signup: ${r.agency || domainOf(r.email)}`,
         body: `${r.email} has just started the free trial. A personal note from the founder today beats the automatic one at five CVs.`,
         line: `${r.email} ${r.agency || ''}`,
+        lead: r,
       }));
   } catch {
     return [];
@@ -371,6 +407,16 @@ async function main() {
 
   const events = [...mail.events, ...(firstRun ? [] : await newLeads(env, state))];
   if (firstRun) await newLeads(env, state);
+
+  // Every new trial user who has not opted out gets a personal note waiting in Drafts.
+  const trials = events.filter((e) => e.type === 'trial' && e.lead?.may_contact !== false
+    && !suppressed().has(String(e.lead.email).toLowerCase()));
+  if (act && trials.length) {
+    const filed = await draftTrialNotes(env, trials.map((e) => e.lead));
+    if (filed === trials.length) {
+      for (const e of trials) e.body = `${e.lead.email} has just run a CV. A personal note is in Drafts: read it, then send.`;
+    }
+  }
 
   for (const ev of events) console.log(`  ${ev.type.padEnd(8)} ${ev.line}`);
   const alerts = events.filter((e) => e.alert);

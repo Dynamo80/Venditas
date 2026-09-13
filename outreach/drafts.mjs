@@ -82,6 +82,22 @@ You're on the founding price: £79 a month for as long as you keep it.
 
 ${SENDER.person}`,
 
+  // Not a reply: the first note to someone who has just run a CV, filed in
+  // Drafts by ops/watch.mjs within twenty minutes of the signup. Written to be
+  // true for anyone who has run one CV and no more is known about them.
+  trial: (c) => `Hi,
+
+You've just run a CV through Venditas${c.agency ? ` for ${c.agency}` : ''}. Thank you for trying it. I built it, and I'd really like to know whether the Word document came out the way you needed.
+
+Two things worth knowing while you try it: you can upload your own Word template and it keeps your header, footer and fonts, and every document is checked for the candidate's contact details before you get it.
+
+If anything came out wrong, reply with the CV and I'll fix it the same day.
+
+${SENDER.person}
+${SENDER.fullName}, ${SENDER.company} · venditas.in
+
+(If you'd rather I didn't email, just say so and I won't.)`,
+
   no: (c) => `Understood, thanks for replying — most people do not, and it is genuinely useful to know.
 
 You are off the list. I will not contact you again.
