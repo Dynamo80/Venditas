@@ -108,8 +108,12 @@ if ($Tasks -contains'daily') {
   $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At $At
   # The batch itself still refuses to send outside UK working hours, so a
   # machine woken at 23:00 reads the inbox and sends nothing.
+  #
+  # Two hours, not one: the routine now waits up to half an hour for a mail
+  # host that is down at the scheduled minute (14 September lost a day to a
+  # blip), and the stages behind it can take fifteen minutes each.
   $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew
+    -ExecutionTimeLimit (New-TimeSpan -Hours 2) -MultipleInstances IgnoreNew
   Register-ScheduledTask -TaskName $Names.daily -Action $action -Trigger $trigger -Settings $settings `
     -Description 'Venditas: inbox, nurture, follow-ups and the daily batch.' -Force | Out-Null
 

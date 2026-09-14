@@ -25,7 +25,8 @@ powershell -ExecutionPolicy Bypass -File ops\install-schedule.ps1 -Task watch -R
 | **New email from X** | Someone we never wrote to. There is a draft only if they asked about price, data or buying. Answer today |
 | **Trial signup: X** | Someone has just run a CV, and a personal note to them is already in Drafts (`drafts.mjs`, "trial"). Read it, send it today. It beats the automatic email at five CVs |
 | **Replies are not being read** | The mailbox has been unreachable for three hours. `node ops/preflight.mjs` |
-| **Outreach blocked today** / **a stage failed** | `node ops/preflight.mjs`, then `node ops/daily.mjs --send --confirm` inside UK working hours |
+| **Outreach blocked today** | The mail host was down for the whole half-hour the job kept asking (seven probes, five minutes apart; a blip shorter than that is ridden out silently and shows as `waiting` lines in `ops/daily.log`). `node ops/preflight.mjs`, then `node ops/daily.mjs --send --confirm` inside UK working hours |
+| **a stage failed** | `node ops/preflight.mjs`, then `node ops/daily.mjs --send --confirm` inside UK working hours |
 | **Weekly check: needs a look** | Pages written but not live means deploy (`deploy.md`). SEO problems: `node ops/seo.mjs` lists them by page |
 
 Every notification is also written to `ops/notify.log`. To get them on a phone

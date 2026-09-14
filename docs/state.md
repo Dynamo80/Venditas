@@ -54,8 +54,18 @@ outreach` is registered **live** (`--send --confirm`), weekdays at 14:00 IST, an
 catches up a day missed while the laptop slept. On 13 September it had never
 run. That day's dry run finished with no failures.
 
+**The first live run, 14 September at 14:00 IST, sent nothing.** The mail host
+was unreachable at that minute and reachable again within the hour; the job
+probed once and gave up, so the day's 25 sends were lost to a blip. Fixed the
+same day: `daily.mjs` now re-probes every five minutes for up to half an hour
+while the UK window is open, and the task's time limit is two hours. The
+task was re-registered live. **Nothing was sent by hand on the 14th**: the
+15 September run at 14:00 IST is the first real chance again.
+
 1. **Confirm the first live run sent.** `ops/daily.log` should say `sent N`,
-   not `dry` or `BLOCKED`, and `status.mjs` should show more than 54 sent
+   not `dry` or `BLOCKED`, and `status.mjs` should show more than 54 sent.
+   If the 14:00 minute is bad again, to send today by hand:
+   `node ops/daily.mjs --send --confirm` any time before 22:00 IST
 2. A reply now arrives as a notification, with the answer already in Drafts
    (`ops/watch.mjs`). Read it, send it → recruiter runs their own CV → invoice
    via Skydo. `docs/runbooks/replies.md`, within the hour

@@ -105,6 +105,48 @@ function stage(name, script, args, { timeout = 15 * 60_000 } = {}) {
   return { name, ok: true, seconds };
 }
 
+/** How many times to ask the mail host before giving up on the day, and how long between asks. */
+const PREFLIGHT_TRIES = 7;
+const PREFLIGHT_WAIT_MS = 5 * 60_000;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Run preflight until it says READY, or until the tries run out, or until the
+ * UK sending window closes underneath us. Every attempt is printed in full the
+ * first time and as one line after that, so the log for a bad morning reads
+ * "dead, dead, dead, back at 14:21" rather than seven pages of checks.
+ * @returns {Promise<boolean>} true when outreach can run
+ */
+async function waitForMail() {
+  for (let attempt = 1; attempt <= PREFLIGHT_TRIES; attempt++) {
+    const pre = spawnSync(process.execPath, [path.join(ROOT, 'ops/preflight.mjs')], {
+      cwd: ROOT, encoding: 'utf8', timeout: 3 * 60_000,
+    });
+    const out = (pre.stdout || '').trimEnd();
+    if (pre.status !== 1) {
+      if (attempt === 1) console.log(out);
+      else console.log(`\n   try ${attempt}: mail host back. Continuing.\n`);
+      return true;
+    }
+    if (attempt === 1) console.log(out);
+    else console.log(`   try ${attempt} of ${PREFLIGHT_TRIES}: still unreachable`);
+
+    if (attempt === PREFLIGHT_TRIES) break;
+    const later = new Date(Date.now() + PREFLIGHT_WAIT_MS);
+    if (LIVE && !FORCE && !isSendableNow(later).ok) {
+      console.log('   the UK window closes before the next try; not waiting.');
+      break;
+    }
+    if (attempt === 1) {
+      console.log(`\n   waiting ${PREFLIGHT_WAIT_MS / 60_000} minutes between tries, up to ${PREFLIGHT_TRIES} tries`);
+    }
+    log(`waiting — mail host unreachable, try ${attempt} of ${PREFLIGHT_TRIES}`);
+    await sleep(PREFLIGHT_WAIT_MS);
+  }
+  return false;
+}
+
 async function main() {
   const now = new Date();
   console.log('='.repeat(66));
@@ -134,19 +176,24 @@ async function main() {
 
   // Stage zero: is sending possible at all? Without this the run spends its
   // first fifteen minutes discovering, one timeout at a time, that the mail
-  // host is unreachable — and then says so in a stack trace. Ask once, plainly,
-  // and stop if the answer is no.
-  const pre = spawnSync(process.execPath, [path.join(ROOT, 'ops/preflight.mjs')], {
-    cwd: ROOT, encoding: 'utf8', timeout: 3 * 60_000,
-  });
-  console.log((pre.stdout || '').trimEnd());
-  if (pre.status === 1) {
+  // host is unreachable — and then says so in a stack trace. Ask plainly, and
+  // stop if the answer is no.
+  //
+  // But not after asking once. On 14 September the 14:00 run found the mail
+  // host dead, gave up, and the host was back within the hour; the day's 25
+  // sends were lost to a blip. The GoDaddy route from this network drops for
+  // minutes at a time, so a single probe answers "is it down this second",
+  // not "is it down today". Ask again every few minutes for up to half an
+  // hour, while the UK window is still open, and only then call it blocked.
+  const ready = await waitForMail();
+  if (!ready) {
+    const minutes = Math.round((PREFLIGHT_TRIES - 1) * PREFLIGHT_WAIT_MS / 60_000);
     console.log(' Nothing was attempted. Fix the mail path, then run this again.\n');
-    log('BLOCKED — mail host unreachable, nothing attempted');
+    log(`BLOCKED — mail host unreachable for ${PREFLIGHT_TRIES} tries over ${minutes} min, nothing attempted`);
     if (LIVE) {
       await notify({
         title: 'Outreach blocked today',
-        body: 'The mail host is unreachable, so nothing went out and no reply was read. Run node ops/preflight.mjs.',
+        body: `The mail host stayed unreachable for ${minutes} minutes, so nothing went out and no reply was read. Run node ops/preflight.mjs.`,
       });
     }
     process.exitCode = 1;
