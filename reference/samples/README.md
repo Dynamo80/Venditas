@@ -20,6 +20,15 @@ python make_tech.py
 `make_sample.py` is the original prototype (`messy-cv.pdf`, a data engineer with
 a left sidebar); the six below follow its approach.
 
+## The scanned sample
+
+`scanned-management-accountant.pdf` has no text layer: one JPEG of a CV,
+drawn to a canvas and wrapped in a page, which is what a phone scan looks
+like to the reader. It is here because every scanned CV failed on our side
+until 15 September 2026 (decision 020) and nothing in this pack would have
+caught it. It has no generator; the fixture was produced once and checked in.
+Invented like the rest: Priya Raman, `example.com`, a drama-range number.
+
 ## The six samples
 
 | Generator | PDF | Specialism | Candidate | Formatting hazard | Live test |

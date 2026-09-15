@@ -21,6 +21,7 @@ import net from 'node:net';
 import path from 'node:path';
 import { PRO } from '../lib/pricing.mjs';
 import { lastRun } from './automation.mjs';
+import { emailKey } from '../lib/meter.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1'), '..');
 const SITE = 'https://www.venditas.in';
@@ -208,7 +209,16 @@ async function main() {
   // first version of this asked for leads.plan, got a 400, and reported the
   // whole database unreachable — which sent me looking in the wrong place
   // entirely.
-  const leads = await sb('leads?select=email,agency,may_contact,first_seen&order=first_seen.desc');
+  const leads = await sb('leads?select=email,agency,may_contact,first_seen,cv_count&order=first_seen.desc');
+  // Attempts, keyed by the same salted hash the app meters with. Bumped BEFORE
+  // extraction, so attempts minus deliveries is the number of runs that ended
+  // in an error — the one thing a prospect's "it failed" email leaves out.
+  const totals = await sb('usage_totals?select=key,count,first_seen,last_seen');
+  const attemptsOf = (email) => {
+    if (!totals) return null;
+    const row = (totals.rows || []).find((r) => r.key === emailKey(email));
+    return row ? Number(row.count) || 0 : 0;
+  };
   if (!leads) {
     console.log('  (leads table unreadable — check credentials and RLS)');
   } else {
@@ -228,8 +238,16 @@ async function main() {
       console.log(`  from outreach   ${fromOutreach.length}${fromOutreach.length ? `  (${fromOutreach.map((r) => domainOf(r.email)).join(', ')})` : '  (no trial yet from an agency we emailed)'}`);
     }
     for (const r of rows.slice(0, 5)) {
-      console.log(`    ${pad(r.email, 34)} ${pad(r.agency || '-', 22)} ${r.first_seen?.slice(0, 10)}`);
+      const got = Number(r.cv_count) || 0;
+      const tried = attemptsOf(r.email);
+      // A lead row only exists because a document went back, so a zero here
+      // is a lead from before sql/005 started counting, not a lead with nothing.
+      const runs = !got ? 'delivered (before the counter)'
+        : tried === null ? `${got} delivered`
+        : `${got} of ${tried}${tried > got ? '  FAILED ' + (tried - got) : ''}`;
+      console.log(`    ${pad(r.email, 34)} ${pad(r.agency || '-', 22)} ${r.first_seen?.slice(0, 10)}  ${runs}`);
     }
+    console.log('    (n of m = Word files delivered of CVs attempted; a gap is a run that errored)');
   }
 
   const mrr = await sb('mrr?select=*');
@@ -242,10 +260,48 @@ async function main() {
     console.log(`  MRR             ${m.currency || 'GBP'} ${Number(m.mrr ?? 0).toFixed(2)}`);
   }
 
+  // "CVs run" used to be one number, summed from usage_daily, and it counted
+  // attempts: the meter bumps before extraction. A prospect wrote in that the
+  // tool had failed and this file could not say so. Now it can.
   const usage = await sb('usage_daily?select=count&kind=eq.email');
   if (usage) {
-    const total = (usage.rows || []).reduce((n, r) => n + (Number(r.count) || 0), 0);
-    console.log(`  CVs run (all)   ${total}`);
+    const attempted = (usage.rows || []).reduce((n, r) => n + (Number(r.count) || 0), 0);
+    // max(count, 1): a lead exists only because a file went back, and leads
+    // from before sql/005 never had their first delivery counted.
+    const delivered = (leads?.rows || []).reduce((n, r) => n + Math.max(Number(r.cv_count) || 0, 1), 0);
+    console.log(`  CVs attempted   ${attempted}   (metered before extraction, last 90 days)`);
+    console.log(`  CVs delivered   ${delivered}   (a Word file went back)`);
+    // The failure that matters most is invisible in both numbers above: someone
+    // whose very first CV errored never becomes a lead at all. Their attempts
+    // are still in usage_totals, under a hash no lead matches.
+    // Counted by app/api/format/route.js under usage_daily kind 'fail:<reason>'.
+    const fails = await sb('usage_daily?select=kind,count&kind=like.fail:*');
+    if (fails && (fails.rows || []).length) {
+      const byReason = {};
+      for (const r of fails.rows) byReason[r.kind.slice(5)] = (byReason[r.kind.slice(5)] || 0) + (Number(r.count) || 0);
+      const line = Object.entries(byReason).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(', ');
+      console.log(`  CVs failed      ${Object.values(byReason).reduce((a, b) => a + b, 0)}   (${line}; last 90 days)`);
+    } else if (fails) {
+      console.log('  CVs failed      0   (none counted since failure counting began)');
+    }
+    if (totals) {
+      const known = new Set((leads?.rows || []).map((r) => emailKey(r.email)));
+      const strangers = (totals.rows || []).filter((r) => !known.has(r.key));
+      const tries = strangers.reduce((n, r) => n + (Number(r.count) || 0), 0);
+      if (strangers.length) {
+        console.log(`  never delivered ${strangers.length} address(es) tried ${tries} CV(s) and got nothing back  <- errors`);
+        for (const r of strangers.slice(0, 5)) {
+          const when = r.first_seen?.slice(0, 10) === r.last_seen?.slice(0, 10)
+            ? r.last_seen?.slice(0, 16).replace('T', ' ')
+            : `${r.first_seen?.slice(0, 10)} to ${r.last_seen?.slice(0, 10)}`;
+          console.log(`    ${pad('(hash ' + r.key.slice(0, 8) + ')', 34)} ${pad('-', 22)} ${when} UTC  0 of ${r.count}  FAILED ${r.count}`);
+        }
+        console.log('                  Vercel keeps about an hour of logs on this plan, so ask the person what it said:');
+        console.log('                  vercel logs --project venditas --scope abin-johnsons-projects --level error --since 1h --no-follow');
+      } else {
+        console.log('  never delivered 0   (nobody has tried a CV and got nothing back)');
+      }
+    }
   }
 
   // ---- outreach ---------------------------------------------------------

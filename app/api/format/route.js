@@ -1,6 +1,6 @@
 import { extract, MAX_UPLOAD_BYTES } from '../../../lib/extract.mjs';
 import { render, redactionLeaks, makeReference } from '../../../lib/render.mjs';
-import { check, guard, recordLead, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
+import { check, guard, recordLead, recordFailure, FREE_TOTAL, FREE_PER_DAY } from '../../../lib/meter.mjs';
 import { readSession, SESSION_COOKIE } from '../../../lib/demo-account.mjs';
 import { coverage, COVERAGE_FLOOR } from '../../../lib/coverage.mjs';
 import { checkTemplate, intoTemplate, MAX_TEMPLATE_BYTES } from '../../../lib/template.mjs';
@@ -120,6 +120,9 @@ export async function POST(request) {
     brand.logoType = type;
   }
 
+  // The trial CV has been spent by now, so from here every failure is counted
+  // (lib/meter.mjs recordFailure) and shows up in ops/status.mjs by reason.
+  const who = session?.email || email;
   let data;
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -128,12 +131,17 @@ export async function POST(request) {
     // Only errors explicitly marked user-facing are shown. Anything else is a
     // fault on our side: log it in full, tell them something true and useful,
     // and never hand a stranger the name of an environment variable.
-    if (e?.userFacing) return bad(e.message, 422);
+    if (e?.userFacing) {
+      await recordFailure(who, 'file');
+      return bad(e.message, 422);
+    }
     console.error('extraction failed:', e?.message || 'unknown');
+    await recordFailure(who, /timeout|abort/i.test(e?.message) ? 'timeout' : 'extract');
     return bad("We couldn't process that CV. This one is on us — try again shortly.", 500);
   }
 
   if (!data.name && !data.experience?.length) {
+    await recordFailure(who, 'not-a-cv');
     return bad(
       "That didn't look like a CV — no name and no work history came back. If it is one, it may be an image-only scan we couldn't read.",
       422
@@ -148,6 +156,7 @@ export async function POST(request) {
     // The redaction check below reads this final document, template text included.
     if (template) docx = await intoTemplate(docx, template);
   } catch (e) {
+    await recordFailure(who, 'render');
     if (e?.userFacing) return bad(e.message, 422);
     console.error('render failed:', e?.message || 'unknown');
     return bad('Formatting failed after the CV was read. Nothing was saved.', 500);
@@ -164,6 +173,7 @@ export async function POST(request) {
       const leaks = redactionLeaks(docText, data);
       if (leaks.length) {
         console.error('redaction leak', leaks);
+        await recordFailure(who, 'leak');
         return bad(
           `Blocked: the candidate's ${leaks.join(' and ')} would still have been visible. Nothing was returned.`,
           500
@@ -171,6 +181,7 @@ export async function POST(request) {
       }
     } catch (e) {
       console.error('redaction check failed:', e?.message || 'unknown');
+      await recordFailure(who, 'redaction-check');
       return bad('Could not verify redaction, so nothing was returned.', 500);
     }
   }

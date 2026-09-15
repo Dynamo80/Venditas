@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^1.0.9",
     "docx": "^9.7.1",
     "mammoth": "^1.12.2",
     "marked": "^18.0.11",

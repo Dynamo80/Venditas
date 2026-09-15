@@ -40,6 +40,36 @@ attach the Word file.
 | `crm` | They mention a CRM. **Read this one before sending** — if they are on Loxo, Recruit CRM, Zoho or Vincere, the honest answer is to walk away |
 | `no` | A refusal. Thank them, then run `--replied` and add them to `outreach/suppressed.txt` |
 
+## When they say it failed
+
+A "tried it and it gave an error" reply usually arrives without the error.
+Before answering, find out what happened; the tool tells you more than the
+email does.
+
+1. `node ops/status.mjs`. Under CUSTOMERS AND LEADS every lead shows
+   *delivered of attempted*, and a **never delivered** line lists anyone whose
+   attempts all errored (they never became a lead, because a lead is only
+   recorded once a Word file has gone back). The date on that line should
+   match when they wrote.
+2. If it was in the last hour, the server's own error is still there:
+   `vercel logs --project venditas --scope abin-johnsons-projects --level error --since 1h --no-follow`.
+   Older than that and it is gone: Vercel keeps about an hour of logs on the
+   free plan.
+3. Otherwise ask for the exact wording, and match it here:
+
+| They saw | It means |
+|---|---|
+| "Old .doc files are not supported yet" | Ask for .docx or PDF |
+| "Unsupported file type" | Not a PDF or Word file |
+| "No readable content" / "didn't look like a CV" | A scanned or image-only PDF with no text layer |
+| "This one is on us — try again shortly" | Our side: the model call failed (Gemini free tier down or over quota) or a code fault. Every scanned PDF gave this until 15 September 2026 (decision 020) |
+| "Blocked: the candidate's … would still have been visible" | The redaction check refused to ship a leak. A real bug in lib/deidentify.mjs; keep the file if they will share it |
+| "Come back tomorrow" / "used all 10" | The trial limits, working as intended |
+
+Reply personally either way. Ask them to try once more with the same file,
+and if it is a .doc or a scan, say so plainly: those are the two failures
+they can fix themselves. Do not send a sequence to someone who has written in.
+
 ## When they say yes
 
 1. Send a Skydo invoice for £79, or a Razorpay link.

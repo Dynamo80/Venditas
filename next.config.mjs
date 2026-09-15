@@ -24,6 +24,8 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 export default {
   poweredByHeader: false,
+  // A native module (page rasteriser for scanned CVs); bundling it breaks it.
+  serverExternalPackages: ['@napi-rs/canvas'],
   reactStrictMode: true,
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
